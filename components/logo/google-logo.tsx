@@ -1,6 +1,4 @@
-import { JSX } from "react";
-
-export const GoogleLogo = (props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) => 
+export const GoogleLogo = () => 
     <svg width="25" height="25" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="0.5" y="0.5" width="39" height="39" rx="19.5" fill="white"/>
         <g clipPath="url(#clip0_710_6217)">

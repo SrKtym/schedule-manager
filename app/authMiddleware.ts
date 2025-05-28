@@ -1,6 +1,4 @@
 import { Hono } from "hono";
-import { auth } from "@/lib/auth";
-import { NextResponse, type NextRequest } from "next/server";
 import { getSession } from "@/lib/fetch";
 import { createMiddleware } from "hono/factory";
 import { AuthType } from "@/lib/auth";

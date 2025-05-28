@@ -1,6 +1,4 @@
-import { JSX } from "react"
-
-export const GithubLogo = (props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) => 
+export const GithubLogo = () => 
     <svg 
         width="24" 
         height="24"
