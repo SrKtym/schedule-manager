@@ -1,0 +1,1 @@
+ALTER TABLE "passkeys" ALTER COLUMN "name" DROP NOT NULL;
