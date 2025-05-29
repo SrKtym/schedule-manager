@@ -1,5 +1,3 @@
-/* eslint no-unused-vars: 0 */
-
 'use server';
 
 import { formSchema } from '@/lib/formschema';
