@@ -18,7 +18,7 @@ export default function SendEmail() {
                     email: response.messages.success,
                     redirectTo: '/reset/password'
                 });
-                if (data?.status) {
+                if (data) {
                     addToast(
                         {
                             title: 'メールの送信に成功しました。',
@@ -26,6 +26,14 @@ export default function SendEmail() {
                             description: `${response.messages?.success} にメールを送信しました。添付されたリンクに進みパスワードを変更してください。`
                         }
                     );
+                } else {
+                    addToast(
+                        {
+                            title: 'メールの送信に失敗しました。',
+                            color: 'danger',
+                            description: `お手数ですが再試行してください。詳細: ${error.message}`
+                        }
+                    )
                 }
             } else {
                 return response;

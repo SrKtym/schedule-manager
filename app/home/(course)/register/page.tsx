@@ -11,14 +11,15 @@ export default async function Page(
             grade?: string,
             faculty?: string,
             department?: string,
-            query?: string
+            query?: string,
+            rows?: number
         }>
     }   
 ) {
     const params = await props.searchParams;
     const gradeList = params.grade?.split(',') ?? targetGrade;
-    const facultyList = params.faculty?.split(',') ?? [...targetFaculty, ...[]];
-    const departmentList = params.department?.split(',') ?? [...targetDepartment, ...[]];
+    const facultyList = params.faculty?.split(',') ?? targetFaculty;
+    const departmentList = params.department?.split(',') ?? targetDepartment;
     const response = await Promise.allSettled([
         getCourse(gradeList, facultyList, departmentList, params.query),
         getRegisteredCourse()
@@ -40,7 +41,7 @@ export default async function Page(
             <Suspense fallback={
                 <Spinner classNames={{label: "text-foreground mt-4"}} label="読み込み中…" variant="wave"/>
             }>
-                <DataTable items={response[0]}/>
+                <DataTable items={response[0]} rows={params.rows}/>
                 <Schedule registeredCourse={response[1]}/>
             </Suspense>
         </div>

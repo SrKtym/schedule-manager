@@ -9,11 +9,20 @@ import React, { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { targetGrade, targetFaculty, targetDepartment } from "@/lib/definitions";
 
-export function SearchField() {
+export function SearchField(
+    {
+        itemsLength,
+        rowsPerPage
+    }: {
+        itemsLength: number,
+        rowsPerPage: number
+    }
+) {
     const searchParams = useSearchParams();
     const pathName = usePathname();
     const router = useRouter();
     const [invalid, setInvalid] = useState<boolean>(false);
+
 
     const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const param = new URLSearchParams(searchParams);
@@ -96,8 +105,32 @@ export function SearchField() {
                     variant="bordered"
                     startContent={<Search className="h-[18px] w-[18px]" color="gray"/>}
                     onChange={(e) => handleSearch(e.target.value)}
-                    defaultValue={searchParams.get('query')?.toString()}/>
+                    defaultValue={searchParams.get('query')?.toString()}
+                />
                 <Button className='sr-only' color="primary">検索</Button>
+            </div>
+            <div className="flex justify-between items-center">
+                <span>
+                    検索結果: {itemsLength}件のアイテム
+                </span>
+                <label className="flex items-center">表示件数: 
+                    <select 
+                        name="rows"
+                        defaultValue={rowsPerPage}
+                        className="bg-transparent outline-none"
+                        onChange={handleFilter}
+                    >
+                        <option value='10'>
+                            10
+                        </option>
+                        <option value='20'>
+                            20
+                        </option>
+                        <option value='30'>
+                            30
+                        </option>
+                    </select>
+                </label>
             </div>
         </div>
     );

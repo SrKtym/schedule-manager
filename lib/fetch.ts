@@ -35,7 +35,7 @@ export const getCourse = cache(async (
     query?: string
 ) => {
     const result = await db.query.course.findMany({
-        where: (course, {or, and, inArray, ilike, sql}) => 
+        where: (course, {or, and, inArray, ilike}) => 
             or(
                 and(
                     inArray(course.targetGrade, gradeList as []),

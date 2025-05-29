@@ -1,7 +1,6 @@
 'use client';
 
 import { Pagination } from "@heroui/pagination";
-import React, { useMemo } from "react";
 
 export function CustomPagination({totalPages}: {totalPages: number}) {
 

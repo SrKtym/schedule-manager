@@ -14,13 +14,20 @@ import {
 } from "@heroui/table";
 import { dataTableColumns } from "@/lib/definitions";
 import { Spinner } from "@heroui/react";
-import { useState } from "react";
 
 
-export function DataTable({items}: {items: typeof course.$inferSelect[]}) {
-    const [rowsPerPage, setRowsPerPage] = useState<number>(30);
-    const filteredItems = items.length;
-    const totalPages = Math.ceil(filteredItems / rowsPerPage) || 1;
+export function DataTable(
+    {
+        items,
+        rows
+    }: {
+        items: typeof course.$inferSelect[],
+        rows?: number
+    }
+) {
+    const itemsLength = items.length;
+    const rowsPerPage = rows || 10;
+    const totalPages = Math.ceil(itemsLength / rowsPerPage) || 1;
 
     return (
         <Table
@@ -29,7 +36,12 @@ export function DataTable({items}: {items: typeof course.$inferSelect[]}) {
             bottomContent={<CustomPagination totalPages={totalPages}/>}
             bottomContentPlacement="outside"
             selectionMode="multiple"
-            topContent={<SearchField />}
+            topContent={
+                <SearchField 
+                    itemsLength={itemsLength} 
+                    rowsPerPage={rowsPerPage}
+                />
+            }
             topContentPlacement="outside"
             >
             <TableHeader columns={dataTableColumns}>
