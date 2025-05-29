@@ -25,7 +25,7 @@ export const getTheme = cache(async () => {
             where: (users, {eq}) => (eq(users.id, session.session.userId))
         });
         
-        return user?.settings[0].theme;
+        return user?.settings[0].theme || 'light';
     }
 })
 

@@ -14,7 +14,10 @@ import { registered } from "@/lib/db/schema/public";
 
 export function Schedule({registeredCourse}: {registeredCourse: typeof registered.$inferSelect[]}) {
     return (
-        <Table>
+        <Table
+            aria-label="schedule"
+            isHeaderSticky
+        >
             <TableHeader columns={scheduleTableHeaders.columns}>
                 {(column) => (
                     <TableColumn key={column.key}>
