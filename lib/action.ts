@@ -2,7 +2,7 @@
 
 import { formSchema } from '@/lib/formschema';
 import { db } from './db';
-import { registered, settings } from './db/schema/public';
+import { settings } from './db/schema/public';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
@@ -68,12 +68,6 @@ export async function SignUp(formData: FormData) {
                     email: validatedFields.data.email,
                     password: validatedFields.data.password,   //scryptによるハッシュ化
                 }
-            });
-            await db.transaction(async (tx) => {
-                await Promise.all([
-                    tx.insert(settings).values({email: validatedFields.data.email}),
-                    tx.insert(registered).values({email: validatedFields.data.email})
-                ])
             });
             return {
                 messages: {
@@ -267,11 +261,7 @@ export async function ConfirmPassword(formData: FormData) {
 }
 
 export const setTheme = cache(async (checked: boolean) => {
-    try {
-        await db.update(settings).set({theme: checked ? 'dark' : 'light'});
-    } catch (error) {
-        return;
-    }
+    await db.update(settings).set({theme: checked ? 'dark' : 'light'});
 });
 
 export const handleRowsPerPage = cache(async () => {

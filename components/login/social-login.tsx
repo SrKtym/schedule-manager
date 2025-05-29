@@ -1,3 +1,5 @@
+'use client';
+
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@heroui/button";
 import { GoogleLogo } from "../logo/google-logo";

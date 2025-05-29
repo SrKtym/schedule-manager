@@ -2,6 +2,7 @@ import { db } from "./db";
 import { auth } from "@/lib/auth";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
+import { settings, registered } from "./db/schema/public";
 
 
 export const getSession = cache(async () => {
@@ -13,14 +14,19 @@ export const getSession = cache(async () => {
 
 export const getTheme = cache(async () => {
     const session = await getSession();
-    const user = await db.query.users.findFirst({
-        with: {
-            settings: true
-        },
-        where: (users, {eq}) => (eq(users.id, session?.session.userId ?? ''))
-    });
-    
-    return user?.settings[0].theme ?? 'light';
+    if (!session) {
+        return 'light';
+    } else {
+        await db.insert(settings).values({email: session.user.email}).onConflictDoNothing();
+        const user = await db.query.users.findFirst({
+            with: {
+                settings: true
+            },
+            where: (users, {eq}) => (eq(users.id, session.session.userId))
+        });
+        
+        return user?.settings[0].theme;
+    }
 })
 
 export async function get2faCookie() {
