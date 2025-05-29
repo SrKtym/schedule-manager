@@ -27,7 +27,6 @@
     "react-dom": "19.1.0",
     "react-qr-code": "^2.0.15",
     "resend": "^4.3.0",
-    "schedule-manager": ".",
     "tailwind-merge": "^3.1.0",
     "tw-animate-css": "^1.2.5",
     "use-debounce": "^10.0.4",
