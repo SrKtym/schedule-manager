@@ -25,13 +25,6 @@ export function Schedule({registeredCourse}: {registeredCourse: typeof registere
                     </TableColumn>
                 )}
             </TableHeader>
-            {/* <TableHeader columns={scheduleTableHeaders.rows}>
-                {(row) => (
-                    <TableColumn key={row.key} className="flex">
-                        {row.name}
-                    </TableColumn>
-                )}
-            </TableHeader> */}
             <TableBody
                 emptyContent={'講義が未登録です'}
                 items={registeredCourse}
