@@ -56,7 +56,7 @@ export const auth = betterAuth({
 
         google: {
             clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GITHUB_CLIENT_SECRET
+            clientSecret: env.GOOGLE_CLIENT_SECRET
         },
         
         twitter: {
