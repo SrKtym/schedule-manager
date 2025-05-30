@@ -31,7 +31,7 @@ export const getTheme = cache(async () => {
 
 export async function get2faCookie() {
     const cookieStore = await cookies();
-    return cookieStore.get('better-auth.two_factor')?.value
+    return cookieStore.get('__Secure-better-auth.two_factor')?.value
 }
 
 export const getCourse = cache(async (
