@@ -2,7 +2,7 @@ import { db } from "./db";
 import { auth } from "@/lib/auth";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
-import { settings, registered } from "./db/schema/public";
+import { settings } from "./db/schema/public";
 
 
 export const getSession = cache(async () => {
