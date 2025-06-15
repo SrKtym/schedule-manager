@@ -97,7 +97,8 @@ export function SearchField(
                     onOpenChange={() => param.get('faculty') ? setInvalid(false) : setInvalid(true)}
                 >
                     {getParam('faculty')?.map((faculty) => (
-                        <SelectSection 
+                        <SelectSection
+                            key={faculty}
                             title={faculty}
                             showDivider
                             classNames={{
