@@ -4,6 +4,11 @@ import { TwoFactorSettings } from '@/components/login/two-factor-settings';
 import { redirect } from 'next/navigation';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { OtpVerifyForm } from '@/components/login/otp-verify-form';
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: '2要素認証'
+}
 
 
 export default async function TwoFactorPage() {
@@ -12,8 +17,12 @@ export default async function TwoFactorPage() {
 
     if (session) {
         const user = await db.query.users.findFirst({
-            with: {accounts: true, twoFactors: true},
-            where: (users, {eq}) => (eq(users.id, session?.session.userId ?? ''))
+            with: {
+                accounts: true, 
+                twoFactors: true,
+                settings: true
+            },
+            where: (users, {eq}) => (eq(users.id, session.session.userId))
         });
 
         return (
@@ -40,7 +49,7 @@ export default async function TwoFactorPage() {
         );
     } else if (cookie) {
         return (
-            <OtpVerifyForm />
+            <OtpVerifyForm/>
         );
     } else {
         redirect('/');

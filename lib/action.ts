@@ -6,6 +6,8 @@ import { settings } from './db/schema/public';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
+import { cookies } from 'next/headers';
+import { getSession } from './fetch';
 
 
 export type State = {
@@ -123,6 +125,7 @@ export async function SignIn(formData: FormData) {
                 asResponse: true
             });
             if (res.ok) {
+                await db.insert(settings).values({email: validatedFields.data.email}).onConflictDoNothing();
                 if (user.twoFactorEnabled !== true) {
                     if ('twoFactorRedirect' in res) {
                         return {
@@ -260,13 +263,32 @@ export async function ConfirmPassword(formData: FormData) {
     }
 }
 
+export const setThemeCookie = cache(async (theme?: 'light' | 'dark') => {
+    const cookieStore = await cookies();
+    if (theme) {
+        cookieStore.set({
+            name: 'theme',
+            value: theme,
+            path: '/home'
+        });
+    } else {
+        const session = await getSession();
+        const settings = await db.query.settings.findFirst({
+            where: (settings, {eq}) => (eq(settings.email, session?.user.email as string))
+        });
+        cookieStore.set({
+            name: 'theme',
+            value: settings?.theme || 'light',
+            path: '/home'
+        });
+    }
+})
+
 export const setTheme = cache(async (checked: boolean) => {
-    await db.update(settings).set({theme: checked ? 'dark' : 'light'});
+    const theme = await db.update(settings).set({theme: checked ? 'dark' : 'light'}).returning({color: settings.theme});
+    return theme[0].color;
 });
 
-export const handleRowsPerPage = cache(async () => {
-
-});
 
 
 

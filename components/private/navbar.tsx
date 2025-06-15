@@ -1,7 +1,7 @@
 'use client';
 
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@heroui/react";
+import { Button } from "@heroui/button";
 import { ThemeButton } from "./theme-button";
 import { 
     Modal,
@@ -31,14 +31,15 @@ export function CustomNavbar({
     image,
     email
 }: {
-    theme: 'light' | 'dark',
+    theme: string,
     name: string,
     image?: string | null,
     email: string
 }) {
     const [open, setOpen] = useState<boolean>(false);
-    const [confirm, setConfirm] = useState<boolean>(false);
+    const [logOutConfirm, setLogOutConfirm] = useState<boolean>(false);
     const router = useRouter();
+
 
     return (
         <Navbar isBordered>
@@ -59,7 +60,7 @@ export function CustomNavbar({
                     <Link href='/home/settings'>設定</Link>
                 </NavbarItem>
             </NavbarContent>
-            <NavbarContent as='div' className='items-center' justify="end">
+            <NavbarContent className='items-center' justify="end">
                 <ThemeButton theme={theme}/>
                 <Dropdown placement="bottom-start">
                     <DropdownTrigger>
@@ -70,7 +71,7 @@ export function CustomNavbar({
                                 isBordered: true,
                                 src: image ?? undefined
                             }}
-                            className="transition-transform"
+                            className="cursor-pointer transition-transform"
                             name={name}
                             description={email}
                         />
@@ -81,7 +82,7 @@ export function CustomNavbar({
                                 setOpen(true);
                                 break;
                             case 'logOut':
-                                setConfirm(true);
+                                setLogOutConfirm(true);
                                 break;
                         }
                     }}>
@@ -94,26 +95,30 @@ export function CustomNavbar({
                     </DropdownMenu>
                 </Dropdown>
             </NavbarContent>
-            <Modal isOpen={confirm} onOpenChange={setConfirm}>
+            <Modal isOpen={logOutConfirm} onOpenChange={setLogOutConfirm}>
                 <ModalContent>
                     <ModalHeader className="justify-center">
                         本当にログアウトしますか？
                     </ModalHeader>
                     <ModalBody>
                         <div className='flex items-center justify-between space-x-5'>
-                            <Button className='max-w-[180px] w-full' color='danger' onPress={async () => {
-                                await authClient.signOut({
-                                    fetchOptions: {
-                                        onSuccess() {
-                                            router.push('/');
+                            <Button 
+                                className='max-w-[180px] w-full' 
+                                color='danger' 
+                                onPress={async () => {
+                                    await authClient.signOut({
+                                        fetchOptions: {
+                                            onSuccess() {
+                                                router.push('/');
+                                            }
                                         }
-                                    }
-                                });
-                            }}>
+                                    });
+                                }}
+                            >
                                 はい
                             </Button>
                             <Button className='max-w-[180px] w-full' onPress={() => {
-                                setConfirm(false);
+                                setLogOutConfirm(false);
                             }}>
                                 いいえ
                             </Button>
@@ -127,8 +132,12 @@ export function CustomNavbar({
                         アカウントの設定
                     </ModalHeader>
                     <ModalBody>
-                        <p>パスワードの変更</p>
-                        <p>2要素認証の設定</p>
+                        <div className="flex flex-col items-center space-y-3">
+                            <p>パスワードの変更</p>
+                            <p>2要素認証の設定</p>
+                            <p>パスキーの設定</p>
+                            <p className="text-red-500">アカウントの削除</p>
+                        </div>
                     </ModalBody>
                 </ModalContent>
             </Modal>

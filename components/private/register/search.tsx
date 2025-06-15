@@ -2,12 +2,12 @@
 
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
+import { Select, SelectItem, SelectSection } from "@heroui/select";
 import { Search } from "lucide-react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
-import { targetGrade, targetFaculty, targetDepartment } from "@/lib/definitions";
+import { targetGrade, targetFaculty, targetDepartment, week, period, credit, required, rows } from "@/lib/definitions";
 
 export function SearchField(
     {
@@ -19,23 +19,27 @@ export function SearchField(
     }
 ) {
     const searchParams = useSearchParams();
+    const param = new URLSearchParams(searchParams);
     const pathName = usePathname();
     const router = useRouter();
     const [invalid, setInvalid] = useState<boolean>(false);
 
+    const getParam = (name: 'grade' | 'faculty' | 'department' | 'required') => {
+        const values = param.get(name)?.split(",");
+        return values;
+    }
 
     const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const param = new URLSearchParams(searchParams);
         if (e.target.value) {
             param.set(e.target.name, e.target.value);
         } else {
             param.delete(e.target.name);
+            if (!param.get('faculty')) param.delete('department');
         }
         router.replace(`${pathName}?${param}`);
     };
 
     const handleSearch = useDebouncedCallback((term: string) => {
-        const param = new URLSearchParams(searchParams);
         param.set('page', '1');
         if (term) {
             param.set('query', term);
@@ -45,14 +49,15 @@ export function SearchField(
         router.replace(`${pathName}?${param}`);
     }, 300);
 
+
     return (
         <div className="space-y-5">
-            <div className="flex space-x-5">
+            <div className="grid grid-cols-3 gap-3">
                 <Select
                     name="grade"
                     label='対象学年' 
                     placeholder="学年を選んでください"
-                    defaultSelectedKeys={searchParams.get('grade')?.split(',')}
+                    defaultSelectedKeys={getParam('grade')}
                     selectionMode="multiple"
                     variant="bordered"
                     onChange={handleFilter}
@@ -67,7 +72,7 @@ export function SearchField(
                     name="faculty"
                     label='対象学部' 
                     placeholder="学部を選んでください"
-                    defaultSelectedKeys={searchParams.get('faculty')?.split(',')}
+                    defaultSelectedKeys={getParam('faculty')}
                     selectionMode="multiple"
                     variant="bordered"
                     onChange={handleFilter}
@@ -82,18 +87,69 @@ export function SearchField(
                     name="department"
                     label='対象学科' 
                     placeholder="学科を選んでください"
-                    defaultSelectedKeys={searchParams.get('department')?.split(',')}
                     selectionMode="multiple"
                     variant="bordered"
-                    errorMessage='学部が選択されていません'
-                    disabledKeys={searchParams.get('faculty') ? undefined : targetDepartment}
+                    errorMessage='学部が選択されていません。'
+                    defaultSelectedKeys={getParam('department')}
+                    disabledKeys={param.get('faculty') ? undefined : targetDepartment()}
                     isInvalid={invalid}
                     onChange={handleFilter}
-                    onOpenChange={() => searchParams.get('faculty') ? setInvalid(false) : setInvalid(true)}
+                    onOpenChange={() => param.get('faculty') ? setInvalid(false) : setInvalid(true)}
                 >
-                    {targetDepartment.map((department) => (
-                        <SelectItem key={department}>
-                            {department}
+                    {getParam('faculty')?.map((faculty) => (
+                        <SelectSection 
+                            title={faculty}
+                            showDivider
+                            classNames={{
+                                heading: "flex w-full sticky top-1 z-20 py-1.5 px-2 bg-default-100 shadow-small rounded-small",
+                        }}>
+                            {targetDepartment(faculty).map((department) => (
+                                <SelectItem key={department}>
+                                    {department}
+                                </SelectItem>
+                            ))}
+                        </SelectSection>
+                    )) ?? null}
+                </Select>
+                <Select
+                    name="week"
+                    label="週"
+                    placeholder="曜日を選んでください"  
+                    selectionMode="multiple"
+                    variant="bordered"
+                    onChange={handleFilter}  
+                >
+                    {week.map((week) => (
+                        <SelectItem key={week}>
+                            {week}
+                        </SelectItem>
+                    ))}
+                </Select>
+                <Select
+                    name="period"
+                    label="時限"
+                    placeholder="時限を選んでください"
+                    selectionMode="multiple"
+                    variant="bordered"
+                    onChange={handleFilter}
+                >
+                    {period.map((period) => (
+                        <SelectItem key={period}>
+                            {period}
+                        </SelectItem>
+                    ))}
+                </Select>
+                <Select
+                    name="credit"
+                    label="単位"
+                    placeholder="単位数を選んでください"
+                    selectionMode="multiple"
+                    variant="bordered"
+                    onChange={handleFilter}
+                >
+                    {credit.map((credit) => (
+                        <SelectItem key={credit}>
+                            {credit}
                         </SelectItem>
                     ))}
                 </Select>
@@ -105,32 +161,48 @@ export function SearchField(
                     variant="bordered"
                     startContent={<Search className="h-[18px] w-[18px]" color="gray"/>}
                     onChange={(e) => handleSearch(e.target.value)}
-                    defaultValue={searchParams.get('query')?.toString()}
+                    defaultValue={param.get('query')?.toString()}
                 />
                 <Button className='sr-only' color="primary">検索</Button>
             </div>
             <div className="flex justify-between items-center">
                 <span>
-                    検索結果: {itemsLength}件のアイテム
+                    検索結果: 
+                    <Suspense fallback={<p>処理中...</p>}>
+                        {itemsLength}件のアイテム
+                    </Suspense>
                 </span>
-                <label className="flex items-center">表示件数: 
-                    <select 
-                        name="rows"
-                        defaultValue={rowsPerPage}
-                        className="bg-transparent outline-none"
+                <div className="w-full max-w-[280px] grid grid-cols-2 gap-x-3">
+                    <Select
+                        name="required"
+                        label="履修要件"
+                        labelPlacement="inside"
+                        selectionMode="multiple"
+                        defaultSelectedKeys={getParam('required')}
+                        variant="bordered"
                         onChange={handleFilter}
                     >
-                        <option value='10'>
-                            10
-                        </option>
-                        <option value='20'>
-                            20
-                        </option>
-                        <option value='30'>
-                            30
-                        </option>
-                    </select>
-                </label>
+                        {required.map((required) => (
+                            <SelectItem key={required}>
+                                {required}
+                            </SelectItem>
+                        ))}
+                    </Select>
+                    <Select
+                        name="rows"
+                        label="表示件数"
+                        labelPlacement="inside"
+                        defaultSelectedKeys={[rowsPerPage.toString()]}
+                        variant="bordered"
+                        onChange={handleFilter}
+                    >
+                        {rows.map((row) => (
+                            <SelectItem key={row}>
+                                {row.toString()}
+                            </SelectItem>
+                        ))}
+                    </Select>
+                </div>
             </div>
         </div>
     );

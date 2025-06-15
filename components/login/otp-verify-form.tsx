@@ -7,6 +7,7 @@ import { Tab, Tabs } from '@heroui/tabs';
 import { authClient } from "@/lib/auth-client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { setThemeCookie } from '@/lib/action';
 
 
 export function OtpVerifyForm() {
@@ -32,6 +33,7 @@ export function OtpVerifyForm() {
                                 code: formData.get('totp') as string
                             });
                             if (data?.token) {
+                                await setThemeCookie();
                                 router.push('/home');
                             } else {
                                 addToast({

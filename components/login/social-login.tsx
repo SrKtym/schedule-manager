@@ -5,6 +5,7 @@ import { Button } from "@heroui/button";
 import { GoogleLogo } from "../logo/google-logo";
 import { GithubLogo } from "../logo/github-logo";
 import { XLogo } from "../logo/x-logo";
+import { setThemeCookie } from "@/lib/action";
 
 
 export function SocialLogin() {
@@ -15,6 +16,7 @@ export function SocialLogin() {
                     provider: 'google',
                     callbackURL: '/home'
                 });
+                setThemeCookie();
             }}>
                 <GoogleLogo />
                 Googleで続行
@@ -24,6 +26,7 @@ export function SocialLogin() {
                     provider: 'github',
                     callbackURL: '/home'
                 });
+                setThemeCookie();
             }}>
                 <GithubLogo />
                 GitHubで続行
@@ -33,6 +36,7 @@ export function SocialLogin() {
                     provider: 'twitter',
                     callbackURL: '/home'
                 });
+                setThemeCookie();
             }}>
                 <XLogo />
                 X（旧Twitter）で続行

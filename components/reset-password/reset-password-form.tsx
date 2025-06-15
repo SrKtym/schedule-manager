@@ -3,18 +3,17 @@
 import { ResetPasswordAction } from "@/lib/action";
 import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { addToast, ToastProvider } from "@heroui/toast";
+import { addToast } from "@heroui/toast";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
 
 export function ResetPassword() {
     const searchParams = useSearchParams();
     const param = new URLSearchParams(searchParams);
     const token = param.get('token');
-    const router = useRouter();
 
     async function action(prevState: string[] | undefined, formData: FormData) {
         if (token) {
@@ -34,7 +33,22 @@ export function ResetPassword() {
     const [errorMessages, formAction, isPending] = useActionState(action, undefined);
 
 
-    if (token) {
+    if (!token) {
+        return (
+            <div className="flex-col items-center justify-center space-y-6">
+                <h1 className="text-2xl text-white drop-shadow-xl">
+                    トークンが無効または存在しません。お手数ですが再度メールアドレスを入力してください。
+                </h1>
+                <div className="text-center">
+                    <Link href='/reset/send-email'>
+                        <Button color="primary">
+                            再試行
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        );
+    } else {
         return (
             <form action={formAction} className='space-y-5 bg-white rounded-3xl px-5 py-2.5 overflow-visible'>
                 <h1 className="text-xl font-medium">新しいパスワードを入力してください。</h1>
@@ -48,7 +62,6 @@ export function ResetPassword() {
                     variant='bordered'
                     isRequired
                 />
-                <ToastProvider placement="top-center" />
                 <div id='password-error' aria-live='polite' aria-atomic='true'>
                     {errorMessages && errorMessages.map((error: string) => (
                         <p className='text-base text-red-500' key={error}>{error}</p>
@@ -64,8 +77,5 @@ export function ResetPassword() {
                 </Button>
             </form>
         );
-    } else {
-        router.push('/');
     }
-
 }

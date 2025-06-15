@@ -82,15 +82,20 @@ export default function SignUpForm() {
                     {state?.messages?.errors && state.messages.errors}
                 </p>
             </div>
-            <Button type='submit' color='primary' variant='solid' className='w-full' aria-disabled={isPending}>
-                {isPending ?
-                <div className="flex items-center space-x-3">
-                    <Loader2 className="animate-spin"/>
-                    <p>送信中...</p>
-                </div> :
-                <div>
-                    サインアップ
-                </div>}
+            <Button 
+                type='submit' 
+                color='primary'  
+                className='w-full' 
+                aria-disabled={isPending}
+            >
+                    {isPending ?
+                    <div className="flex items-center space-x-3">
+                        <Loader2 className="animate-spin"/>
+                        <p>送信中...</p>
+                    </div> :
+                    <div>
+                        サインアップ
+                    </div>}
             </Button>
              <div className='grid grid-cols-3 items-center'>
                 <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>

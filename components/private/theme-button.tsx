@@ -2,11 +2,9 @@
 
 import { Switch } from "@heroui/switch";
 import { Moon, Sun } from "lucide-react";
-import { setTheme } from "@/lib/action";
-import { useRouter } from "next/navigation";
+import { setTheme, setThemeCookie } from "@/lib/action";
 
-export function ThemeButton({theme}: {theme: 'light' | 'dark'}) {
-    const router = useRouter();
+export function ThemeButton({theme}: {theme: string}) {
 
     return (
         <Switch
@@ -15,9 +13,16 @@ export function ThemeButton({theme}: {theme: 'light' | 'dark'}) {
             title={theme === 'light' ? 'ダークモードに変更' : 'ライトモードに変更'}
             defaultSelected={theme === 'light' ? false : true}
             thumbIcon={({isSelected}) => isSelected ? <Moon color="cyan" /> : <Sun color="orange" />}
-            onChange={(e) => {
-                setTheme(e.target.checked);
-                router.refresh();
+            onChange={async (e) => {
+                if (e.target.checked) {
+                    document.documentElement.classList.remove('light')
+                    document.documentElement.classList.add('dark')
+                } else {
+                    document.documentElement.classList.remove('dark')
+                    document.documentElement.classList.add('light')
+                }
+                const theme = await setTheme(e.target.checked);
+                setThemeCookie(theme);
             }}
         >
         </Switch>

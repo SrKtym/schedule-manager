@@ -3,10 +3,10 @@
 import type { StateOmitName } from '@/lib/action';
 import React, { useActionState } from 'react';
 import { authClient } from '@/lib/auth-client';
-import { SignIn } from '@/lib/action';
+import { setThemeCookie, SignIn } from '@/lib/action';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
-import { addToast } from '@heroui/toast';
+import { addToast } from '@heroui/react';
 import { Loader2, KeyRound } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -25,6 +25,7 @@ export default function SignInForm() {
                     description: `入力されたメールアドレスはすでに登録されています。前回のログイン: ${response.messages.success}`
                 });
             } else if (response.messages.success === 'signin') {
+                await setThemeCookie();
                 router.push('/home');
             } else {
                 router.push('/two-factor');
@@ -75,15 +76,20 @@ export default function SignInForm() {
                     {state?.messages?.errors && state.messages.errors}
                 </p>
             </div>
-            <Button type='submit' color='primary' className='w-full' aria-disabled={isPending}>
-                {isPending ?
-                <div className="flex items-center space-x-3">
-                    <Loader2 className="animate-spin"/>
-                    <p>送信中...</p>
-                </div> :
-                <p>
-                    サインイン
-                </p>}
+            <Button 
+                type='submit' 
+                color='primary' 
+                className='w-full' 
+                aria-disabled={isPending}
+            >
+                    {isPending ?
+                    <div className="flex items-center space-x-3">
+                        <Loader2 className="animate-spin"/>
+                        <p>送信中...</p>
+                    </div> :
+                    <p>
+                        サインイン
+                    </p>}
             </Button>
             <div className='grid grid-cols-3 items-center'>
                 <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>
@@ -95,7 +101,8 @@ export default function SignInForm() {
                 <Button color='primary' variant='ghost' onPress={async () => {
                     await authClient.signIn.passkey({
                         fetchOptions: {
-                            onSuccess() {
+                            async onSuccess() {
+                                await setThemeCookie();
                                 router.push('/home');
                             },
                             onError(context) {

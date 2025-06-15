@@ -1,9 +1,24 @@
+import { SearchField } from "@/components/private/register/search";
 import { DataTable } from "@/components/private/register/data-table";
-import { Spinner } from "@heroui/spinner";
+import { CustomPagination } from "@/components/private/register/pagination";
+import { Skeleton } from "@heroui/react";
 import { Suspense } from "react";
-import { targetGrade, targetFaculty, targetDepartment } from "@/lib/definitions";
-import { getCourse, getRegisteredCourse } from "@/lib/fetch";
+import { 
+    targetGrade, 
+    targetFaculty, 
+    targetDepartment, 
+    week, 
+    period, 
+    credit, 
+    required 
+} from "@/lib/definitions";
+import { getCourse, getItemsLength, getRegisteredCourse } from "@/lib/fetch";
 import { Schedule } from "@/components/private/schedule/schedule";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: '履修登録'
+}
 
 export default async function Page(
     props: {
@@ -11,7 +26,12 @@ export default async function Page(
             grade?: string,
             faculty?: string,
             department?: string,
+            week?: string,
+            period?: string,
+            credit?: string,
+            page?: number
             query?: string,
+            required?: string,
             rows?: number
         }>
     }   
@@ -19,9 +39,34 @@ export default async function Page(
     const params = await props.searchParams;
     const gradeList = params.grade?.split(',') ?? targetGrade;
     const facultyList = params.faculty?.split(',') ?? targetFaculty;
-    const departmentList = params.department?.split(',') ?? targetDepartment;
+    const departmentList = params.department?.split(',') ?? targetDepartment();
+    const weekList = params.week?.split(',') ?? week;
+    const periodList = params.period?.split(',') ?? period;
+    const creditList = params.credit?.split(',') ?? credit;
+    const requiredList = params.required?.split(',') ?? required;
     const response = await Promise.allSettled([
-        getCourse(gradeList, facultyList, departmentList, params.query),
+        getCourse(
+            gradeList, 
+            facultyList, 
+            departmentList,
+            weekList,
+            periodList,
+            creditList,
+            requiredList,
+            params.query,
+            params.page, 
+            params.rows
+        ),
+        getItemsLength(
+            gradeList,
+            facultyList,
+            departmentList,
+            weekList,
+            periodList,
+            creditList,
+            requiredList,
+            params.query
+        ),
         getRegisteredCourse()
     ])
     .then((dataList) => {
@@ -36,14 +81,43 @@ export default async function Page(
         return result;
     })
 
+    const totalPages = Math.ceil(response[1] / (params.rows || 10)) || 1;
+
     return (
-        <div className="grid gap-5 sm:grid-cols-2 gap-5">
-            <Suspense fallback={
-                <Spinner classNames={{label: "text-foreground mt-4"}} label="読み込み中…" variant="wave"/>
-            }>
-                <DataTable items={response[0]} rows={params.rows}/>
-                <Schedule registeredCourse={response[1]}/>
-            </Suspense>
+        <div className="grid gap-x-5 lg:grid-cols-2 gap-y-5">
+            <div className="space-y-5">
+                <SearchField 
+                    itemsLength={response[1]} 
+                    rowsPerPage={params.rows || 10}
+                />
+                <Suspense fallback={
+                    <Skeleton className="rounded-lg">
+                        <div>
+
+                        </div>
+                    </Skeleton>
+                }>
+                    <DataTable 
+                        items={response[0]} 
+                    />
+                </Suspense>
+                <Suspense fallback={
+                    <Skeleton className="rounded-md">
+                        <div>
+
+                        </div>
+                    </Skeleton>
+                }>
+                    <CustomPagination totalPages={totalPages}/>
+                </Suspense>
+            </div>
+            <div className="flex items-center">
+                <Suspense fallback>
+                    <Schedule 
+                        registeredCourse={response[2]}
+                    />
+                </Suspense>
+            </div>
         </div>
     );
 }

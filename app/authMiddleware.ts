@@ -20,7 +20,7 @@ const isAuthenticated = createMiddleware<{Variables: AuthType}>(async (c, next) 
 
 
 const app = new Hono()
-    .use("/", isAuthenticated, async (c) => {
+    .get("/", isAuthenticated, async (c) => {
         const user = c.get("user");
         
         if(user) {

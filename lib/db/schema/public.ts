@@ -4,7 +4,7 @@ import { relations } from 'drizzle-orm';
 
 
 export const gradeEnum = pgEnum("grade", ['1学年', '2学年', '3学年', '4学年']);
-export const facultyOfEnum = pgEnum("faculty_of", [
+export const facultyOfEnum = pgEnum("faculty", [
     '文学部', 
     '経済学部', 
     '法学部', 
@@ -141,11 +141,11 @@ export const settings = pgTable("settings", {
 
 
 export const attribute = pgTable("attribute", {
-    userId: text('user_id')
+    email: text('email')
         .primaryKey()
-        .references(() => users.id, { onDelete: 'cascade' }),
+        .references(() => users.email, { onDelete: 'cascade' }),
     grade: gradeEnum().notNull(),
-    facultyOf: facultyOfEnum().notNull(),
+    faculty: facultyOfEnum().notNull(),
     department: departmentEnum().notNull(),
 });
 
@@ -213,8 +213,8 @@ export const settingsRelations = relations(settings, ({one}) => ({
 
 export const attributeRelations = relations(attribute, ({one}) => ({
     user: one(users, {
-        fields: [attribute.userId],
-        references: [users.id]
+        fields: [attribute.email],
+        references: [users.email]
     })
 }));
 
