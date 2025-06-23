@@ -3,8 +3,8 @@ import { betterAuth } from 'better-auth';
 import { twoFactor } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from './db';
-import * as schema from '@/lib/db/schema/public';
+import { db } from './drizzle';
+import * as schema from '@/lib/drizzle/schema/public';
 import { sendEmailToConfirm, sendEmailToReset, sendTwoFactorTokenEmail } from './send-email';
 import { nextCookies } from 'better-auth/next-js';
 
@@ -34,6 +34,13 @@ export const auth = betterAuth({
         },
     },
 
+    user: {
+        deleteUser: {
+            enabled: true
+        }
+    },
+
+
     plugins: [
         twoFactor({
             otpOptions: {
@@ -61,12 +68,8 @@ export const auth = betterAuth({
         
         twitter: {
             clientId: env.TWITTER_CLIENT_ID,
-            clientSecret: env.TWITTER_CLENNT_SECRET
+            clientSecret: env.TWITTER_CLIENT_SECRET
         }
     }
 });
 
-export type AuthType = {
-    user: typeof auth.$Infer.Session.user | null
-    session: typeof auth.$Infer.Session.session | null
-}

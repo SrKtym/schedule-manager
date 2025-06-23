@@ -1,8 +1,8 @@
 'use server';
 
 import { formSchema } from '@/lib/formschema';
-import { db } from './db';
-import { settings } from './db/schema/public';
+import { db } from './drizzle';
+import { settings } from './drizzle/schema/public';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
@@ -263,18 +263,12 @@ export async function ConfirmPassword(formData: FormData) {
     }
 }
 
-export const setThemeCookie = cache(async (theme?: 'light' | 'dark') => {
+export const setThemeCookie = cache(async () => {
     const cookieStore = await cookies();
-    if (theme) {
-        cookieStore.set({
-            name: 'theme',
-            value: theme,
-            path: '/home'
-        });
-    } else {
-        const session = await getSession();
+    const session = await getSession();
+    if (session) {
         const settings = await db.query.settings.findFirst({
-            where: (settings, {eq}) => (eq(settings.email, session?.user.email as string))
+            where: (settings, {eq}) => (eq(settings.email, session.user.email))
         });
         cookieStore.set({
             name: 'theme',
@@ -282,7 +276,7 @@ export const setThemeCookie = cache(async (theme?: 'light' | 'dark') => {
             path: '/home'
         });
     }
-})
+});
 
 export const setTheme = cache(async (checked: boolean) => {
     const theme = await db.update(settings).set({theme: checked ? 'dark' : 'light'}).returning({color: settings.theme});

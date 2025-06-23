@@ -10,13 +10,15 @@ export const env = createEnv({
         GOOGLE_CLIENT_ID: z.string(),
         GOOGLE_CLIENT_SECRET: z.string(),
         TWITTER_CLIENT_ID: z.string(),
-        TWITTER_CLENNT_SECRET: z.string(),
+        TWITTER_CLIENT_SECRET: z.string(),
         RESEND_API_KEY: z.string(),
         DATABASE_URL: z.string().url()
     },
 
     client: {
-        NEXT_PUBLIC_APP_URL: z.string().url()
+        NEXT_PUBLIC_APP_URL: z.string().url(),
+        NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string()
     },
 
     runtimeEnv: {
@@ -26,9 +28,11 @@ export const env = createEnv({
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
         TWITTER_CLIENT_ID: process.env.TWITTER_CLIENT_ID!,
-        TWITTER_CLENNT_SECRET: process.env.TWITTER_CLENNT_SECRET!,
+        TWITTER_CLIENT_SECRET: process.env.TWITTER_CLIENT_SECRET!,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL!,
         RESEND_API_KEY: process.env.RESEND_API_KEY!,
-        DATABASE_URL: process.env.DATABASE_URL!
+        DATABASE_URL: process.env.DATABASE_URL!,
+        NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     }
 });

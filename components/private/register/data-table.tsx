@@ -1,46 +1,89 @@
 'use client';
 
-import { course } from "@/lib/db/schema/public";
+import { course } from "@/lib/drizzle/schema/public";
 import { 
+    Button,
     Table,
     TableBody,
     TableCell,
     TableColumn,
     TableHeader,
     TableRow,
-    getKeyValue
-} from "@heroui/table";
+    getKeyValue,
+    type Selection
+} from "@heroui/react";
 import { dataTableColumns } from "@/lib/definitions";
+import { useState } from "react";
+import { CustomPagination } from "./pagination";
 
 
 
-export function DataTable({items}: {items: typeof course.$inferSelect[]}) {
+export function DataTable({items, totalPages}: {items: typeof course.$inferSelect[], totalPages: number}) {
+    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
+
     return (
-        <Table
-            aria-label="table"
-            isHeaderSticky
-            selectionMode="multiple"
-        >
-            <TableHeader columns={dataTableColumns}>
-                {(column) => (
-                    <TableColumn key={column.key} allowsSorting={column.sortable}>
-                        {column.name}
-                    </TableColumn>
-                )}
-            </TableHeader>
-            <TableBody 
-                emptyContent={'アイテムがありません'} 
-                items={items} 
+        <div>
+            <Table
+                aria-label="table"
+                isHeaderSticky
+                selectionMode="multiple"
+                onSelectionChange={setSelectedKeys}
+                bottomContent={<CustomPagination totalPages={totalPages}/>}
             >
-                {(item) => (
-                    <TableRow key={item.name}>
-                        {(itemKey) => (
-                            <TableCell>
-                                {getKeyValue(item, itemKey)}
-                            </TableCell>)}
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>  
+                <TableHeader columns={dataTableColumns}>
+                    {(column) => (
+                        <TableColumn key={column.key} allowsSorting={column.sortable}>
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody 
+                    emptyContent={'講義がありません'} 
+                    items={items} 
+                >
+                    {(item) => (
+                        <TableRow key={item.name}>
+                            {(itemKey) => (
+                                <TableCell>
+                                    {getKeyValue(item, itemKey)}
+                                </TableCell>)}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+            {selectedKeys === 'all'
+                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 right-0 left-0 py-4 pl-3 dark:bg-gray-800 dark:text-white">
+                    <div className="flex items-center justify-between w-full max-w-[800px]">
+                        <p>すべての講義を選択中</p>
+                        <div className="flex gap-5">
+                            <Button color="primary">
+                                すべて登録
+                            </Button>
+                            <Button>
+                                選択を解除
+                            </Button>
+                        </div>
+                    </div>
+                 </div>
+                : selectedKeys.size !== 0
+                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 right-0 left-0 py-4 pl-3 dark:bg-gray-800 dark:text-white">
+                    <div className="flex items-center justify-between w-full max-w-[800px]">
+                        <p>{selectedKeys.size}個の講義を選択中</p>
+                        <div className="flex gap-5">
+                            <Button color="primary">
+                                すべて登録
+                            </Button>
+                            <Button color="danger" onPress={() => {
+                               selectedKeys.clear();
+                               setSelectedKeys(new Set([]));
+                            }}>
+                                選択を解除
+                            </Button>
+                        </div>
+                    </div>
+                 </div>
+                : null
+            }
+        </div>
     );
 }

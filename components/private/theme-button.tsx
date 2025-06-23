@@ -1,8 +1,8 @@
 'use client';
 
-import { Switch } from "@heroui/switch";
+import { Switch } from "@heroui/react";
 import { Moon, Sun } from "lucide-react";
-import { setTheme, setThemeCookie } from "@/lib/action";
+import { setTheme } from "@/lib/action";
 
 export function ThemeButton({theme}: {theme: string}) {
 
@@ -22,7 +22,7 @@ export function ThemeButton({theme}: {theme: string}) {
                     document.documentElement.classList.add('light')
                 }
                 const theme = await setTheme(e.target.checked);
-                setThemeCookie(theme);
+                document.cookie = `theme=${theme}; path=/home`;
             }}
         >
         </Switch>

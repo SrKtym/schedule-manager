@@ -3,9 +3,11 @@
 import type { State } from '@/lib/action';
 import { useActionState } from 'react';
 import { SignUp } from '@/lib/action';
-import { Button } from '@heroui/button';
-import { Input } from '@heroui/input';
-import { addToast } from "@heroui/toast";
+import { 
+    addToast,
+    Button,
+    Input
+} from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Link from 'next/link';
 import { SocialLogin } from './social-login';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Pagination } from "@heroui/pagination";
+import { Pagination } from "@heroui/react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 export function CustomPagination({totalPages}: {totalPages: number}) {

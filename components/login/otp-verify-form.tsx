@@ -1,11 +1,14 @@
 'use client';
 
-import { Button } from '@heroui/button';
-import { Input } from '@heroui/input';
-import { addToast } from '@heroui/toast';
-import { Tab, Tabs } from '@heroui/tabs';
+import { 
+    addToast,
+    Button,
+    Input,
+    Tab,
+    Tabs
+} from '@heroui/react';
 import { authClient } from "@/lib/auth-client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setThemeCookie } from '@/lib/action';
 
@@ -52,7 +55,12 @@ export function OtpVerifyForm() {
                                 variant='bordered'
                                 isRequired
                                 />
-                            <Button className='w-full' color='primary' type='submit'>
+                            <Button 
+                                className='w-full' 
+                                color='primary' 
+                                type='submit'
+                                spinner
+                            >
                                 確認
                             </Button>
                         </form>

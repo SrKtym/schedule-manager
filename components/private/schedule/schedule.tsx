@@ -10,7 +10,7 @@ import {
     getKeyValue
 } from "@heroui/table";
 import { scheduleTableHeaders } from "@/lib/definitions";
-import { registered } from "@/lib/db/schema/public";
+import { registered } from "@/lib/drizzle/schema/public";
 
 export function Schedule({registeredCourse}: {registeredCourse: typeof registered.$inferSelect[]}) {
     return (

@@ -1,4 +1,5 @@
-import { getSession, getThemeCookie } from "@/lib/fetch";
+import { getSession } from "@/lib/fetch";
+import { getThemeCookie } from "@/lib/fetch";
 import { CustomNavbar } from "@/components/private/navbar";
 
 
@@ -19,6 +20,9 @@ export default async function HomeLayout({children}: {children: React.ReactNode}
                 <main className="w-full p-3">
                     {children}
                 </main>
+                <footer className="flex justify-center w-full px-3 py-10">
+                    フッター
+                </footer>
             </div>
         );
     }

@@ -4,9 +4,11 @@ import type { StatePickEmail } from "@/lib/action";
 import { ConfirmEmail } from "@/lib/action";
 import { authClient } from "@/lib/auth-client";
 import { useActionState } from "react";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { addToast } from "@heroui/toast";
+import { 
+    addToast,
+    Button,
+    Input
+} from "@heroui/react";
 import { Loader2 } from "lucide-react";
 
 

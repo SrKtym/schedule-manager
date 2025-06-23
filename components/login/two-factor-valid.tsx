@@ -1,15 +1,15 @@
 'use client';
 
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@heroui/button";
-import { Input } from '@heroui/input';
-import { addToast } from '@heroui/toast';
-import {  
+import {
+    addToast,
+    Button,
+    Input,
     Modal,
     ModalBody,
     ModalContent,
     ModalHeader,
-} from '@heroui/modal';
+} from '@heroui/react';
 import QRCode from 'react-qr-code';
 import { useState, useActionState } from "react";
 import { useRouter } from 'next/navigation';
@@ -145,27 +145,32 @@ export function TwofactorValid({password}: {password?: string}) {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <Button color='danger' value='disable' onPress={async (e) => {
-                if (password) {
-                    await authClient.twoFactor.disable({
-                        password: password 
-                    }, {
-                        onSuccess() {
-                            router.push('/passkey');
-                        },
-                        onError(context) {
-                            addToast({
-                                title: '2要素認証を無効にできませんでした。',
-                                color: 'danger',
-                                description: `お手数ですが再試行してください。詳細: ${context.error.message}`
-                            });
-                        },
-                    });
-                } else {
-                    setSelected(e.target.getAttribute('value') as string);
-                    setIsRequired(true);
-                }
-            }}>
+            <Button 
+                color='danger' 
+                value='disable' 
+                spinner
+                onPress={async (e) => {
+                    if (password) {
+                        await authClient.twoFactor.disable({
+                            password: password 
+                        }, {
+                            onSuccess() {
+                                router.push('/passkey');
+                            },
+                            onError(context) {
+                                addToast({
+                                    title: '2要素認証を無効にできませんでした。',
+                                    color: 'danger',
+                                    description: `お手数ですが再試行してください。詳細: ${context.error.message}`
+                                });
+                            },
+                        });
+                    } else {
+                        setSelected(e.target.getAttribute('value') as string);
+                        setIsRequired(true);
+                    }
+                }}
+            >
                 2要素認証を無効にする
             </Button>
             <Modal isOpen={isRequired} onOpenChange={setIsRequired}>
@@ -221,8 +226,18 @@ export function TwofactorValid({password}: {password?: string}) {
                 </ModalContent>
             </Modal>
             <Link href='/passkey'>
-                <Button className="w-full">
+                <Button 
+                    className="w-full"
+                    color="secondary"
+                >
                     パスキーの設定へ
+                </Button>
+            </Link>
+            <Link href='/home'>
+                <Button
+                    className="w-full"
+                >
+                    ホームページへ
                 </Button>
             </Link>
         </div>

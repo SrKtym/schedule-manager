@@ -1,6 +1,6 @@
 {
-  "id": "96eb5956-6aa6-46e5-ab7f-d155ea67fa76",
-  "prevId": "471b3d1d-109f-4d16-b131-fdae1f1c3f2a",
+  "id": "46330ff1-e4ac-40c1-bf68-097656ae89d1",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -68,8 +68,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "hashed_password": {
-          "name": "hashed_password",
+        "password": {
+          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -105,7 +105,19 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "policy on accounts": {
+          "name": "policy on accounts",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "current_user",
+            "session_user"
+          ],
+          "using": "\"users\".\"email_verified\" = true \n        AND \"users\".\"id\" = \"accounts\".\"user_id\"",
+          "withCheck": "\"users\".\"email_verified\" = true\n        AND \"users\".\"id\" = \"accounts\".\"user_id\""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -113,8 +125,8 @@
       "name": "attribute",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": true,
           "notNull": true
@@ -126,9 +138,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "facultyOf": {
-          "name": "facultyOf",
-          "type": "faculty_of",
+        "faculty": {
+          "name": "faculty",
+          "type": "faculty",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -143,15 +155,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "attribute_user_id_users_id_fk": {
-          "name": "attribute_user_id_users_id_fk",
+        "attribute_email_users_email_fk": {
+          "name": "attribute_email_users_email_fk",
           "tableFrom": "attribute",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "email"
           ],
           "columnsTo": [
-            "id"
+            "email"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -196,7 +208,7 @@
         },
         "targetFaculty": {
           "name": "targetFaculty",
-          "type": "faculty_of",
+          "type": "faculty",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
@@ -245,7 +257,17 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "policy on course": {
+          "name": "policy on course",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": ""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -263,7 +285,7 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "public_key": {
           "name": "public_key",
@@ -475,8 +497,8 @@
       "name": "settings",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": true,
           "notNull": true
@@ -500,15 +522,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "settings_user_id_users_id_fk": {
-          "name": "settings_user_id_users_id_fk",
+        "settings_email_users_email_fk": {
+          "name": "settings_email_users_email_fk",
           "tableFrom": "settings",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "email"
           ],
           "columnsTo": [
-            "id"
+            "email"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -655,7 +677,18 @@
           ]
         }
       },
-      "policies": {},
+      "policies": {
+        "policy on users": {
+          "name": "policy on users",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "session_user"
+          ],
+          "using": "\"users\".\"email_verified\" = true \n        AND \"users\".\"id\" = \"accounts\".\"user_id\"",
+          "withCheck": "\"users\".\"email_verified\" = true\n        AND \"users\".\"id\" = \"accounts\".\"user_id\""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -704,7 +737,16 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "policy on verification": {
+          "name": "policy on verification",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ]
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     }
@@ -750,8 +792,8 @@
         "保健学科"
       ]
     },
-    "public.faculty_of": {
-      "name": "faculty_of",
+    "public.faculty": {
+      "name": "faculty",
       "schema": "public",
       "values": [
         "文学部",

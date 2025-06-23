@@ -1,16 +1,16 @@
 'use client';
 
 import { authClient } from '@/lib/auth-client';
-import { addToast } from '@heroui/toast';
-import { Button } from '@heroui/button';
-import { Input } from '@heroui/input';
-import {  
+import {
+    addToast,
+    Button,
+    Input,
     Modal,
     ModalBody,
     ModalContent,
     ModalHeader,
-} from '@heroui/modal';
-import { RadioGroup } from '@heroui/radio';
+    RadioGroup
+} from '@heroui/react';
 import { CustomRadio } from '../custom-radio';
 import { useState, useActionState } from 'react';
 import { useRouter } from 'next/navigation';

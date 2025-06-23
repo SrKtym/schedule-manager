@@ -1,10 +1,11 @@
 import { get2faCookie, getSession } from '@/lib/fetch';
-import { db } from '@/lib/db';
+import { db } from '@/lib/drizzle';
 import { TwoFactorSettings } from '@/components/login/two-factor-settings';
 import { redirect } from 'next/navigation';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { OtpVerifyForm } from '@/components/login/otp-verify-form';
 import { Metadata } from "next";
+
 
 export const metadata: Metadata = {
     title: '2要素認証'

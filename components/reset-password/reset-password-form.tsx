@@ -3,9 +3,11 @@
 import { ResetPasswordAction } from "@/lib/action";
 import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { addToast } from "@heroui/toast";
+import { 
+    addToast,
+    Button,
+    Input
+} from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 

@@ -1,13 +1,25 @@
 'use client';
 
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Select, SelectItem, SelectSection } from "@heroui/select";
-import { Search } from "lucide-react";
+import { 
+    Input,
+    Select, 
+    SelectItem, 
+    SelectSection
+} from "@heroui/react";
+import { Icon } from "@iconify/react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import React, { Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
-import { targetGrade, targetFaculty, targetDepartment, week, period, credit, required, rows } from "@/lib/definitions";
+import { 
+    targetGrade, 
+    targetFaculty, 
+    targetDepartment, 
+    week, 
+    period, 
+    credit, 
+    required, 
+    rows 
+} from "@/lib/definitions";
 
 export function SearchField(
     {
@@ -155,16 +167,23 @@ export function SearchField(
                     ))}
                 </Select>
             </div>
-            <div className="relative flex space-x-2">
+            <div className="flex space-x-2">
                 <Input 
-                    className='pr-3' 
+                    className='pr-3'
+                    type="text"
                     placeholder="講義名を入力してください。"
                     variant="bordered"
-                    startContent={<Search className="h-[18px] w-[18px]" color="gray"/>}
+                    startContent={
+                        <Icon 
+                            icon="lucide:search"
+                            width={18}
+                            height={18} 
+                            className="text-default-400" 
+                        />
+                    }
                     onChange={(e) => handleSearch(e.target.value)}
                     defaultValue={param.get('query')?.toString()}
                 />
-                <Button className='sr-only' color="primary">検索</Button>
             </div>
             <div className="flex justify-between items-center">
                 <span>

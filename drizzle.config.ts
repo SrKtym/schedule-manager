@@ -5,10 +5,15 @@ import { env } from './env';
 config({path: '.env'});
 
 export default defineConfig({
-    out: './lib/db/migration',
-    schema: './lib/db/schema',
+    out: './lib/drizzle/migration',
+    schema: './lib/drizzle/schema',
     dialect: 'postgresql',
     dbCredentials: {
         url: env.DATABASE_URL
+    },
+    entities: {
+        roles: {
+            provider: 'supabase'
+        }
     }
 })

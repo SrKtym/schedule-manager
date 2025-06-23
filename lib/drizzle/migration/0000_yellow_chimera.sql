@@ -1,6 +1,6 @@
 CREATE TYPE "public"."credit" AS ENUM('1', '2', '4');--> statement-breakpoint
 CREATE TYPE "public"."department" AS ENUM('史学科', '哲学科', '心理学科', '文学科', '経済学科', '経営学科', '法律学科', '政治学科', '教育学科', '社会学科', '社会心理学科', '数学科', '物理学科', '化学科', '生物学科', '地学科', '情報工学科', '機械工学科', '電気工学科', '建築学科', '生物資源学科', '森林学科', '医学科', '看護学科', '保健学科');--> statement-breakpoint
-CREATE TYPE "public"."faculty_of" AS ENUM('文学部', '経済学部', '法学部', '教育学部', '社会学部', '理学部', '工学部', '農学部', '医学部');--> statement-breakpoint
+CREATE TYPE "public"."faculty" AS ENUM('文学部', '経済学部', '法学部', '教育学部', '社会学部', '理学部', '工学部', '農学部', '医学部');--> statement-breakpoint
 CREATE TYPE "public"."grade" AS ENUM('1学年', '2学年', '3学年', '4学年');--> statement-breakpoint
 CREATE TYPE "public"."notification" AS ENUM('on', 'off');--> statement-breakpoint
 CREATE TYPE "public"."period" AS ENUM('1限目', '2限目', '3限目', '4限目', '5限目', '6限目', '7限目');--> statement-breakpoint
@@ -18,15 +18,16 @@ CREATE TABLE "accounts" (
 	"access_token_expires_at" timestamp,
 	"refresh_token_expires_at" timestamp,
 	"scope" text,
-	"hashed_password" text,
+	"password" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "accounts" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 CREATE TABLE "attribute" (
-	"user_id" text NOT NULL,
+	"email" text PRIMARY KEY NOT NULL,
 	"grade" "grade" NOT NULL,
-	"facultyOf" "faculty_of" NOT NULL,
+	"faculty" "faculty" NOT NULL,
 	"department" "department" NOT NULL
 );
 --> statement-breakpoint
@@ -35,7 +36,7 @@ CREATE TABLE "course" (
 	"week" "week" NOT NULL,
 	"period" "period" NOT NULL,
 	"targetGrade" "grade" NOT NULL,
-	"targetFaculty" "faculty_of",
+	"targetFaculty" "faculty",
 	"targetDepartment" "department",
 	"credit" "credit" NOT NULL,
 	"required" "required" NOT NULL,
@@ -44,9 +45,10 @@ CREATE TABLE "course" (
 	"textbooks" text
 );
 --> statement-breakpoint
+ALTER TABLE "course" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 CREATE TABLE "passkeys" (
 	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
+	"name" text,
 	"public_key" text NOT NULL,
 	"user_id" text NOT NULL,
 	"credential_id" text NOT NULL,
@@ -75,9 +77,9 @@ CREATE TABLE "sessions" (
 );
 --> statement-breakpoint
 CREATE TABLE "settings" (
-	"user_id" text NOT NULL,
-	"theme" "theme" DEFAULT 'light',
-	"notification" "notification" DEFAULT 'on'
+	"email" text PRIMARY KEY NOT NULL,
+	"theme" "theme" DEFAULT 'light' NOT NULL,
+	"notification" "notification" DEFAULT 'on' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "two_factors" (
@@ -102,6 +104,7 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_username_unique" UNIQUE("username")
 );
 --> statement-breakpoint
+ALTER TABLE "users" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 CREATE TABLE "verifications" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
@@ -111,12 +114,21 @@ CREATE TABLE "verifications" (
 	"updated_at" timestamp
 );
 --> statement-breakpoint
+ALTER TABLE "verifications" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "attribute" ADD CONSTRAINT "attribute_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "attribute" ADD CONSTRAINT "attribute_email_users_email_fk" FOREIGN KEY ("email") REFERENCES "public"."users"("email") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "passkeys" ADD CONSTRAINT "passkeys_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "registered" ADD CONSTRAINT "registered_name_course_name_fk" FOREIGN KEY ("name") REFERENCES "public"."course"("name") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "registered" ADD CONSTRAINT "registered_email_users_email_fk" FOREIGN KEY ("email") REFERENCES "public"."users"("email") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "settings" ADD CONSTRAINT "settings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "settings" ADD CONSTRAINT "settings_email_users_email_fk" FOREIGN KEY ("email") REFERENCES "public"."users"("email") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "two_factors" ADD CONSTRAINT "two_factors_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE VIEW "public"."schedule_view" AS (select "name" from "registered");
+CREATE VIEW "public"."schedule_view" AS (select "name" from "registered");--> statement-breakpoint
+CREATE POLICY "policy on accounts" ON "accounts" AS PERMISSIVE FOR ALL TO current_user, session_user USING ("users"."email_verified" = true 
+        AND "users"."id" = "accounts"."user_id") WITH CHECK ("users"."email_verified" = true
+        AND "users"."id" = "accounts"."user_id");--> statement-breakpoint
+CREATE POLICY "policy on course" ON "course" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
+CREATE POLICY "policy on users" ON "users" AS PERMISSIVE FOR ALL TO session_user USING ("users"."email_verified" = true 
+        AND "users"."id" = "accounts"."user_id") WITH CHECK ("users"."email_verified" = true
+        AND "users"."id" = "accounts"."user_id");--> statement-breakpoint
+CREATE POLICY "policy on verification" ON "verifications" AS PERMISSIVE FOR ALL TO admin;

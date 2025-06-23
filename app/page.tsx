@@ -1,4 +1,4 @@
-import { Button } from '@heroui/button';
+import { Button } from '@heroui/react';
 import Link from "next/link";
 
 export default function StartPage() {

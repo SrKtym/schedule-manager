@@ -1,6 +1,5 @@
 import { SearchField } from "@/components/private/register/search";
 import { DataTable } from "@/components/private/register/data-table";
-import { CustomPagination } from "@/components/private/register/pagination";
 import { Skeleton } from "@heroui/react";
 import { Suspense } from "react";
 import { 
@@ -98,17 +97,9 @@ export default async function Page(
                     </Skeleton>
                 }>
                     <DataTable 
-                        items={response[0]} 
+                        items={response[0]}
+                        totalPages={totalPages}   
                     />
-                </Suspense>
-                <Suspense fallback={
-                    <Skeleton className="rounded-md">
-                        <div>
-
-                        </div>
-                    </Skeleton>
-                }>
-                    <CustomPagination totalPages={totalPages}/>
                 </Suspense>
             </div>
             <div className="flex items-center">

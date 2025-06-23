@@ -1,8 +1,7 @@
-import { db } from "./db";
+import { db } from "./drizzle";
 import { auth } from "@/lib/auth";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
-
 
 export const getSession = cache(async () => {
     const settionData = await auth.api.getSession({
@@ -13,7 +12,7 @@ export const getSession = cache(async () => {
 
 export async function get2faCookie() {
     const cookieStore = await cookies();
-    return cookieStore.get('__Secure-better-auth.two_factor')?.value;
+    return cookieStore.get('better-auth.two_factor')?.value;
 }
 
 export async function getThemeCookie() {

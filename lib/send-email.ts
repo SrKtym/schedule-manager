@@ -34,7 +34,7 @@ export async function sendTwoFactorTokenEmail(email: string, token: string) {
     await resend.emails.send({
         from: 'schedule-manager-livid.vercel.app',
         to: email,
-        subject: '2段階認証',
+        subject: 'OTP認証',
         react: OtpNotificationEmail(email, token)
     });
 }

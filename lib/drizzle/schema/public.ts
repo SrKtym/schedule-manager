@@ -1,5 +1,16 @@
-import { text, integer, timestamp, boolean, pgEnum, pgTable, pgView } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { 
+    text, 
+    integer, 
+    timestamp, 
+    boolean, 
+    pgEnum, 
+    pgTable, 
+    pgView, 
+    pgPolicy, 
+    pgRole
+} from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+
 
 
 
@@ -51,6 +62,8 @@ export const requiredEnum = pgEnum("required", ['必修', '選択必修', '任�
 export const themeEnum = pgEnum("theme", ['light', 'dark']);
 export const notificationEnum = pgEnum("notification", ['on', 'off']);
 
+export const admin = pgRole("admin", { createRole: true, createDb: true, inherit: true }).existing();
+export const professor = pgRole("professor").existing();
 
 
 export const users = pgTable("users", {
@@ -104,7 +117,15 @@ export const verifications = pgTable("verifications", {
     expiresAt: timestamp('expires_at').notNull(),
     createdAt: timestamp('created_at'),
     updatedAt: timestamp('updated_at').$onUpdate(() => new Date())
-});
+}, () => [
+    pgPolicy("policy on verification"), {
+        as: 'permissive',
+        for: 'all',
+        to: admin,
+        using: sql``,
+        withCheck: sql``
+    }
+]);
 
 export const twoFactors = pgTable("two_factors", {
     id: text('id').primaryKey(),
@@ -119,7 +140,7 @@ export const passkeys = pgTable("passkeys", {
     publicKey: text('public_key').notNull(),
     userId: text('user_id')
         .notNull()
-        .references(()=> users.id, { onDelete: 'cascade' }),
+        .references(() => users.id, { onDelete: 'cascade' }),
     credentialID: text('credential_id').notNull(),
     counter: integer('counter').notNull(),
     deviceType: text('device_type').notNull(),
@@ -174,10 +195,53 @@ export const registered = pgTable("registered", {
 });
 
 
+
+export const messages = pgTable("messages", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    senderEmail: text('sender_email').notNull(),
+    receiverEmail: text('receiver_email').notNull(),
+    subject: text('subject'),
+    body: text('body'),
+    isRead: boolean('is_read').default(false),
+    createdAt: timestamp('created_at').notNull()
+})
+
 export const scheduleView = pgView("schedule_view")
     .as((qb) => qb.select({name: registered.name})
     .from(registered));
 
+
+
+
+export const policyOnUsers = pgPolicy("policy on users", {
+    as: 'permissive',
+    for: 'all',
+    to: 'session_user',
+    using: sql`${users.emailVerified} = true 
+        AND ${users.id} = ${accounts.userId}`,
+    withCheck: sql`${users.emailVerified} = true
+        AND ${users.id} = ${accounts.userId}`
+}).link(users);
+
+export const policyOnAccounts = pgPolicy("policy on accounts", {
+    as: 'permissive',
+    for: 'all',
+    to: ['session_user', 'current_user'],
+    using: sql`${users.emailVerified} = true 
+        AND ${users.id} = ${accounts.userId}`,
+    withCheck: sql`${users.emailVerified} = true
+        AND ${users.id} = ${accounts.userId}`
+
+}).link(accounts);
+
+export const policyOnCourse = pgPolicy("policy on course", {
+    as: 'permissive',
+    for: 'select',
+    to: 'public',
+    using: sql``
+}).link(course);
 
 
 

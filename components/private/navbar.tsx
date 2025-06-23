@@ -1,25 +1,27 @@
 'use client';
 
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@heroui/button";
 import { ThemeButton } from "./theme-button";
 import { 
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalHeader } from "@heroui/modal";
-import { 
-    Navbar,
-    NavbarContent,
-    NavbarItem
-} from "@heroui/navbar";
-import { 
+    Button,
     Dropdown,
     DropdownItem,
     DropdownMenu,
-    DropdownTrigger
-} from "@heroui/dropdown";
-import { User } from "@heroui/user";
+    DropdownTrigger,
+    Listbox,
+    ListboxItem,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalHeader,
+    Navbar,
+    NavbarContent,
+    NavbarItem,
+    NavbarMenuToggle,
+    NavbarMenu,
+    NavbarMenuItem,
+    User
+} from "@heroui/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -36,31 +38,45 @@ export function CustomNavbar({
     image?: string | null,
     email: string
 }) {
+    const menuItems = [
+        { key: "", label: "ホーム" },
+        { key: "register", label: "履修登録" },
+        { key: "schedule", label: "時間割" },
+        { key: "notification", label: "通知" },
+        { key: "settings", label: "設定"}
+    ];
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [open, setOpen] = useState<boolean>(false);
     const [logOutConfirm, setLogOutConfirm] = useState<boolean>(false);
     const router = useRouter();
 
 
     return (
-        <Navbar isBordered>
-            <NavbarContent justify="start">
-                <NavbarItem>
-                    <Link href='/home'>ホーム</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link href='/home/register'>履修登録</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link href='/home/schedule'>時間割</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link href='/home/notification'>通知</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link href='/home/settings'>設定</Link>
-                </NavbarItem>
+        <Navbar 
+            isBordered
+            isMenuOpen={isMenuOpen}
+            onMenuOpenChange={setIsMenuOpen}    
+        >
+            <NavbarMenuToggle
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                className="sm:hidden"
+            />
+            <NavbarContent 
+                className="hidden sm:flex"
+                justify="start"
+            >
+                {menuItems.map((item) => (
+                    <NavbarItem key={item.key}>
+                        <Link href={`/home/${item.key}`}>
+                            {item.label}
+                        </Link>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
-            <NavbarContent className='items-center' justify="end">
+            <NavbarContent 
+                className="items-center" 
+                justify="end"
+            >
                 <ThemeButton theme={theme}/>
                 <Dropdown placement="bottom-start">
                     <DropdownTrigger>
@@ -76,16 +92,20 @@ export function CustomNavbar({
                             description={email}
                         />
                     </DropdownTrigger>
-                    <DropdownMenu aria-label="profile-actions" variant="flat" onAction={(key) => {
-                        switch (key) {
-                            case 'settings':
-                                setOpen(true);
-                                break;
-                            case 'logOut':
-                                setLogOutConfirm(true);
-                                break;
-                        }
-                    }}>
+                    <DropdownMenu 
+                        aria-label="profile-actions" 
+                        variant="flat" 
+                        onAction={(key) => {
+                            switch (key) {
+                                case 'settings':
+                                    setOpen(true);
+                                    break;
+                                case 'logOut':
+                                    setLogOutConfirm(true);
+                                    break;
+                            }
+                        }}
+                    >
                         <DropdownItem key='settings'>
                             設定
                         </DropdownItem> 
@@ -95,6 +115,15 @@ export function CustomNavbar({
                     </DropdownMenu>
                 </Dropdown>
             </NavbarContent>
+            <NavbarMenu>
+                {menuItems.map((item) => (
+                    <NavbarMenuItem key={item.key}>
+                        <Link href={`/home/${item.key}`}>
+                            {item.label}
+                        </Link>
+                    </NavbarMenuItem>
+                ))}
+            </NavbarMenu>
             <Modal isOpen={logOutConfirm} onOpenChange={setLogOutConfirm}>
                 <ModalContent>
                     <ModalHeader className="justify-center">
@@ -104,7 +133,8 @@ export function CustomNavbar({
                         <div className='flex items-center justify-between space-x-5'>
                             <Button 
                                 className='max-w-[180px] w-full' 
-                                color='danger' 
+                                color='danger'
+                                spinner
                                 onPress={async () => {
                                     await authClient.signOut({
                                         fetchOptions: {
@@ -132,12 +162,50 @@ export function CustomNavbar({
                         アカウントの設定
                     </ModalHeader>
                     <ModalBody>
-                        <div className="flex flex-col items-center space-y-3">
-                            <p>パスワードの変更</p>
-                            <p>2要素認証の設定</p>
-                            <p>パスキーの設定</p>
-                            <p className="text-red-500">アカウントの削除</p>
-                        </div>
+                        <Listbox aria-label="listbox">
+                            <ListboxItem 
+                                key="reset-password" 
+                                description="パスワードを変更します。"
+                                href="/reset/send-email"
+                            >
+                                パスワードの変更
+                            </ListboxItem>
+                            <ListboxItem 
+                                key="2fa-settings" 
+                                description={
+                                    <p className="text-justify">
+                                        2要素認証を有効または無効にします。
+                                        有効の場合、TOTPアプリにアカウントを登録できます。
+                                    </p>
+                                }
+                                href="/two-factor"    
+                            >
+                                2要素認証の設定
+                            </ListboxItem>
+                            <ListboxItem
+                                key="passkey-settings"
+                                description={
+                                    <p className="text-justify">
+                                        パスキーの登録をします。
+                                        登録済みのパスキーはサインイン時に使用できます。
+                                    </p>
+                                }
+                                href="/passkey"
+                            >
+                                パスキーの設定
+                            </ListboxItem>
+                            <ListboxItem
+                                key="delete-accounts"
+                                description="アカウントを削除します。"
+                                className="text-danger"
+                                color="danger"
+                                onPress={() => {
+
+                                }}
+                                >
+                                アカウントの削除
+                            </ListboxItem>
+                        </Listbox>
                     </ModalBody>
                 </ModalContent>
             </Modal>
