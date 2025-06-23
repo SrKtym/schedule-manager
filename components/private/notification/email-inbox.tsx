@@ -32,15 +32,16 @@ type Message = {
   created_at: string
 }
 
+const sidebarItems = [
+    { icon: "lucide:inbox", label: "受信トレイ" },
+    { icon: "lucide:star", label: "スター付き" },
+    { icon: "lucide:clock", label: "スヌーズ中"},
+    { icon: "lucide:send", label: "送信済み" },
+    { icon: "lucide:file", label: "下書き" },
+    { icon: "lucide:trash", label: "ごみ箱" },
+];
+
 export function EmailInbox({email}: {email: string}) {
-    const sidebarItems = [
-        { icon: "lucide:inbox", label: "受信トレイ" },
-        { icon: "lucide:star", label: "スター付き" },
-        { icon: "lucide:clock", label: "スヌーズ中"},
-        { icon: "lucide:send", label: "送信済み" },
-        { icon: "lucide:file", label: "下書き" },
-        { icon: "lucide:trash", label: "ごみ箱" },
-    ];
     const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLooding, setIsLooding] = useState<boolean>(true);
