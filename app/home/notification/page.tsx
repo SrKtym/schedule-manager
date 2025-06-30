@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getSession } from "@/lib/fetch";
-import { EmailInbox } from "@/components/private/notification/email-inbox";
+import { EmailInbox } from "@/components/private/notification/inbox";
 
 
 export const metadata: Metadata = {
@@ -9,7 +9,5 @@ export const metadata: Metadata = {
 
 export default async function NotificationPage() {
     const session = await getSession();
-    if (session) {
-        return <EmailInbox email={session.user.email}/>
-    }
+    if (session) return <EmailInbox email={session.user.email}/>
 }

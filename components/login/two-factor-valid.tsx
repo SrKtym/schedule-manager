@@ -148,7 +148,7 @@ export function TwofactorValid({password}: {password?: string}) {
             <Button 
                 color='danger' 
                 value='disable' 
-                spinner
+                spinner={<Loader2 className="animate-spin"/>}
                 onPress={async (e) => {
                     if (password) {
                         await authClient.twoFactor.disable({
@@ -215,9 +215,12 @@ export function TwofactorValid({password}: {password?: string}) {
                                         続行
                                     </p>}
                                 </Button>
-                                <Button className='max-w-[180px] w-full' onPress={() => {
-                                    setIsRequired(false);
-                                }}>
+                                <Button 
+                                    className='max-w-[180px] w-full' 
+                                    onPress={() => {
+                                        setIsRequired(false);
+                                    }}
+                                >
                                     キャンセル
                                 </Button>
                             </div>

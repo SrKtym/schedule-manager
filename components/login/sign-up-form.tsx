@@ -108,7 +108,13 @@ export default function SignUpForm() {
             <div className='flex-1 items-center justify-center text-center text-sm space-y-3'>
                 <div>
                     <p className='mb-2'>アカウントをお持ちの方</p>
-                    <Link href='/sign-in' className='underline text-blue-500 transition-colors hover:bg-gray-200'>サインイン</Link>
+                    <Link 
+                        href='/sign-in' 
+                        prefetch
+                        className='underline text-blue-500 transition-colors hover:bg-gray-200'
+                    >
+                        サインイン
+                    </Link>
                 </div>
             </div> 
         </form>

@@ -128,12 +128,14 @@ export async function SignIn(formData: FormData) {
                 await db.insert(settings).values({email: validatedFields.data.email}).onConflictDoNothing();
                 if (user.twoFactorEnabled !== true) {
                     if ('twoFactorRedirect' in res) {
+                        // 2要素認証が無効の場合
                         return {
                             messages: {
                                 success: 'signin'
                             }
                         }
                     } else {
+                        // 2要素認証が有効の場合
                         return {
                             messages: {
                                 success: 'twofactor'
@@ -141,6 +143,7 @@ export async function SignIn(formData: FormData) {
                         }
                     }
                 } else {
+                    // 初回ログイン（サインアップ）時の処理
                     return {
                         messages: {
                             success: 'verify-otp'

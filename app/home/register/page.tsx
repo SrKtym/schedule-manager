@@ -1,6 +1,5 @@
 import { SearchField } from "@/components/private/register/search";
 import { DataTable } from "@/components/private/register/data-table";
-import { Skeleton } from "@heroui/react";
 import { Suspense } from "react";
 import { 
     targetGrade, 
@@ -14,6 +13,7 @@ import {
 import { getCourse, getItemsLength, getRegisteredCourse } from "@/lib/fetch";
 import { Schedule } from "@/components/private/schedule/schedule";
 import { Metadata } from "next";
+import { DataTableSkelton } from "@/components/skeltons";
 
 export const metadata: Metadata = {
     title: '履修登録'
@@ -83,19 +83,13 @@ export default async function Page(
     const totalPages = Math.ceil(response[1] / (params.rows || 10)) || 1;
 
     return (
-        <div className="grid gap-x-5 lg:grid-cols-2 gap-y-5">
+        <div className="flex flex-col space-y-5 lg:grid grid-cols-2 gap-x-5">
             <div className="space-y-5">
                 <SearchField 
                     itemsLength={response[1]} 
                     rowsPerPage={params.rows || 10}
                 />
-                <Suspense fallback={
-                    <Skeleton className="rounded-lg">
-                        <div>
-
-                        </div>
-                    </Skeleton>
-                }>
+                <Suspense fallback={<DataTableSkelton />}>
                     <DataTable 
                         items={response[0]}
                         totalPages={totalPages}   

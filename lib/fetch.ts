@@ -12,7 +12,7 @@ export const getSession = cache(async () => {
 
 export async function get2faCookie() {
     const cookieStore = await cookies();
-    return cookieStore.get('__Secure-better-auth.two_factor')?.value;
+    return cookieStore.get('better-auth.two_factor')?.value;
 }
 
 export async function getThemeCookie() {
@@ -33,16 +33,22 @@ export const getCourse = cache(async (
     rows?: number
 ) => {
     const result = await db.query.course.findMany({
-        where: (course, {or, and, inArray, ilike}) => 
+        where: (course, {or, and, inArray, isNull, ilike}) => 
             or(
                 and(
                     inArray(course.targetGrade, gradeList as []),
-                    inArray(course.targetFaculty, facultyList as []),
-                    inArray(course.targetDepartment, departmentList as []),
+                    or(
+                        inArray(course.targetFaculty, facultyList as []),
+                        isNull(course.targetFaculty)
+                    ),
+                    or(
+                        inArray(course.targetDepartment, departmentList as []),
+                        isNull(course.targetDepartment)
+                    ),
                     inArray(course.week, weekList as []),
                     inArray(course.period, periodList as []),
                     inArray(course.credit, creditList as []),
-                    inArray(course.required, requiredList as [])
+                    inArray(course.required, requiredList as []),
                 ),
                 ilike(course.name, `%${query}%`),
                 ilike(course.professor, `%${query}%`)
@@ -64,12 +70,18 @@ export const getItemsLength = cache(async (
     query?: string
 ) => {
     const result = await db.query.course.findMany({
-        where: (course, {or, and, inArray, ilike}) => 
+        where: (course, {or, and, inArray, isNull, ilike}) => 
             or(
                 and(
                     inArray(course.targetGrade, gradeList as []),
-                    inArray(course.targetFaculty, facultyList as []),
-                    inArray(course.targetDepartment, departmentList as []),
+                    or(
+                        inArray(course.targetFaculty, facultyList as []),
+                        isNull(course.targetFaculty)
+                    ),
+                    or(
+                        inArray(course.targetDepartment, departmentList as []),
+                        isNull(course.targetDepartment)
+                    ),
                     inArray(course.week, weekList as []),
                     inArray(course.period, periodList as []),
                     inArray(course.credit, creditList as []),

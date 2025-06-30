@@ -11,6 +11,7 @@ import { authClient } from "@/lib/auth-client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setThemeCookie } from '@/lib/action';
+import { Loader2 } from 'lucide-react';
 
 
 export function OtpVerifyForm() {
@@ -59,7 +60,7 @@ export function OtpVerifyForm() {
                                 className='w-full' 
                                 color='primary' 
                                 type='submit'
-                                spinner
+                                spinner={<Loader2 className="animate-spin"/>}
                             >
                                 確認
                             </Button>

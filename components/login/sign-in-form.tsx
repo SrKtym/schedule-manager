@@ -123,11 +123,21 @@ export default function SignInForm() {
             </div>
             <div className='flex-1 items-center justify-center text-center text-sm space-y-3'>
                 <div>
-                    <Link href='/reset' className='mb-2 underline text-blue-500 transition-colors hover:bg-gray-200'>パスワードをお忘れの方</Link>
+                    <Link 
+                        href='/reset' 
+                        className='mb-2 underline text-blue-500 transition-colors hover:bg-gray-200'
+                    >
+                        パスワードをお忘れの方
+                    </Link>
                 </div>
                 <div>
                     <p className='mb-2'>アカウントをお持ちでない方</p>
-                    <Link href='/sign-up' className='underline text-blue-500 transition-colors hover:bg-gray-200'>サインアップ</Link>
+                    <Link 
+                        href='/sign-up' 
+                        className='underline text-blue-500 transition-colors hover:bg-gray-200'
+                    >
+                        サインアップ
+                    </Link>
                 </div>
             </div> 
         </form>

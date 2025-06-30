@@ -1,3 +1,4 @@
+// データテーブル
 export const targetGrade = [
     '1学年', '2学年', '3学年', '4学年'
 ];
@@ -108,6 +109,7 @@ export const dataTableColumns = [
     }
 ];
 
+// スケジュールテーブル
 export const scheduleTableHeaders = {
     columns: [
         {
@@ -162,3 +164,23 @@ export const scheduleTableHeaders = {
         }
     ]
 }
+
+// 受信箱
+export type Message = {
+  id: string,
+  sender_email: string,
+  receiver_email: string,
+  subject: string,
+  body: string,
+  is_read: boolean,
+  created_at: string
+}
+
+export const sidebarItems = [
+    { icon: "lucide:inbox", label: "受信トレイ" },
+    { icon: "lucide:star", label: "スター付き" },
+    { icon: "lucide:clock", label: "スヌーズ中"},
+    { icon: "lucide:send", label: "送信済み" },
+    { icon: "lucide:file", label: "下書き" },
+    { icon: "lucide:trash", label: "ごみ箱" },
+];

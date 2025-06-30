@@ -8,6 +8,7 @@ export function ThemeButton({theme}: {theme: string}) {
 
     return (
         <Switch
+            aria-label="theme button"
             color="secondary"
             size="md"
             title={theme === 'light' ? 'ダークモードに変更' : 'ライトモードに変更'}

@@ -6,7 +6,7 @@ import {
     SelectItem, 
     SelectSection
 } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import { Search } from "lucide-react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
@@ -46,7 +46,7 @@ export function SearchField(
             param.set(e.target.name, e.target.value);
         } else {
             param.delete(e.target.name);
-            if (!param.get('faculty')) param.delete('department');
+            if (!getParam('faculty')) param.delete('department');
         }
         router.replace(`${pathName}?${param}`);
     };
@@ -60,6 +60,7 @@ export function SearchField(
         }
         router.replace(`${pathName}?${param}`);
     }, 300);
+
 
 
     return (
@@ -103,10 +104,10 @@ export function SearchField(
                     variant="bordered"
                     errorMessage='学部が選択されていません。'
                     defaultSelectedKeys={getParam('department')}
-                    disabledKeys={param.get('faculty') ? undefined : targetDepartment()}
+                    disabledKeys={(getParam('faculty')) ? undefined : targetDepartment()}
                     isInvalid={invalid}
                     onChange={handleFilter}
-                    onOpenChange={() => param.get('faculty') ? setInvalid(false) : setInvalid(true)}
+                    onOpenChange={() => getParam('faculty') ? setInvalid(false) : setInvalid(true)}
                 >
                     {getParam('faculty')?.map((faculty) => (
                         <SelectSection
@@ -115,7 +116,8 @@ export function SearchField(
                             showDivider
                             classNames={{
                                 heading: "flex w-full sticky top-1 z-20 py-1.5 px-2 bg-default-100 shadow-small rounded-small",
-                        }}>
+                            }}
+                        >
                             {targetDepartment(faculty).map((department) => (
                                 <SelectItem key={department}>
                                     {department}
@@ -168,31 +170,29 @@ export function SearchField(
                 </Select>
             </div>
             <div className="flex space-x-2">
-                <Input 
-                    className='pr-3'
+                <Input
                     type="text"
                     placeholder="講義名を入力してください。"
                     variant="bordered"
                     startContent={
-                        <Icon 
-                            icon="lucide:search"
+                        <Search 
                             width={18}
-                            height={18} 
-                            className="text-default-400" 
+                            height={18}
+                            color="gray"    
                         />
                     }
                     onChange={(e) => handleSearch(e.target.value)}
                     defaultValue={param.get('query')?.toString()}
                 />
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center space-x-2">
                 <span>
                     検索結果: 
                     <Suspense fallback={<p>処理中...</p>}>
                         {itemsLength}件のアイテム
                     </Suspense>
                 </span>
-                <div className="w-full max-w-[280px] grid grid-cols-2 gap-x-3">
+                <div className="w-full max-w-[280px] flex space-x-3">
                     <Select
                         name="required"
                         label="履修要件"

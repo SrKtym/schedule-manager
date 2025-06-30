@@ -62,7 +62,7 @@ export function CustomNavbar({
                 className="sm:hidden"
             />
             <NavbarContent 
-                className="hidden sm:flex"
+                className="max-sm:hidden"
                 justify="start"
             >
                 {menuItems.map((item) => (
@@ -82,6 +82,7 @@ export function CustomNavbar({
                     <DropdownTrigger>
                         <User 
                             as='button'
+                            aria-label="user button"
                             avatarProps={{
                                 color: 'primary',
                                 isBordered: true,
