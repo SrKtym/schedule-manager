@@ -62,17 +62,22 @@ export function DataTable({items, totalPages}: {items: typeof course.$inferSelec
                 </TableBody>
             </Table>
             {selectedKeys === 'all'
-                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 right-0 left-0 py-4 pl-3 dark:bg-gray-800 dark:text-white">
+                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 left-0 right-0 p-3 backdrop-blur-xl dark:bg-gray-800 dark:text-white">
                     <div className="flex items-center justify-between w-full max-w-[800px]">
                         <p className="flex items-center h-[40px]">すべての講義を選択中</p>
                     </div>
                   </div>
                 : selectedKeys.size !== 0
-                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 right-0 left-0 py-4 pl-3 dark:bg-gray-800 dark:text-white">
-                    <div className="flex items-center justify-between w-full max-w-[800px]">
+                ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 left-0 right-0 p-3 backdrop-blur-xl dark:bg-gray-800 dark:text-white">
+                    <div className="flex items-center justify-between w-full max-w-[800px] gap-2">
                         <p>{selectedKeys.size}個の講義を選択中</p>
                         <div className="flex gap-5">
-                            <Button color="primary">
+                            <Button 
+                                color="primary"
+                                onPress={async () => {
+                                    console.log(Array.from(selectedKeys.values()))
+                                }}
+                            >
                                 すべて登録
                             </Button>
                             <Button color="danger" onPress={() => {

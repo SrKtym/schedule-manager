@@ -110,60 +110,9 @@ export const dataTableColumns = [
 ];
 
 // スケジュールテーブル
-export const scheduleTableHeaders = {
-    columns: [
-        {
-            name: '月曜日',
-            key: 'Monday'
-        },
-        {
-            name: '火曜日',
-            key: 'Tuesday'
-        },
-        {
-            name: '水曜日',
-            key: 'Wednesday'
-        },
-        {
-            name: '木曜日',
-            key: 'Thursday'
-        },
-        {
-            name: '金曜日',
-            key: 'Friday'
-        }
-    ],
-    rows: [
-        {
-            name: '1限目',
-            key: '1st'
-        },
-        {
-            name: '2限目',
-            key: '2nd'
-        },
-        {
-            name: '3限目',
-            key: '3rd'
-        },
-        {
-            name: '4限目',
-            key: '4th'
-        },
-        {
-            name: '5限目',
-            key: '5th'
-        },
-        {
-            name: '6限目',
-            key: '6th'
-        },
-        {
-            name: '7限目',
-            key: '7th'
-        }
-    ]
-}
+export const days = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日'];
+export const times = ['(09:00-10:30)', '(10:40-12:10)', '(13:00-14:30)', '(14:40-16:10)', '(16:20-17:50)'];
+
 
 // 受信箱
 export type Message = {
@@ -184,3 +133,5 @@ export const sidebarItems = [
     { icon: "lucide:file", label: "下書き" },
     { icon: "lucide:trash", label: "ごみ箱" },
 ];
+
+

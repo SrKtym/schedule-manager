@@ -2,6 +2,7 @@
 
 import { formSchema } from '@/lib/formschema';
 import { db } from './drizzle';
+import { eq } from 'drizzle-orm';
 import { settings } from './drizzle/schema/public';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
@@ -281,8 +282,13 @@ export const setThemeCookie = cache(async () => {
     }
 });
 
-export const setTheme = cache(async (checked: boolean) => {
-    const theme = await db.update(settings).set({theme: checked ? 'dark' : 'light'}).returning({color: settings.theme});
+export const setTheme = cache(async (checked: boolean, email: string) => {
+    const theme = await db
+        .update(settings)
+        .set({theme: checked ? 'dark' : 'light'})
+        .where(eq(settings.email, email))
+        .returning({color: settings.theme});
+
     return theme[0].color;
 });
 

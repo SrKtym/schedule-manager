@@ -125,7 +125,7 @@ export default function SignInForm() {
                 <div>
                     <Link 
                         href='/reset' 
-                        className='mb-2 underline text-blue-500 transition-colors hover:bg-gray-200'
+                        className='mb-2 underline text-blue-500 hover:bg-gray-200'
                     >
                         パスワードをお忘れの方
                     </Link>
@@ -134,7 +134,7 @@ export default function SignInForm() {
                     <p className='mb-2'>アカウントをお持ちでない方</p>
                     <Link 
                         href='/sign-up' 
-                        className='underline text-blue-500 transition-colors hover:bg-gray-200'
+                        className='underline text-blue-500 hover:bg-gray-200'
                     >
                         サインアップ
                     </Link>

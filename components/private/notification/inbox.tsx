@@ -1,7 +1,7 @@
 'use client'
 
 import { Icon } from "@iconify/react";
-import { Button, Input } from "@heroui/react";
+import { Button, Input, Tooltip } from "@heroui/react";
 import { EmailLogo } from "@/components/logo/email-logo";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from '@/lib/supabase/client'
@@ -103,17 +103,23 @@ export function EmailInbox({email}: {email: string}) {
                         />
                     </div>
                 </div>
-                <Button 
-                    isIconOnly 
-                    variant="light"
-                    aria-label="User settings"
+                <Tooltip
+                    key="settings"
+                    color="foreground"
+                    content="設定"    
                 >
-                    <Icon 
-                        icon="lucide:settings" 
-                        width={24} 
-                        height={24} 
-                    />
-                </Button>
+                    <Button 
+                        isIconOnly 
+                        variant="light"
+                        aria-label="User settings"
+                    >
+                        <Icon 
+                            icon="lucide:settings" 
+                            width={24} 
+                            height={24} 
+                        />
+                    </Button>
+                </Tooltip>
             </div>
             <div className="flex">
                 {/* サイドバー */}

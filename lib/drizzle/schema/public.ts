@@ -7,7 +7,8 @@ import {
     pgTable, 
     pgView, 
     pgPolicy, 
-    pgRole
+    pgRole,
+    primaryKey
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
@@ -189,9 +190,9 @@ export const course = pgTable("course", {
 
 export const registered = pgTable("registered", {
     name: text('name')
-        .references(() => course.name, { onDelete: 'cascade'}),
+        .references(() => course.name, { onDelete: 'cascade' }),
     email: text('email')
-        .references(() => users.email, { onDelete: 'cascade'})
+        .references(() => users.email, { onDelete: 'cascade' })
 });
 
 

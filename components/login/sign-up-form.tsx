@@ -111,7 +111,7 @@ export default function SignUpForm() {
                     <Link 
                         href='/sign-in' 
                         prefetch
-                        className='underline text-blue-500 transition-colors hover:bg-gray-200'
+                        className='underline text-blue-500 hover:bg-gray-200'
                     >
                         サインイン
                     </Link>

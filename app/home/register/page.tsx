@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: '履修登録'
 }
 
-export default async function Page(
+export default async function RegisterPage(
     props: {
         searchParams: Promise<{
             grade?: string,
@@ -65,8 +65,7 @@ export default async function Page(
             creditList,
             requiredList,
             params.query
-        ),
-        getRegisteredCourse()
+        )
     ])
     .then((dataList) => {
         const result = dataList.map((data) => {
@@ -96,11 +95,9 @@ export default async function Page(
                     />
                 </Suspense>
             </div>
-            <div className="flex items-center">
+            <div>
                 <Suspense fallback>
-                    <Schedule 
-                        registeredCourse={response[2]}
-                    />
+                    <Schedule />
                 </Suspense>
             </div>
         </div>

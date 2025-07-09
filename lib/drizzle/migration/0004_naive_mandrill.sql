@@ -1,0 +1,1 @@
+ALTER TABLE "registered" ALTER COLUMN "name" SET NOT NULL;

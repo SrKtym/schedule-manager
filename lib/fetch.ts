@@ -2,6 +2,8 @@ import { db } from "./drizzle";
 import { auth } from "@/lib/auth";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
+import { registered } from "./drizzle/schema/public";
+import { eq, sql } from "drizzle-orm";
 
 export const getSession = cache(async () => {
     const settionData = await auth.api.getSession({
@@ -95,10 +97,16 @@ export const getItemsLength = cache(async (
     return result.length;
 })
 
-export const getRegisteredCourse = cache(async () => {
-    const settion = await getSession();
-    const result = await db.query.registered.findMany({
-        where: (registered, {eq}) => (eq(registered.email, settion?.user.email ?? ''))
-    });
-    return result;
+export const getRegisteredCourse = cache(async (period: string, week: string) => {
+    const session = await getSession();
+    if (session) {
+        const result = await db
+            .select({
+                name: sql<string>`coalesce(${registered.name}, "-")`
+            })
+            .from(registered)
+            .where(eq(registered.email, session.user.email));
+
+        return result;
+    }
 });

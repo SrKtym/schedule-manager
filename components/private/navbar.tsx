@@ -22,6 +22,7 @@ import {
     NavbarMenuItem,
     User
 } from "@heroui/react";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -77,7 +78,7 @@ export function CustomNavbar({
                 className="items-center" 
                 justify="end"
             >
-                <ThemeButton theme={theme}/>
+                <ThemeButton theme={theme} email={email} />
                 <Dropdown placement="bottom-start">
                     <DropdownTrigger>
                         <User 
@@ -135,7 +136,7 @@ export function CustomNavbar({
                             <Button 
                                 className='max-w-[180px] w-full' 
                                 color='danger'
-                                spinner
+                                spinner={<Loader2 className="animate-spin"/>}
                                 onPress={async () => {
                                     await authClient.signOut({
                                         fetchOptions: {
@@ -148,9 +149,12 @@ export function CustomNavbar({
                             >
                                 はい
                             </Button>
-                            <Button className='max-w-[180px] w-full' onPress={() => {
-                                setLogOutConfirm(false);
-                            }}>
+                            <Button 
+                                className='max-w-[180px] w-full' 
+                                onPress={() => {
+                                    setLogOutConfirm(false);
+                                }}
+                            >
                                 いいえ
                             </Button>
                         </div>
