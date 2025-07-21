@@ -2,43 +2,11 @@
 
 import { formSchema } from '@/lib/formschema';
 import { db } from './drizzle';
-import { eq } from 'drizzle-orm';
-import { settings } from './drizzle/schema/public';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { getSession } from './fetch';
-
-
-export type State = {
-    errors?: {
-        name?: string[],
-        email?: string[],
-        password?: string[],
-    },
-    messages?: {
-        success?: string,
-        errors?: string, 
-    }
-};
-
-export type StateOmitName = {
-    errors?: Omit<State['errors'], 'name'>,
-    messages?: {
-        success?: string,
-        errors?: string, 
-    }
-};
-
-export type StatePickEmail = {
-    errors?: Omit<State['errors'], 'name' | 'password'>,
-    messages?: {
-        success?: string,
-        errors?: string, 
-    }
-}
-
 
 
 export async function SignUp(formData: FormData) {
@@ -126,7 +94,6 @@ export async function SignIn(formData: FormData) {
                 asResponse: true
             });
             if (res.ok) {
-                await db.insert(settings).values({email: validatedFields.data.email}).onConflictDoNothing();
                 if (user.twoFactorEnabled !== true) {
                     if ('twoFactorRedirect' in res) {
                         // 2要素認証が無効の場合
@@ -282,15 +249,6 @@ export const setThemeCookie = cache(async () => {
     }
 });
 
-export const setTheme = cache(async (checked: boolean, email: string) => {
-    const theme = await db
-        .update(settings)
-        .set({theme: checked ? 'dark' : 'light'})
-        .where(eq(settings.email, email))
-        .returning({color: settings.theme});
-
-    return theme[0].color;
-});
 
 
 

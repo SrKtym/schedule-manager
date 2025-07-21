@@ -1,9 +1,9 @@
 'use client';
 
-import type { StateOmitName } from '@/lib/action';
 import { useActionState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { setThemeCookie, SignIn } from '@/lib/action';
+import type { StateOmitName } from '@/lib/definitions';
 import { 
     addToast,
     Button,

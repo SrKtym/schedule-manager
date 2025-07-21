@@ -101,3 +101,24 @@ export function DataTableSkelton() {
         </Card>
     );
 }
+
+export function ScheduleSkelton() {
+    return (
+        <Card className="flex flex-col p-4 gap-4 w-full h-[660px] rouded-lg">
+            <div className="flex flex-col items-center gap-4">
+                <Skeleton className="w-[95px] h-[32px]" />
+                <Skeleton className="w-full h-[500px]" />
+            </div>
+            <div className="flex justify-between items-center gap-3">
+                <div className="flex flex-col gap-2">
+                    <Skeleton className="w-[154px] h-[30px] sm:w-[192px]"/>
+                    <div className="flex justify-between items-center gap-2">
+                        <Skeleton className="w-[58px] h-[24px]"/>
+                        <Skeleton className="w-[58px] h-[24px]"/>
+                    </div>
+                </div>
+                <Skeleton className="w-[130px] h-[40px] rounded-md" />
+            </div>
+        </Card>
+    );
+}

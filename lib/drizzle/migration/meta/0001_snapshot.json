@@ -1,6 +1,6 @@
 {
-  "id": "81b4d3bc-5742-485f-b10c-a9cca99b158a",
-  "prevId": "46330ff1-e4ac-40c1-bf68-097656ae89d1",
+  "id": "ebf3ddf3-4e56-4a65-92da-c0cccf503fe0",
+  "prevId": "30fd4c2d-695f-4464-9a82-6dde6c648125",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -245,12 +245,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "textbooks": {
-          "name": "textbooks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
@@ -299,8 +293,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "text": {
-          "name": "text",
+        "body": {
+          "name": "body",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -309,7 +303,7 @@
           "name": "is_read",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "created_at": {
@@ -422,13 +416,19 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "email": {
           "name": "email",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -461,7 +461,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "registered_name_email_unique": {
+          "name": "registered_name_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name",
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -889,9 +898,7 @@
         "2限目",
         "3限目",
         "4限目",
-        "5限目",
-        "6限目",
-        "7限目"
+        "5限目"
       ]
     },
     "public.required": {
@@ -934,7 +941,7 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "definition": "select \"name\" from \"registered\"",

@@ -18,11 +18,6 @@ export default async function TwoFactorPage() {
 
     if (session) {
         const user = await db.query.users.findFirst({
-            with: {
-                accounts: true, 
-                twoFactors: true,
-                settings: true
-            },
             where: (users, {eq}) => (eq(users.id, session.session.userId))
         });
 

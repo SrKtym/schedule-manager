@@ -1,3 +1,32 @@
+// サーバーアクション
+export type State = {
+    errors?: {
+        name?: string[],
+        email?: string[],
+        password?: string[],
+    },
+    messages?: {
+        success?: string,
+        errors?: string, 
+    }
+};
+
+export type StateOmitName = {
+    errors?: Omit<State['errors'], 'name'>,
+    messages?: {
+        success?: string,
+        errors?: string, 
+    }
+};
+
+export type StatePickEmail = {
+    errors?: Omit<State['errors'], 'name' | 'password'>,
+    messages?: {
+        success?: string,
+        errors?: string, 
+    }
+}
+
 // データテーブル
 export const targetGrade = [
     '1学年', '2学年', '3学年', '4学年'
@@ -51,7 +80,7 @@ export const targetDepartment = (faculty?: string) => {
 };
 
 export const week = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日'];
-export const period = ['1限目', '2限目', '3限目', '4限目', '5限目', '6限目', '7限目'];
+export const period = ['1限目', '2限目', '3限目', '4限目', '5限目'];
 export const credit = ['1', '2', '4'];
 export const required = ['必修', '選択必修', '任意'];
 export const rows = [10, 20, 30];
@@ -59,53 +88,43 @@ export const rows = [10, 20, 30];
 export const dataTableColumns = [
     {
         name: '講義名',
-        key: 'name',
-        sortable: true
+        key: 'name'
     },
     {
         name: '対象学年',
-        key: 'targetGrade',
-        sortable: true
+        key: 'targetGrade'
     },
     {
         name: '対象学部',
-        key: 'targetFaculty',
-        sortable: true
+        key: 'targetFaculty'
     },
     {
         name: '対象学科',
-        key: 'targetDepartment',
-        sortable: true
+        key: 'targetDepartment'
     },
     {
         name: '週',
-        key: 'week',
-        sortable: true
+        key: 'week'
     },
     {
         name: '時限',
-        key: 'period',
-        sortable: true
+        key: 'period'
     },
     {
         name: '単位',
-        key: 'credit',
-        sortable: true
+        key: 'credit'
     },
     {
         name: '履修要件',
-        key: 'required',
-        sortable: true
+        key: 'required'
     },
     {
         name: '教室名',
-        key: 'classroom',
-        sortable: true
+        key: 'classroom'
     },
     {
         name: '担当教員',
-        key: 'professor',
-        sortable: true
+        key: 'professor'
     }
 ];
 
@@ -117,12 +136,12 @@ export const times = ['(09:00-10:30)', '(10:40-12:10)', '(13:00-14:30)', '(14:40
 // 受信箱
 export type Message = {
   id: string,
-  sender_email: string,
-  receiver_email: string,
-  subject: string,
-  body: string,
-  is_read: boolean,
-  created_at: string
+  senderEmail: string,
+  receiverEmail: string,
+  subject: string | null,
+  body: string | null,
+  isRead: boolean,
+  createdAt: string
 }
 
 export const sidebarItems = [

@@ -1,6 +1,6 @@
 'use client';
 
-import type { State } from '@/lib/action';
+import type { State } from '@/lib/definitions';
 import { useActionState } from 'react';
 import { SignUp } from '@/lib/action';
 import { 

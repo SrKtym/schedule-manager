@@ -61,12 +61,12 @@ export function Sidebar({
                         />
                         {!isCollapsed && item.label}
                         {item.label === "受信トレイ" 
-                        && messages.some(message => !message.is_read)
+                        && messages.some(message => !message.isRead)
                         ? <Chip 
                             size="sm"
                             color="primary"
                         >
-                            {messages.filter(message => !message.is_read).length}
+                            {messages.filter(message => !message.isRead).length}
                         </Chip>
                         : null}
                     </Button>

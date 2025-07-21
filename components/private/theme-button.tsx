@@ -2,7 +2,9 @@
 
 import { Switch } from "@heroui/react";
 import { Moon, Sun } from "lucide-react";
-import { setTheme } from "@/lib/action";
+import { hc } from "hono/client";
+import { AppType } from "@/app/api/[[...route]]/route";
+import { env } from "@/env";
 
 export function ThemeButton({
     theme,
@@ -11,7 +13,7 @@ export function ThemeButton({
     theme: string,
     email: string
 }) {
-
+    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
     return (
         <Switch
             aria-label="theme button"
@@ -28,7 +30,13 @@ export function ThemeButton({
                     document.documentElement.classList.remove('dark')
                     document.documentElement.classList.add('light')
                 }
-                const theme = await setTheme(e.target.checked, email);
+                const res = await client.api.theme.$post({
+                    json: {
+                        email: email,
+                        checked: e.target.checked
+                    }
+                });
+                const theme = await res.json();
                 document.cookie = `theme=${theme}; path=/home`;
             }}
         >

@@ -169,22 +169,20 @@ export function SearchField(
                     ))}
                 </Select>
             </div>
-            <div className="flex space-x-2">
-                <Input
-                    type="text"
-                    placeholder="講義名を入力してください。"
-                    variant="bordered"
-                    startContent={
-                        <Search 
-                            width={18}
-                            height={18}
-                            color="gray"    
-                        />
-                    }
-                    onChange={(e) => handleSearch(e.target.value)}
-                    defaultValue={param.get('query')?.toString()}
-                />
-            </div>
+            <Input
+                type="text"
+                placeholder="講義名を入力してください。"
+                variant="bordered"
+                startContent={
+                    <Search 
+                        width={18}
+                        height={18}
+                        color="gray"    
+                    />
+                }
+                onChange={(e) => handleSearch(e.target.value)}
+                defaultValue={param.get('query')?.toString()}
+            />
             <div className="flex justify-between items-center space-x-2">
                 <span>
                     検索結果: 

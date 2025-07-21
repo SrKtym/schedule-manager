@@ -10,10 +10,11 @@ import {
     credit, 
     required 
 } from "@/lib/definitions";
-import { getCourse, getItemsLength, getRegisteredCourse } from "@/lib/fetch";
+import { getCourse, getItemsLength, getRegisteredCourse, getSession } from "@/lib/fetch";
 import { Schedule } from "@/components/private/schedule/schedule";
 import { Metadata } from "next";
-import { DataTableSkelton } from "@/components/skeltons";
+import { DataTableSkelton, ScheduleSkelton } from "@/components/skeltons";
+import { course } from "@/lib/drizzle/schema/public";
 
 export const metadata: Metadata = {
     title: '履修登録'
@@ -28,10 +29,10 @@ export default async function RegisterPage(
             week?: string,
             period?: string,
             credit?: string,
-            page?: number
+            page?: string,
             query?: string,
             required?: string,
-            rows?: number
+            rows?: string
         }>
     }   
 ) {
@@ -43,6 +44,9 @@ export default async function RegisterPage(
     const periodList = params.period?.split(',') ?? period;
     const creditList = params.credit?.split(',') ?? credit;
     const requiredList = params.required?.split(',') ?? required;
+    const page = Number(params.page);
+    const rows = Number(params.rows);
+    const session = await getSession();
     const response = await Promise.allSettled([
         getCourse(
             gradeList, 
@@ -52,9 +56,9 @@ export default async function RegisterPage(
             periodList,
             creditList,
             requiredList,
-            params.query,
-            params.page, 
-            params.rows
+            page, 
+            rows,
+            params.query
         ),
         getItemsLength(
             gradeList,
@@ -65,7 +69,8 @@ export default async function RegisterPage(
             creditList,
             requiredList,
             params.query
-        )
+        ),
+        getRegisteredCourse(session)
     ])
     .then((dataList) => {
         const result = dataList.map((data) => {
@@ -73,31 +78,36 @@ export default async function RegisterPage(
                 case 'fulfilled':
                     return data.value;
                 case 'rejected':
-                    return data.reason;
+                    if (data.reason instanceof Error)
+                        return data.reason.message;
             }
         });
         return result;
     })
 
-    const totalPages = Math.ceil(response[1] / (params.rows || 10)) || 1;
+    const totalPages = Math.ceil(response[1] as number / (rows || 10)) || 1;
 
     return (
         <div className="flex flex-col space-y-5 lg:grid grid-cols-2 gap-x-5">
             <div className="space-y-5">
                 <SearchField 
-                    itemsLength={response[1]} 
-                    rowsPerPage={params.rows || 10}
+                    itemsLength={response[1] as number} 
+                    rowsPerPage={rows || 10}
                 />
                 <Suspense fallback={<DataTableSkelton />}>
                     <DataTable 
-                        items={response[0]}
-                        totalPages={totalPages}   
+                        items={response[0] as typeof course.$inferSelect[]}
+                        totalPages={totalPages}
+                        session={session}
                     />
                 </Suspense>
             </div>
             <div>
-                <Suspense fallback>
-                    <Schedule />
+                <Suspense fallback={<ScheduleSkelton />}>
+                    <Schedule 
+                        dataList={response[2] as Awaited<ReturnType<typeof getRegisteredCourse>>}
+                        session={session}
+                    />
                 </Suspense>
             </div>
         </div>

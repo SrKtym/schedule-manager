@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1750229395970,
-      "tag": "0000_yellow_chimera",
+      "when": 1752904214787,
+      "tag": "0000_lean_loners",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1750327818007,
-      "tag": "0001_messy_albert_cleary",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1750399009233,
-      "tag": "0002_swift_hiroim",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752044890721,
-      "tag": "0003_wooden_gwen_stacy",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752045047198,
-      "tag": "0004_naive_mandrill",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1752047250954,
-      "tag": "0005_ordinary_chimera",
+      "when": 1752907589241,
+      "tag": "0001_silly_deathstrike",
       "breakpoints": true
     }
   ]

@@ -1,9 +1,12 @@
+// データ取得のみ
+
 import { db } from "./drizzle";
 import { auth } from "@/lib/auth";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
-import { registered } from "./drizzle/schema/public";
-import { eq, sql } from "drizzle-orm";
+import { course, registered } from "./drizzle/schema/public";
+import { eq } from "drizzle-orm";
+
 
 export const getSession = cache(async () => {
     const settionData = await auth.api.getSession({
@@ -14,7 +17,10 @@ export const getSession = cache(async () => {
 
 export async function get2faCookie() {
     const cookieStore = await cookies();
-    return cookieStore.get('better-auth.two_factor')?.value;
+    const cookieName = process.env.NODE_ENV === 'development' ?
+        'better-auth.two_factor' : 
+        '__Secure-better-auth.two_factor';
+    return cookieStore.get(cookieName)?.value;
 }
 
 export async function getThemeCookie() {
@@ -22,6 +28,7 @@ export async function getThemeCookie() {
     return cookieStore.get('theme')?.value || 'light';
 }
 
+// 講義一覧の取得
 export const getCourse = cache(async (
     gradeList: string[], 
     facultyList: string[],
@@ -30,9 +37,9 @@ export const getCourse = cache(async (
     periodList: string[],
     creditList: string[],
     requiredList: string[],
-    query?: string,
     page?: number,
-    rows?: number
+    rows?: number,
+    query?: string
 ) => {
     const result = await db.query.course.findMany({
         where: (course, {or, and, inArray, isNull, ilike}) => 
@@ -61,6 +68,7 @@ export const getCourse = cache(async (
     return result;
 });
 
+// 講義の総数を取得
 export const getItemsLength = cache(async (
     gradeList: string[], 
     facultyList: string[],
@@ -97,16 +105,19 @@ export const getItemsLength = cache(async (
     return result.length;
 })
 
-export const getRegisteredCourse = cache(async (period: string, week: string) => {
-    const session = await getSession();
-    if (session) {
-        const result = await db
-            .select({
-                name: sql<string>`coalesce(${registered.name}, "-")`
-            })
-            .from(registered)
-            .where(eq(registered.email, session.user.email));
+// 登録済みの講義を取得
+export const getRegisteredCourse = cache(async (session: Awaited<ReturnType<typeof getSession>>) => {   
+    const result = await db
+        .select({
+            course: {
+                name: course.name,
+                period: course.period,
+                week: course.week,
+                credit: course.credit
+            }})
+        .from(registered)
+        .innerJoin(course, eq(course.name, registered.name))
+        .where(eq(registered.email, session?.user.email as string))
 
-        return result;
-    }
+    return result;     
 });

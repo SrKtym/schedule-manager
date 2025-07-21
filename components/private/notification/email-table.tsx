@@ -23,6 +23,9 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Message } from "@/lib/definitions";
+import { hc } from "hono/client";
+import { AppType } from "@/app/api/[[...route]]/route";
+import { env } from "@/env";
 
 export function EmailTable({
     messages,
@@ -31,13 +34,19 @@ export function EmailTable({
     messages: Message[],
     ref: React.RefObject<Message | null>
 }) {
+    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL)
     const [open, setOpen] = useState<boolean>(false);
     const router = useRouter();
-    const getMessagesById = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+    const getMessagesById = async (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
         const filtered = messages.filter(message => 
             message.id === e.currentTarget.getAttribute("data-key")
         );
         ref.current = filtered[0];
+        
+        // 既読に変更
+        await client.api.messages.$patch({
+            json: ref.current.id
+        });
         setOpen(true);
     } 
 
@@ -124,7 +133,7 @@ export function EmailTable({
                             key={message.id}
                             onClick={getMessagesById}
                             className={cn("hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer",
-                                message.is_read ? "bg-content1" : "bg-content2")}
+                                message.isRead ? "bg-content1" : "bg-content2")}
                         >
                             <TableCell>
                                 <div className="flex items-center gap-3">
@@ -133,14 +142,14 @@ export function EmailTable({
                                         icon="lucide:star"
                                         width={18}
                                         height={18}
-                                        className={message.is_read ? "text-warning" : "text-default-400"}
+                                        className={message.isRead ? "text-warning" : "text-default-400"}
                                     />
                                     <Avatar 
-                                        name={message.sender_email} 
+                                        name={message.senderEmail} 
                                         size="sm" 
                                     />
                                     <span>
-                                        {message.sender_email}
+                                        {message.senderEmail}
                                     </span>
                                 </div>
                             </TableCell>
@@ -159,9 +168,9 @@ export function EmailTable({
                                     <Chip 
                                         size="sm" 
                                         variant="flat" 
-                                        color={message.is_read ? "default" : "primary"}
+                                        color={message.isRead ? "default" : "primary"}
                                     >
-                                        {message.created_at}
+                                        {message.createdAt.replace("T", " ")}
                                     </Chip>
                                 </div>
                             </TableCell>
@@ -170,7 +179,7 @@ export function EmailTable({
                 </TableBody>
             </Table>
 
-            {/* メールモーダル */}
+            {/* メール詳細 */}
                 <Modal
                     isOpen={open}
                     onOpenChange={setOpen}    
@@ -178,13 +187,13 @@ export function EmailTable({
                     <ModalContent>
                         <ModalHeader className="flex flex-col space-y-2">
                             <h1 className="text-2xl">{ref.current?.subject}</h1>
-                            <p className="text-sm">From: {ref.current?.sender_email}</p>
+                            <p className="text-sm">From: {ref.current?.senderEmail}</p>
                         </ModalHeader>
                         <ModalBody>
                             {ref.current?.body}
                         </ModalBody>
                         <ModalFooter>
-                            {ref.current?.created_at}
+                            {ref.current?.createdAt.replace("T", " ")}
                         </ModalFooter>
                     </ModalContent>
                 </Modal>     

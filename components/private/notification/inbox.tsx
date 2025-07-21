@@ -9,9 +9,13 @@ import { InboxSkelton } from "../../skeltons";
 import type { Message } from "@/lib/definitions";
 import { Sidebar } from "./sidebar";
 import { EmailTable } from "./email-table";
+import { type InferResponseType, hc } from "hono/client";
+import { env } from "@/env";
+import { AppType } from "@/app/api/[[...route]]/route";
 
 
 export function EmailInbox({email}: {email: string}) {
+    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
     const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -19,14 +23,14 @@ export function EmailInbox({email}: {email: string}) {
 
 
     const fetchMessages = async () => {
-        const { data } = await supabase
-            .from('messages')
-            .select('*')
-            .eq('receiver_email', email)
-            .order('created_at', { ascending: false });
-
-        if (data) {
-            setMessages(data);
+        const data = await client.api.messages.$get({
+            query: {
+                email: email
+            }
+        });
+        if (data.ok) {
+            const res = await data.json();
+            setMessages(res);
         }
 
         setIsLoading(false);
@@ -41,10 +45,10 @@ export function EmailInbox({email}: {email: string}) {
             .on(
                 'postgres_changes',
                 {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'messages',
-                filter: `receiver_email=eq.${email}`,
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `receiver_email=eq.${email}`,
                 },
                 (payload) => {
                     const newMessage = payload.new as Message;

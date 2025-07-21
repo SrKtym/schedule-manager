@@ -1,6 +1,6 @@
 'use client';
 
-import type { StatePickEmail } from "@/lib/action";
+import type { StatePickEmail } from "@/lib/definitions";
 import { ConfirmEmail } from "@/lib/action";
 import { authClient } from "@/lib/auth-client";
 import { useActionState } from "react";

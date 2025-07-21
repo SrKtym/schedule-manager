@@ -8,6 +8,8 @@ import {
     pgView, 
     pgPolicy, 
     pgRole,
+    unique,
+    foreignKey,
     primaryKey
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
@@ -57,7 +59,7 @@ export const departmentEnum = pgEnum("department", [
 ]);
 
 export const weekEnum = pgEnum("week", ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日']);
-export const periodEnum = pgEnum("period", ['1限目', '2限目', '3限目', '4限目', '5限目', '6限目', '7限目']);
+export const periodEnum = pgEnum("period", ['1限目', '2限目', '3限目', '4限目', '5限目']);
 export const creditEnum = pgEnum("credit", ['1', '2', '4']);
 export const requiredEnum = pgEnum("required", ['必修', '選択必修', '任意']);
 export const themeEnum = pgEnum("theme", ['light', 'dark']);
@@ -182,18 +184,35 @@ export const course = pgTable("course", {
     credit: creditEnum().notNull(),
     required: requiredEnum().notNull(),
     classroom: text('classroom').notNull(),
-    professor: text('professor').notNull(),
-    textbooks: text('textbooks')
+    professor: text('professor').notNull()
 });
-
 
 
 export const registered = pgTable("registered", {
-    name: text('name')
-        .references(() => course.name, { onDelete: 'cascade' }),
-    email: text('email')
-        .references(() => users.email, { onDelete: 'cascade' })
-});
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    period: periodEnum().notNull(),
+    week: weekEnum().notNull(),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID())
+}, (t) => ({
+     /* foreignKey()演算子を使った外部キー制約の定義 */ 
+    uni: unique().on(t.email, t.period, t.week),
+    nameFk: foreignKey({
+        name: 'registered_name_course_name_fk',
+        columns: [t.name],
+        foreignColumns: [course.name]
+    })
+        .onDelete('cascade'),
+
+    emailFk: foreignKey({
+        name: 'registered_email_users_email_fk',
+        columns: [t.email],
+        foreignColumns: [users.email]
+    })
+        .onDelete('cascade')
+}));
 
 
 
@@ -205,7 +224,7 @@ export const messages = pgTable("messages", {
     receiverEmail: text('receiver_email').notNull(),
     subject: text('subject'),
     body: text('body'),
-    isRead: boolean('is_read').default(false),
+    isRead: boolean('is_read').default(false).notNull(),
     createdAt: timestamp('created_at').notNull()
 })
 
@@ -246,28 +265,28 @@ export const policyOnCourse = pgPolicy("policy on course", {
 
 
 
-export const usersRelation = relations(users, ({many}) => ({
+export const usersRelations = relations(users, ({many}) => ({
     accounts: many(accounts),
-    twoFactors: many(twoFactors),
-    settings: many(settings),
-    attribute: many(attribute),
-    registered: many(registered)
+    attribute: many(attribute)
 }));
 
-export const accountsRelation = relations(accounts, ({one}) => ({
+export const courseRelations = relations(course, ({one}) => ({
+    registered: one(registered)
+}))
+
+export const accountsRelations = relations(accounts, ({one}) => ({
     user: one(users, {
         fields: [accounts.userId],
         references: [users.id]
     })
 }));
 
-export const twoFactorsRelation = relations(twoFactors, ({one}) => ({
+export const twoFactorsRelations = relations(twoFactors, ({one}) => ({
     user: one(users, {
         fields: [twoFactors.userId],
         references: [users.id]
     })
 }));
-
 
 export const settingsRelations = relations(settings, ({one}) => ({
     user: one(users, {
@@ -287,5 +306,11 @@ export const registeredRelations = relations(registered, ({one}) => ({
     user: one(users, {
         fields: [registered.email],
         references: [users.email]
+    }),
+    course: one(course, {
+        fields: [registered.name],
+        references: [course.name]
     })
 }));
+
+
