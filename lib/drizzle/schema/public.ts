@@ -9,12 +9,9 @@ import {
     pgPolicy, 
     pgRole,
     unique,
-    foreignKey,
-    primaryKey
+    foreignKey
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-
-
 
 
 export const gradeEnum = pgEnum("grade", ['1学年', '2学年', '3学年', '4学年']);
@@ -58,7 +55,8 @@ export const departmentEnum = pgEnum("department", [
     '保健学科',
 ]);
 
-export const weekEnum = pgEnum("week", ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日']);
+export const weekEnum = pgEnum("week", ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"]);
+export const daysEnum = pgEnum("days", ['日', '月', '火', '水', '木', '金', '土'])
 export const periodEnum = pgEnum("period", ['1限目', '2限目', '3限目', '4限目', '5限目']);
 export const creditEnum = pgEnum("credit", ['1', '2', '4']);
 export const requiredEnum = pgEnum("required", ['必修', '選択必修', '任意']);
@@ -210,10 +208,30 @@ export const registered = pgTable("registered", {
         name: 'registered_email_users_email_fk',
         columns: [t.email],
         foreignColumns: [users.email]
-    })
-        .onDelete('cascade')
+    }).onDelete('cascade')
 }));
 
+
+export const schedule = pgTable("schedule", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    email: text('email').notNull(),
+    title: text('title')
+        .notNull()
+        .default('（タイトルなし）'),
+    start: timestamp('start', { mode: 'date', precision: 0 }).notNull(),
+    end: timestamp('end', { mode: 'date', precision: 0 }).notNull(),
+    description: text('description'),
+    color: text('color').notNull()
+}, (t) => ({
+    uni: unique().on(t.email, t.start, t.end),
+    emailFk: foreignKey({
+        name: 'schedule_email_users_email_fk',
+        columns: [t.email],
+        foreignColumns: [users.email]
+    }).onDelete('cascade')
+}))
 
 
 export const messages = pgTable("messages", {
@@ -228,9 +246,9 @@ export const messages = pgTable("messages", {
     createdAt: timestamp('created_at').notNull()
 })
 
-export const scheduleView = pgView("schedule_view")
-    .as((qb) => qb.select({name: registered.name})
-    .from(registered));
+// export const scheduleView = pgView("schedule_view")
+//     .as((qb) => qb.select({name: registered.name})
+//     .from(registered));
 
 
 
