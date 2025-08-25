@@ -7,5 +7,6 @@ export const authClient = createAuthClient({
     baseURL: env.NEXT_PUBLIC_APP_URL,
     plugins: [
         passkeyClient(), 
-        twoFactorClient()]
+        twoFactorClient()
+    ]
 });
