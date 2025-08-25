@@ -12,6 +12,7 @@ export const env = createEnv({
         TWITTER_CLIENT_ID: z.string(),
         TWITTER_CLIENT_SECRET: z.string(),
         RESEND_API_KEY: z.string(),
+        ARCJET_KEY: z.string(),
         DATABASE_URL: z.string().url()
     },
 
@@ -31,6 +32,7 @@ export const env = createEnv({
         TWITTER_CLIENT_SECRET: process.env.TWITTER_CLIENT_SECRET!,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL!,
         RESEND_API_KEY: process.env.RESEND_API_KEY!,
+        ARCJET_KEY: process.env.ARCJET_KEY!,
         DATABASE_URL: process.env.DATABASE_URL!,
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
