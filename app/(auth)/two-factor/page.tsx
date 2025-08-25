@@ -1,9 +1,9 @@
 import { get2faCookie, getSession } from '@/lib/fetch';
 import { db } from '@/lib/drizzle';
-import { TwoFactorSettings } from '@/components/login/two-factor-settings';
+import { TwoFactorSettings } from '@/components/auth/two-factor/two-factor-settings';
 import { redirect } from 'next/navigation';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
-import { OtpVerifyForm } from '@/components/login/otp-verify-form';
+import { OtpVerifyForm } from '@/components/auth/two-factor/otp-verify-form';
 import { Metadata } from "next";
 
 

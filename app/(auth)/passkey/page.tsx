@@ -1,4 +1,4 @@
-import { PasskeyCard } from "@/components/login/passkey-card";
+import { PasskeyCard } from "@/components/auth/passkey/passkey-card";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

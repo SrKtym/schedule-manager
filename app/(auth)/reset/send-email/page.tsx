@@ -1,4 +1,4 @@
-import SendEmail from "@/components/reset-password/send-email-form";
+import SendEmail from "@/components/auth/reset/send-email-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
