@@ -4,7 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { db } from '@/lib/drizzle';
 import { course, messages, registered, settings } from '@/lib/drizzle/schema/public';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 // nodejsランタイム
 
@@ -21,8 +21,7 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const {period} = c.req.valid('query');
-            const {week} = c.req.valid('query');
+            const {period, week} = c.req.valid('query');
             const dataList = await db
                 .select({
                     name: course.name,
@@ -46,13 +45,12 @@ const app = new Hono()
         zValidator(
             'json',
             z.object({
-                email: z.string(),
+                email: z.string().email(),
                 name: z.string()
             })
         ),
         async (c) => {
-            const {email} = c.req.valid('json');
-            const {name} = c.req.valid('json');
+            const {email, name} = c.req.valid('json');
             await db.transaction(async (tx) => {
                 const sq = await tx
                     .select({
@@ -89,13 +87,12 @@ const app = new Hono()
         zValidator(
             'json',
             z.object({
-                email: z.string(),
+                email: z.string().email(),
                 name: z.array(z.string())
             })
         ),
         async (c) => {
-            const {email} = c.req.valid('json');
-            const {name} = c.req.valid('json');
+            const {email, name} = c.req.valid('json');    
             await db.transaction(async (tx) => {
                 const sq = await tx
                     .select({
@@ -133,26 +130,6 @@ const app = new Hono()
             });
         })
 
-    // 通知の取得
-    .get('/messages',
-        zValidator(
-            'query',
-            z.object({
-                email: z.string()
-            })
-        ),
-        async (c) => {
-            const {email} = c.req.valid('query');
-            const data = await db
-                .select()
-                .from(messages)
-                .where(eq(messages.receiverEmail, email))
-                .orderBy(desc(messages.createdAt))
-
-            return c.json(data);
-        }
-    )
-
     // 通知を既読に変更
     .patch('/messages',
         zValidator(
@@ -177,16 +154,18 @@ const app = new Hono()
         zValidator(
             'json',
             z.object({
-                email: z.string(),
+                email: z.string().email(),
                 checked: z.boolean()
             })
         ),
         async (c) => {
-            const {email} = c.req.valid('json');
-            const {checked} = c.req.valid('json');
+            const {email, checked} = c.req.valid('json');
             const theme = await db
                 .insert(settings)
-                .values({email: email})
+                .values({
+                    email: email,
+                    theme: checked ? 'dark' : 'light' 
+                })
                 .onConflictDoUpdate({
                     target: settings.email,
                     set: {
@@ -197,7 +176,6 @@ const app = new Hono()
 
             return c.json(theme[0].color);
         }
-
     )
 
 export type AppType = typeof app;
