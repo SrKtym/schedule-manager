@@ -1,16 +1,19 @@
+// データ更新系
 'use server';
 
-import { formSchema } from '@/lib/formschema';
+import { logInFormSchema, scheduleSchema, ScheduleState } from '@/lib/definitions';
 import { db } from './drizzle';
 import { auth } from '@/lib/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { getSession } from './fetch';
+import { schedule } from './drizzle/schema/public';
+import { revalidatePath } from 'next/cache';
 
 
-export async function SignUp(formData: FormData) {
-    const validatedFields = formSchema.safeParse({
+export async function signUp(formData: FormData) {
+    const validatedFields = logInFormSchema.safeParse({
         name: formData.get('name'),
         email: formData.get('email'),
         password: formData.get('password'),
@@ -57,8 +60,8 @@ export async function SignUp(formData: FormData) {
     }
 }
 
-export async function SignIn(formData: FormData) {
-    const validatedFields = formSchema.omit({name: true}).safeParse({
+export async function signIn(formData: FormData) {
+    const validatedFields = logInFormSchema.omit({name: true}).safeParse({
         email: formData.get('email'),
         password: formData.get('password'),
     });
@@ -145,8 +148,8 @@ export async function SignIn(formData: FormData) {
 } 
 
 
-export async function ConfirmEmail(formData: FormData) {
-    const validatedField = formSchema.omit({name: true, password: true}).safeParse({
+export async function confirmEmail(formData: FormData) {
+    const validatedField = logInFormSchema.omit({name: true, password: true}).safeParse({
         email: formData.get('email'),
     });
     
@@ -183,8 +186,23 @@ export async function ConfirmEmail(formData: FormData) {
     }
 }
 
-export async function ResetPasswordAction(formData: FormData, token: string) {    
-    const validatedField = formSchema.omit({name: true, email: true}).safeParse({
+export async function confirmPassword(formData: FormData) {
+    const validatedField = logInFormSchema.omit({name: true, email: true}).safeParse({
+        password: formData.get('password'),
+    });
+    if (validatedField.error) {
+        return {
+            error: validatedField.error.flatten().fieldErrors.password
+        }
+    } else {
+        return {
+            success: validatedField.data.password
+        }
+    }
+}
+
+export async function resetPasswordAction(formData: FormData, token: string) {    
+    const validatedField = logInFormSchema.omit({name: true, email: true}).safeParse({
         password: formData.get('password'),
     });
     
@@ -219,18 +237,32 @@ export async function ResetPasswordAction(formData: FormData, token: string) {
     }
 }
 
-export async function ConfirmPassword(formData: FormData) {
-    const validatedField = formSchema.omit({name: true, email: true}).safeParse({
-        password: formData.get('password'),
+export async function createSchedule(prevState: ScheduleState | undefined, formData: FormData) {
+    const validatedFields = scheduleSchema.safeParse({
+        email: formData.get('email'),
+        title: formData.get('title'),
+        description: formData.get('description'),
+        start: formData.get('dateRangeStart'),
+        end: formData.get('dateRangeEnd'),
+        color: formData.get('color'),
     });
-    if (validatedField.error) {
+    if (validatedFields.error) {
         return {
-            error: validatedField.error.flatten().fieldErrors.password
-        }
+            error: validatedFields.error.flatten().fieldErrors
+        };
     } else {
-        return {
-            success: validatedField.data.password
-        }
+        await db
+            .insert(schedule)
+            .values(validatedFields.data)
+            .onConflictDoUpdate({
+                target: [schedule.email, schedule.start, schedule.end],
+                set: {
+                    title: validatedFields.data.title,
+                    description: validatedFields.data.description,
+                    color: validatedFields.data.color
+                }
+            });
+        revalidatePath('/home/schedule');
     }
 }
 
