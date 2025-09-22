@@ -62,7 +62,10 @@ export function CommentsOnAssignment({id}: {id: string}) {
         
                         <div className="space-y-6">
                             {filteredComments.map((comment) => (
-                                <div className="flex gap-3">
+                                <div 
+                                    key={comment.id}
+                                    className="flex gap-3"
+                                >
                                     <Avatar
                                         name={comment.userName}
                                         size="sm"

@@ -34,8 +34,9 @@ export function OtherAssignment({id}: {id: string}) {
                     
                     <div className="space-y-3">
                         {currentAssignment?.map((assignment) => (
-                            <Button 
-                                variant="light" 
+                            <Button
+                                key={assignment.id}
+                                variant="light"
                                 className="w-full justify-start text-left h-auto py-2"
                                 startContent={
                                     <div className="w-8 h-8 rounded-full bg-content2 flex items-center justify-center flex-shrink-0">
