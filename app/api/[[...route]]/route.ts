@@ -1,10 +1,24 @@
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { db } from '@/lib/drizzle';
-import { course, messages, registered, settings } from '@/lib/drizzle/schema/public';
+import { 
+    assignmentStatus, 
+    attachmentMetaData, 
+    course, 
+    messages, 
+    registered, 
+    settings, 
+    submissionMetaData 
+} from '@/lib/drizzle/schema/public';
 import { and, eq, inArray } from 'drizzle-orm';
+import { 
+    selectAssignmentStatusSchema, 
+    selectAttachmentMetaDataSchema, 
+    selectRegisteredSchema, 
+    selectSubmissionMetaDataSchema 
+} from '@/schemas/select-schema';
 
 // nodejsランタイム
 
@@ -15,10 +29,7 @@ const app = new Hono()
     .get('/course',
         zValidator(
             'query',
-            z.object({
-                period: z.enum(["1限目", "2限目", "3限目", "4限目", "5限目"]),
-                week: z.enum(["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"])
-            })
+            selectRegisteredSchema.pick({period: true, week: true})
         ),
         async (c) => {
             const {period, week} = c.req.valid('query');
@@ -44,10 +55,7 @@ const app = new Hono()
     .post('/course/single',
         zValidator(
             'json',
-            z.object({
-                email: z.string().email(),
-                name: z.string()
-            })
+            selectRegisteredSchema.pick({email: true, name: true})
         ),
         async (c) => {
             const {email, name} = c.req.valid('json');
@@ -86,8 +94,7 @@ const app = new Hono()
     .post('/course/multiple',
         zValidator(
             'json',
-            z.object({
-                email: z.string().email(),
+            selectRegisteredSchema.pick({email: true, name: true}).extend({
                 name: z.array(z.string())
             })
         ),
@@ -120,10 +127,10 @@ const app = new Hono()
     .delete('/course', 
         zValidator(
             'json',
-            z.string()
+            selectRegisteredSchema.pick({name: true})
         ),
         async (c) => {
-            const name = c.req.valid('json');
+            const {name} = c.req.valid('json');
             await db.delete(registered).where(eq(registered.name, name));
             return c.json({
                 success: '登録を解除しました。'
@@ -145,6 +152,103 @@ const app = new Hono()
 
             return c.json({
                 success: '既読済み'
+            });
+        }
+    )
+
+    // 課題の提出または編集（学生用）
+    .post('/assignment',
+        zValidator(
+            'json',
+            z.object({
+                assignment: selectAssignmentStatusSchema.omit({
+                    evaluated: true
+                }),
+                submission: selectSubmissionMetaDataSchema.pick({
+                    name: true,
+                    type: true,
+                    url: true
+                })
+            })
+        ),
+        async (c) => {
+            const {assignment, submission} = c.req.valid('json');
+
+            await db.transaction(async (tx) => {
+                await tx
+                    .insert(assignmentStatus)
+                    .values({
+                        assignmentId: assignment.assignmentId,
+                        courseName: assignment.courseName,
+                        email: assignment.email,
+                        userName: assignment.userName,
+                        status: assignment.status
+                    })
+                    .onConflictDoUpdate({
+                        target: [
+                            assignmentStatus.assignmentId, 
+                            assignmentStatus.courseName, 
+                            assignmentStatus.email
+                        ],
+                        set: {
+                            status: assignment.status
+                        }
+                });
+
+                await tx
+                    .insert(submissionMetaData)
+                    .values({
+                        name: submission.name,
+                        type: submission.type,
+                        url: submission.url
+                    })
+                    .onConflictDoUpdate({
+                        target: submissionMetaData.url,
+                        set: {
+                            name: submission.name,
+                            type: submission.type,
+                            url: submission.url
+                        }
+                    });
+            });
+
+            return c.json({
+                success: '提出または編集に成功しました。'
+            });
+        }
+    )
+
+    // 講義資料メタデータの保存と更新（教員用）
+    .post('/material',
+        zValidator(
+            'json',
+            selectAttachmentMetaDataSchema.pick({
+                name: true,
+                type: true,
+                url: true
+            })
+        ),
+        async (c) => {
+            const {name, type, url} = c.req.valid('json');
+
+            await db.insert(attachmentMetaData)
+                .values({
+                    name: name,
+                    type: type,
+                    url: url,
+
+                })
+                .onConflictDoUpdate({
+                    target: attachmentMetaData.url,
+                    set: {
+                        name: name,
+                        type: type,
+                        url: url
+                    }
+                });
+
+            return c.json({
+                success: 'ファイルのメタデータを保存しました。'
             });
         }
     )
