@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth";
-import { aj } from "@/lib/arcjet";
+import { auth } from "@/lib/better-auth/auth";
+import { aj } from "@/lib/arcjet/arcjet";
 import ip from "@arcjet/ip";
 import {
     type ArcjetDecision,
@@ -13,7 +13,7 @@ import {
 } from "@arcjet/next";
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/fetch";
+import { getSession } from "@/utils/fetch";
 
 const emailOptions = {
     mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
@@ -114,6 +114,5 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
     }
-
     return authHandlers.POST(req);
 };
