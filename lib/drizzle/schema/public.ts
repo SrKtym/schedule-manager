@@ -9,11 +9,13 @@ import {
     pgPolicy, 
     pgRole,
     unique,
-    foreignKey
+    foreignKey,
+    check,
+    primaryKey
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-
+// Enum型の定義
 export const gradeEnum = pgEnum("grade", ['1学年', '2学年', '3学年', '4学年']);
 export const facultyOfEnum = pgEnum("faculty", [
     '文学部', 
@@ -62,11 +64,24 @@ export const creditEnum = pgEnum("credit", ['1', '2', '4']);
 export const requiredEnum = pgEnum("required", ['必修', '選択必修', '任意']);
 export const themeEnum = pgEnum("theme", ['light', 'dark']);
 export const notificationEnum = pgEnum("notification", ['on', 'off']);
+export const assignmentStatusEnum = pgEnum("status", ['未提出', '提出済', '評定済']);
+export const fileTypeEnum = pgEnum("file_type", ['PDFファイル', 'Wordファイル', 'Excelファイル', 'PowerPointファイル']);
+export const announcementTypeEnum = pgEnum("announcement_type", ['資料', 'アンケート', 'その他']);
 
+// ロールの定義
 export const admin = pgRole("admin", { createRole: true, createDb: true, inherit: true }).existing();
 export const professor = pgRole("professor").existing();
 
 
+
+
+
+// -----------------------------------------------------------------------------------------------
+// Better-Auth用のテーブル
+// -----------------------------------------------------------------------------------------------
+
+
+// ユーザー
 export const users = pgTable("users", {
     id: text('id')
         .primaryKey()
@@ -75,31 +90,48 @@ export const users = pgTable("users", {
     email: text('email').notNull().unique(),
     emailVerified: boolean('email_verified').notNull(),
     image: text('image'),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').$onUpdate(() => new Date()).notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
     username: text('username').unique(),
     displayUsername: text('display_username'),
+    role: text("role"),
+    banned: boolean("banned"),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires"),
     twoFactorEnabled: boolean('two_factor_enabled')
 });
 
+// セッション
 export const sessions = pgTable("sessions", {
     id: text('id').primaryKey(),
     expiresAt: timestamp('expires_at').notNull(),
     token: text('token').notNull().unique(),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').$onUpdate(() => new Date()).notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
     ipAddress: text('ip_address'),
     userAgent: text('user_agent'),
     userId: text('user_id')
         .notNull()
-        .references(()=> users.id, { onDelete: 'cascade' })
+        .references(()=> users.id, { onDelete: 'cascade' }),
+    impersonatedBy: text("impersonated_by")
 });
 
+// アカウント
 export const accounts = pgTable("accounts", {
     id: text('id').primaryKey(),
     accountId: text('account_id').notNull(),
     providerId: text('provider_id').notNull(),
-    userId: text('user_id').notNull().references(()=> users.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+        .notNull()
+        .references(()=> users.id, { onDelete: 'cascade' }),
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),
@@ -107,17 +139,26 @@ export const accounts = pgTable("accounts", {
     refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     scope: text('scope'),
     password: text('password'),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').$onUpdate(() => new Date()).notNull()
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull()
 });
 
+// 認証
 export const verifications = pgTable("verifications", {
     id: text('id').primaryKey(),
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at'),
-    updatedAt: timestamp('updated_at').$onUpdate(() => new Date())
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull()
 }, () => [
     pgPolicy("policy on verification"), {
         as: 'permissive',
@@ -128,13 +169,17 @@ export const verifications = pgTable("verifications", {
     }
 ]);
 
+// 2要素認証
 export const twoFactors = pgTable("two_factors", {
     id: text('id').primaryKey(),
     secret: text('secret').notNull(),
     backupCodes: text('backup_codes').notNull(),
-    userId: text('user_id').notNull().references(()=> users.id, { onDelete: 'cascade' })
+    userId: text('user_id')
+        .notNull()
+        .references(()=> users.id, { onDelete: 'cascade' })
 });
 
+// パスキー認証
 export const passkeys = pgTable("passkeys", {
     id: text('id').primaryKey(),
     name: text('name'),
@@ -148,11 +193,33 @@ export const passkeys = pgTable("passkeys", {
     backedUp: boolean('backed_up').notNull(),
     transports: text('transports'),
     createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    aaguid: text("aaguid"),
+});
+
+// JWK
+export const jwkss = pgTable("jwkss", {
+    id: text("id").primaryKey(),
+    publicKey: text("public_key").notNull(),
+    privateKey: text("private_key").notNull(),
+    createdAt: timestamp("created_at")
+        .defaultNow()
+        .notNull(),
 });
 
 
 
 
+
+
+
+
+// -----------------------------------------------------------------------------------------------
+// 以下はカスタムテーブル
+// -----------------------------------------------------------------------------------------------
+
+// テーマと通知の設定
 export const settings = pgTable("settings", {
     email: text('email')
         .primaryKey()
@@ -161,7 +228,7 @@ export const settings = pgTable("settings", {
     notification: notificationEnum().default('on').notNull()
 });
 
-
+// 学生の所属
 export const attribute = pgTable("attribute", {
     email: text('email')
         .primaryKey()
@@ -171,7 +238,7 @@ export const attribute = pgTable("attribute", {
     department: departmentEnum().notNull(),
 });
 
-
+// 講義
 export const course = pgTable("course", {
     name: text('name').primaryKey(),
     week: weekEnum().notNull(),
@@ -185,33 +252,29 @@ export const course = pgTable("course", {
     professor: text('professor').notNull()
 });
 
-
+// 履修登録
 export const registered = pgTable("registered", {
     name: text('name').notNull(),
     email: text('email').notNull(),
     period: periodEnum().notNull(),
-    week: weekEnum().notNull(),
-    id: text('id')
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID())
-}, (t) => ({
+    week: weekEnum().notNull()
+}, (t) => ([
      /* foreignKey()演算子を使った外部キー制約の定義 */ 
-    uni: unique().on(t.email, t.period, t.week),
-    nameFk: foreignKey({
-        name: 'registered_name_course_name_fk',
+    primaryKey({
+        columns: [t.email, t.period, t.week]
+    }),
+    foreignKey({
         columns: [t.name],
         foreignColumns: [course.name]
-    })
-        .onDelete('cascade'),
+    }).onDelete('cascade'),
 
-    emailFk: foreignKey({
-        name: 'registered_email_users_email_fk',
+    foreignKey({
         columns: [t.email],
         foreignColumns: [users.email]
     }).onDelete('cascade')
-}));
+]));
 
-
+// スケジュール
 export const schedule = pgTable("schedule", {
     id: text('id')
         .primaryKey()
@@ -224,16 +287,15 @@ export const schedule = pgTable("schedule", {
     end: timestamp('end', { mode: 'date', precision: 0 }).notNull(),
     description: text('description'),
     color: text('color').notNull()
-}, (t) => ({
-    uni: unique().on(t.email, t.start, t.end),
-    emailFk: foreignKey({
-        name: 'schedule_email_users_email_fk',
+}, (t) => ([
+    unique().on(t.email, t.start, t.end),
+    foreignKey({
         columns: [t.email],
         foreignColumns: [users.email]
     }).onDelete('cascade')
-}))
+]));
 
-
+// メッセージ
 export const messages = pgTable("messages", {
     id: text('id')
         .primaryKey()
@@ -243,16 +305,174 @@ export const messages = pgTable("messages", {
     subject: text('subject'),
     body: text('body'),
     isRead: boolean('is_read').default(false).notNull(),
-    createdAt: timestamp('created_at').notNull()
-})
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull()
+});
 
+// 課題の内容（教員用）
+export const assignmentData = pgTable("assignment_data", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    courseName: text('course_name')
+        .references(() => course.name, { onDelete: 'cascade' })
+        .notNull(),
+    name: text('name').notNull(),
+    description: text('description'),
+    points: integer('points').notNull(),
+    dueDate: timestamp('due_date').notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+    type: fileTypeEnum(),
+    attachmentsMetaDataIds: text('attachments_metadata_ids')
+        .array()
+        .references(() => attachmentMetaData.id, { onDelete: 'cascade' })
+});
+
+// 学生ごとの課題の状態
+export const assignmentStatus = pgTable("assignment_status", {
+    assignmentId: text('assignment_id')
+        .references(() => assignmentData.id, { onDelete: 'cascade' })
+        .notNull(),
+    email: text('email')
+        .references(() => registered.email, { onDelete: 'cascade' })
+        .notNull(),
+    userName: text('user_name')
+        .references(() => users.name, { onDelete: 'cascade' })
+        .notNull(),
+    courseName: text('course_name')
+        .references(() => registered.name, { onDelete: 'cascade' })
+        .notNull(),
+    status: assignmentStatusEnum().notNull(),
+    evaluated: integer('evaluated'),
+}, (t) => [
+    // ステータスが「評定済」でなければ、評定値はnull、または
+    // ステータスが「評定済」なら、評定値はnullでない
+    check("status_check", 
+        sql`(${t.status} != '評定済' AND ${t.evaluated} IS NULL) OR 
+        (${t.status} = '評定済' AND ${t.evaluated} IS NOT NULL)`),
+    primaryKey({
+        columns: [t.assignmentId, t.email]
+    })
+
+]);
+
+// 提出物（テキスト形式と添付ファイル形式のメタデータID）
+export const submission = pgTable("submission", {
+    assignmentId: text('assignment_id')
+        .references(() => assignmentData.id, { onDelete: 'cascade' })
+        .notNull(),
+    email: text('email')
+        .references(() => registered.email, { onDelete: 'cascade' })
+        .notNull(),
+    content: text('content'),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+    submissionMetaDataIds: text('submission_metadata_ids')
+        .array()
+        .references(() => submissionMetaData.id, { onDelete: 'cascade' }),
+}, (t) => [
+    primaryKey({
+        columns: [t.assignmentId, t.email]
+    })
+]);
+
+// アナウンスメント（教員用）
+export const announcement = pgTable("announcement", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    auther: text('auther')
+        .references(() => course.professor, { onDelete: 'cascade' })
+        .notNull(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    courseName: text('course_name')
+        .references(() => course.name, { onDelete: 'cascade' })
+        .notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+    type: announcementTypeEnum().notNull(),
+    attachmentsMetaDataIds: text('attachments_metadata_ids')
+        .array()
+        .references(() => attachmentMetaData.id, { onDelete: 'cascade' }),
+});
+
+// 添付ファイル（提出物以外）メタデータ
+export const attachmentMetaData = pgTable("attachment_metadata", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    name: text('name').notNull(),
+    type: fileTypeEnum().notNull(),
+    url: text('url').notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+});
+
+// 提出物メタデータ
+export const submissionMetaData = pgTable("submission_metadata", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    name: text('name').notNull(),
+    type: fileTypeEnum().notNull(),
+    url: text('url').notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+});
+
+// コメント
+export const comment = pgTable("comment", {
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    assignmentId: text('assignment_id')
+        .references(() => assignmentData.id, { onDelete: 'cascade' }),
+    announcementId: text('announcement_id')
+        .references(() => announcement.id, { onDelete: 'cascade' }),
+    email: text('email')
+        .references(() => users.email, { onDelete: 'cascade' })
+        .notNull(),
+    userName: text('user_name')
+        .references(() => users.name, { onDelete: 'cascade' })
+        .notNull(),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
+    updatedAt: timestamp('updated_at')
+        .$onUpdate(() => new Date())
+        .notNull(),
+});
 // export const scheduleView = pgView("schedule_view")
 //     .as((qb) => qb.select({name: registered.name})
 //     .from(registered));
 
 
 
-
+// ポリシー
 export const policyOnUsers = pgPolicy("policy on users", {
     as: 'permissive',
     for: 'all',
@@ -281,8 +501,7 @@ export const policyOnCourse = pgPolicy("policy on course", {
     using: sql``
 }).link(course);
 
-
-
+// リレーション
 export const usersRelations = relations(users, ({many}) => ({
     accounts: many(accounts),
     attribute: many(attribute)
@@ -330,5 +549,11 @@ export const registeredRelations = relations(registered, ({one}) => ({
         references: [course.name]
     })
 }));
+
+export const assignmentDataRelations = relations(assignmentData, ({many}) => ({
+    attachmentMetaData: many(attachmentMetaData)
+}));
+
+
 
 
