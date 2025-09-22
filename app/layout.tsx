@@ -1,11 +1,9 @@
 import "./globals.css";
-import { notoSansJP } from '@/font/fonts';
+import { notoSansJP } from '@/public/fonts/fonts';
 import React from "react";
 import { Providers } from "./providers";
-import { Metadata } from "next";
-import { getThemeCookie } from "@/lib/fetch";
-
-export const experimental_ppr = true;
+import type { Metadata } from "next";
+import { getThemeCookie } from "@/utils/fetch";
 
 export const metadata: Metadata = {
   title: {
@@ -30,5 +28,5 @@ export default async function RootLayout({
         </Providers>
       </body>
     </html>
-  );
+    );
 }
