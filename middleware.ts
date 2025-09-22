@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import { getSessionCookie } from "better-auth/cookies";
 import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 // edgeランタイム
 
@@ -9,24 +9,24 @@ const app = new Hono()
     // セッションがない場合、/home/*へのアクセスに対して、/sign-inへ遷移
     .on(["GET", "POST"], "/home/*", (c) => {
         const req = c.req.raw as NextRequest;
-        const sessionCookie = getSessionCookie(req);
+        const session = getSessionCookie(req);
         
-        if(sessionCookie) {
+        if(session) {
             return NextResponse.next();
         } else {
             const url = req.nextUrl.clone();
-            url.pathname = '/sign-in';
+            url.pathname = "/sign-in";
             return NextResponse.redirect(url);
         }
     })
     // セッションがある場合、/sign-in, /sign-upへのアクセスに対して，/homeへ遷移
     .on(["GET", "POST"], "/sign-*", (c) => {
         const req = c.req.raw as NextRequest;
-        const sessionCookie = getSessionCookie(req);
+        const session = getSessionCookie(req);
 
-        if (sessionCookie) {
+        if (session) {
             const url = req.nextUrl.clone();
-            url.pathname = '/home';
+            url.pathname = "/home";
             return NextResponse.redirect(url);
         } else {
             return NextResponse.next();
