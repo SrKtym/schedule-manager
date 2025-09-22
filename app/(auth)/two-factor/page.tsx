@@ -1,10 +1,10 @@
-import { get2faCookie, getSession } from '@/lib/fetch';
+import { get2faCookie, getSession } from '@/utils/fetch';
 import { db } from '@/lib/drizzle';
 import { TwoFactorSettings } from '@/components/auth/two-factor/two-factor-settings';
 import { redirect } from 'next/navigation';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
-import { OtpVerifyForm } from '@/components/auth/two-factor/otp-verify-form';
 import { Metadata } from "next";
+import { FormTabs } from '@/components/auth/two-factor/form-tabs';
 
 
 export const metadata: Metadata = {
@@ -22,31 +22,35 @@ export default async function TwoFactorPage() {
         });
 
         return (
-            <div className='flex flex-col items-center justify-center space-y-5 p-5 rounded-3xl bg-white'>
-                <div className='space-y-3'>
-                    <h1 className="text-center text-xl font-medium">
-                        2要素認証の設定を行ってください。
-                    </h1>
-                    <div className='flex items-center justify-center space-x-3'>
-                        <p>現在のステータス: </p>
-                        {user?.twoFactorEnabled ? 
-                        <div className='flex'>
-                            <ShieldCheck className='text-green-500'/>
-                            <p className='text-green-500'>有効</p>
-                        </div> : 
-                        <div className='flex'>
-                            <ShieldAlert className='text-red-500'/>
-                            <p className='text-red-500'>無効</p>
-                        </div>}
+            <div className='flex flex-col items-center justify-center space-y-4'>
+                <div className='flex flex-col items-center justify-center w-full max-w-[480px] space-y-5 p-5 rounded-3xl bg-white'>
+                    <div className='space-y-3'>
+                        <h1 className="text-center text-xl font-medium">
+                            2要素認証の設定を行ってください。
+                        </h1>
+                        <div className='flex items-center justify-center space-x-3'>
+                            <p>現在のステータス: </p>
+                            {user?.twoFactorEnabled ? 
+                                <div className='flex'>
+                                    <ShieldCheck className='text-green-500'/>
+                                    <p className='text-green-500'>
+                                        有効
+                                    </p>
+                                </div> : 
+                                <div className='flex'>
+                                    <ShieldAlert className='text-red-500'/>
+                                    <p className='text-red-500'>
+                                        無効
+                                    </p>
+                                </div>}
+                        </div>
                     </div>
+                    <TwoFactorSettings twoFactorEnabled={user?.twoFactorEnabled}/>
                 </div>
-                <TwoFactorSettings twoFactorIsEnabled={user?.twoFactorEnabled} />
             </div>
         );
     } else if (cookie) {
-        return (
-            <OtpVerifyForm/>
-        );
+        return <FormTabs />;
     } else {
         redirect('/');
     }
