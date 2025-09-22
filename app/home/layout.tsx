@@ -1,29 +1,32 @@
-import { getSession } from "@/lib/fetch";
-import { getThemeCookie } from "@/lib/fetch";
-import { CustomNavbar } from "@/components/private/navbar";
+import { getSession } from "@/utils/fetch";
+import { getThemeCookie } from "@/utils/fetch";
+import { CustomNavbar } from "@/components/home/navbar";
+import { ThemeProvider } from "@/contexts/theme-context";
+import { UserDataProvider, UserData } from "@/contexts/user-data-context";
 
 
 export default async function HomeLayout({children}: {children: React.ReactNode}) {
     const session = await getSession();
     
     if (session) {
+        const userData: UserData = session.user;
         const theme = await getThemeCookie();
 
         return (
-            <div>
-                <CustomNavbar
-                    theme={theme}
-                    name={session.user.name} 
-                    image={session.user.image} 
-                    email={session.user.email}
-                />
-                <main className="w-full p-3">
+            <UserDataProvider userData={userData}>
+                <ThemeProvider theme={theme}>
+                    <CustomNavbar
+                        name={session.user.name} 
+                        image={session.user.image} 
+                    />
+                </ThemeProvider>
+                <main className="w-full">
                     {children}
                 </main>
-                <footer className="flex justify-center w-full px-3 py-10">
+                <footer className="flex justify-center w-full px-3 py-5">
                     フッター
                 </footer>
-            </div>
+            </UserDataProvider>
         );
     }
 }
