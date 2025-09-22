@@ -11,7 +11,7 @@ export const ThemeProvider = ({
     children: ReactNode,
     theme: string
 }) => {
-    const [currentTheme, setCurrentEmail] = useState(theme);
+    const [currentTheme, setCurrentTheme] = useState(theme);
     return (
         <ThemeContext value={currentTheme}>
             {children}

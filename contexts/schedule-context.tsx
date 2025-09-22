@@ -1,9 +1,9 @@
 'use client';
 
-import { fetchRegisteredCourse, fetchSchedule } from '@/lib/fetch';
+import { fetchRegisteredCourseData, fetchSchedule } from '@/utils/fetch';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-const RegisteredContext = createContext<Awaited<ReturnType<typeof fetchRegisteredCourse>>>([]);
+const RegisteredContext = createContext<Awaited<ReturnType<typeof fetchRegisteredCourseData>>>([]);
 const ScheduleContext = createContext<Awaited<ReturnType<typeof fetchSchedule>>>([]);
 
 export const ScheduleProvider = ({ 
@@ -12,7 +12,7 @@ export const ScheduleProvider = ({
     schedule
 }: { 
     children: ReactNode,
-    registeredCourse: Awaited<ReturnType<typeof fetchRegisteredCourse>>,
+    registeredCourse: Awaited<ReturnType<typeof fetchRegisteredCourseData>>,
     schedule?: Awaited<ReturnType<typeof fetchSchedule>>
 }) => {
     const [registered, setRegistered] = useState(registeredCourse);
@@ -32,7 +32,7 @@ export const ScheduleProvider = ({
     );
 };
 
-export const useRegisteredCourse = () => {
+export const useRegisteredCourseData = () => {
     const context = useContext(RegisteredContext);
     return context;
 };
