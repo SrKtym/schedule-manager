@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+
 export function HeroSection() {
     return (
         <section className="relative flex items-center justify-center min-h-screen px-4 py-20 overflow-hidden bg-gradient-to-b from-purple-200 to-gray-200">

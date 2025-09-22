@@ -4,6 +4,7 @@ import { Card, CardBody } from "@heroui/react";
 import { features } from "@/constants/definitions";
 import { motion } from "framer-motion";
 
+
 export function FeaturesSection() {
     return (
         <section 
@@ -41,7 +42,7 @@ export function FeaturesSection() {
                             isHoverable
                         >
                             <CardBody className="text-center p-6">
-                                <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary"/>
+                                <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary" />
                                 <h3 className="text-xl font-semibold mb-2">
                                     {feature.title}
                                 </h3>
