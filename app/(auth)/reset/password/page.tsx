@@ -1,4 +1,4 @@
-import { ResetPassword } from "@/components/auth/reset/reset-password-form";
+import { ResetPasswordForm } from "@/components/auth/reset/reset-password-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function ResetPasswordPage() {
-    return <ResetPassword />;
+    return <ResetPasswordForm />;
 }
