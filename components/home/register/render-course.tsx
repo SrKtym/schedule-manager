@@ -106,7 +106,7 @@ export function RenderCourse({
                     setOpen(true);
                 }}
             >
-                <Edit />
+               <Edit />
             </Button>
             <Button 
                 aria-label="delete"
