@@ -90,6 +90,32 @@ export function InboxSkelton() {
     );
 }
 
+export function FilterSkelton() {
+    return (
+        <>
+            {/* フィルター */}
+            <div className="grid grid-cols-3 gap-3">
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+                <Skeleton className="w-full h-[56px] rounded-lg" />
+            </div>
+            {/* インプット */}
+            <Skeleton className="w-full h-[40px] rounded-lg" />
+            {/* 検索結果とフィルター */}
+            <div className="flex justify-between items-center space-x-2">
+                <Skeleton className="w-full max-w-[180px] h-[24px] rounded-lg "/>
+                <div className="flex space-x-3">
+                    <Skeleton className="w-25 h-[56px] rounded-lg sm:w-[134px]"/>
+                    <Skeleton className="w-25 h-[56px] rounded-lg sm:w-[134px]"/>
+                </div>
+            </div>
+        </>
+    );
+}
+
 export function DataTableSkelton() {
     return (
         <Card className="flex flex-col w-full h-[704px] rouded-lg">
@@ -102,7 +128,7 @@ export function DataTableSkelton() {
     );
 }
 
-export function ScheduleSkelton() {
+export function TimeTableSkelton() {
     return (
         <Card className="flex flex-col p-4 gap-4 w-full h-[660px] rouded-lg">
             <div className="flex flex-col items-center gap-4">
