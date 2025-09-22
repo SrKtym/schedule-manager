@@ -4,11 +4,21 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
-    ppr: 'incremental',
+    // ppr: 'incremental',
     webpackMemoryOptimizations: true,
-    optimizePackageImports: ['@heroui/react', '@iconify/react']
+    optimizePackageImports: ['@heroui/react']
   },
   reactStrictMode: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.heroui.chat',
+        port: '',
+        pathname: '/image/**',
+      },
+    ],
+  },
 };
 
 const bundleAnalyzer = withBundleAnalyzer({
