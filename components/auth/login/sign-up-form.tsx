@@ -1,14 +1,13 @@
 'use client';
 
-import type { State } from '@/lib/definitions';
+import type { State } from '@/types/sign-up';
 import { useActionState } from 'react';
-import { signUp } from '@/lib/action';
+import { signUp } from '@/utils/action';
 import { 
     addToast,
     Button,
     Input
 } from "@heroui/react";
-import { Loader2 } from "lucide-react";
 import Link from 'next/link';
 import { SocialLogin } from '@/components/auth/login/social-login';
 
@@ -92,23 +91,19 @@ export default function SignUpForm() {
             </div>
             <Button 
                 type='submit' 
-                color='primary'  
+                color='primary' 
+                isLoading={isPending}
                 className='w-full' 
                 aria-disabled={isPending}
             >
-                    {isPending ?
-                    <div className="flex items-center space-x-3">
-                        <Loader2 className="animate-spin"/>
-                        <p>送信中...</p>
-                    </div> :
-                    <div>
-                        サインアップ
-                    </div>}
+                {isPending ? '送信中...' : 'サインアップ'}
             </Button>
              <div className='grid grid-cols-3 items-center'>
-                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>
-                <p className='text-center'>または</p>
-                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>
+                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto' />
+                <p className='text-center'>
+                    または
+                </p>
+                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto' />
             </div>
             <SocialLogin />
             <div className='flex-1 items-center justify-center text-center text-sm space-y-3'>

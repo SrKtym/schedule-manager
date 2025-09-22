@@ -1,15 +1,15 @@
 'use client';
 
-import { useActionState } from 'react';
-import { authClient } from '@/lib/auth-client';
-import { setThemeCookie, signIn } from '@/lib/action';
-import type { StateOmitName } from '@/lib/definitions';
+import { useActionState, useTransition } from 'react';
+import { authClient } from '@/lib/better-auth/auth-client';
+import { setThemeCookie, signIn } from '@/utils/action';
+import type { StateOmitName } from '@/types/sign-in';
 import { 
     addToast,
     Button,
     Input
 } from '@heroui/react';
-import { Loader2, KeyRound } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SocialLogin } from './social-login';
@@ -26,8 +26,7 @@ export default function SignInForm() {
                     color: 'warning',
                     description: `入力されたメールアドレスはすでに登録されています。前回のログイン: ${response.messages.success}`
                 });
-            } else if (response.messages.success === 'signin') {
-                await setThemeCookie();
+            } else if (response.messages.success === 'invalid') {
                 router.push('/home');
             } else {
                 router.push('/two-factor');
@@ -38,6 +37,7 @@ export default function SignInForm() {
     }
 
     const [state, formAction, isPending] = useActionState(action, undefined);
+    const [isPendingPasskey, startTransitionPasskey] = useTransition();
 
     return (
         <form 
@@ -87,42 +87,46 @@ export default function SignInForm() {
             <Button 
                 type='submit' 
                 color='primary' 
+                isLoading={isPending}
                 className='w-full' 
                 aria-disabled={isPending}
             >
-                    {isPending ?
-                    <div className="flex items-center space-x-3">
-                        <Loader2 className="animate-spin"/>
-                        <p>送信中...</p>
-                    </div> :
-                    <p>
-                        サインイン
-                    </p>}
+                {isPending ? '送信中...' : 'サインイン'}
             </Button>
             <div className='grid grid-cols-3 items-center'>
-                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>
-                <p className='text-center'>または</p>
-                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto'></div>
+                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto' />
+                <p className='text-center'>
+                    または
+                </p>
+                <div className='border-b-1 border-gray-500 max-w-[250px] w-auto' />
             </div>
             <div className='flex flex-col space-y-3'>
                 <SocialLogin />
-                <Button color='primary' variant='ghost' onPress={async () => {
-                    await authClient.signIn.passkey({
-                        fetchOptions: {
-                            async onSuccess() {
-                                await setThemeCookie();
-                                router.push('/home');
-                            },
-                            onError(context) {
-                                addToast({
-                                    title: 'サインインに失敗しました。',
-                                    color: 'danger',
-                                    description: `お手数ですが再試行してください。詳細: ${context.error.message}`
-                                });
-                            },
-                        }
-                    });
-                }}>
+                <Button 
+                    color='primary' 
+                    variant='ghost' 
+                    aria-disabled={isPendingPasskey}
+                    isLoading={isPendingPasskey}
+                    onPress={() => {
+                        startTransitionPasskey(async () => {
+                            await authClient.signIn.passkey({
+                                fetchOptions: {
+                                    async onSuccess() {
+                                        await setThemeCookie();
+                                        router.push('/home');
+                                    },
+                                    onError(context) {
+                                        addToast({
+                                            title: 'サインインに失敗しました。',
+                                            color: 'danger',
+                                            description: `お手数ですが再試行してください。詳細: ${context.error.message}`
+                                        });
+                                    },
+                                }
+                            });
+                        });
+                    }}
+                >
                     <KeyRound color='gray' />
                     パスキーで続行
                 </Button>
