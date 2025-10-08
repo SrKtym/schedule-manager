@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchSubmissionMetaData } from '@/utils/fetch';
+import { fetchSubmissionMetaData } from '@/utils/getter';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 const SubmissionContext = createContext<Awaited<ReturnType<typeof fetchSubmissionMetaData>> | null>(null);
@@ -10,7 +10,7 @@ export const SubmissionProvider = ({
     submissionMetaData
 }: { 
     children: ReactNode,
-    submissionMetaData: Awaited<ReturnType<typeof fetchSubmissionMetaData>>
+    submissionMetaData: Awaited<ReturnType<typeof fetchSubmissionMetaData>> | null
 }) => {
     const [currentSubmissionMetaData, setCurrentSubmissionMetaData] = useState(submissionMetaData);
     return (

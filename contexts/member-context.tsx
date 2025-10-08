@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchMemberList } from '@/utils/fetch';
+import { fetchMemberList } from '@/utils/getter';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 const MemberContext = createContext<Awaited<ReturnType<typeof fetchMemberList>>>([]);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { fetchComments } from '@/utils/fetch';
+import { fetchComments } from '@/utils/getter';
 
 const CommentContext = createContext<Awaited<ReturnType<typeof fetchComments>>>([]);
 

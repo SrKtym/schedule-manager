@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchAssignmentStatus } from '@/utils/fetch';
+import { fetchAssignmentStatus } from '@/utils/getter';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 const AssignmentStatusContext = createContext<Awaited<ReturnType<typeof fetchAssignmentStatus>>>([]);

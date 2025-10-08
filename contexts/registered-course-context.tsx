@@ -1,26 +1,22 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { fetchRegisteredCourseData } from '@/utils/fetch';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { fetchRegisteredCourseData } from '@/utils/getter';
 
 const RegisteredCourseContext = createContext<{
-    courseDataList: Awaited<ReturnType<typeof fetchRegisteredCourseData>> & {
-        coverImage: string;
-    }[],
-    courseName?: string
+    courseDataList: (Awaited<ReturnType<typeof fetchRegisteredCourseData>>[number] & {
+        coverImage: string
+    })[]
 }>({
-    courseDataList: [],
-    courseName: undefined
+    courseDataList: []
 });
 
 export const RegisteredCourseProvider = ({ 
     children,
-    courseDataList,
-    courseName
+    courseDataList
 }: { 
     children: ReactNode,
     courseDataList: Awaited<ReturnType<typeof fetchRegisteredCourseData>>
-    courseName?: string
 }) => {
     const registeredCourseDataList = courseDataList.map((registered, index) => {
         return {
@@ -29,19 +25,27 @@ export const RegisteredCourseProvider = ({
         }
     });
     const [currentCourseDataList, setCurrentCourseDataList] = useState(registeredCourseDataList);
+
+    useEffect(() => {
+        setCurrentCourseDataList(registeredCourseDataList);
+    }, [courseDataList]);
     
     return (
         <RegisteredCourseContext value={{
-            courseDataList: currentCourseDataList,
-            courseName
+            courseDataList: currentCourseDataList
         }}>
             {children}
         </RegisteredCourseContext>
     );
 };
 
-export const useCurrentCourseData = () => {
-    const {courseDataList, courseName} = useContext(RegisteredCourseContext);
+export const useRegisteredCourseData = () => {
+    const courseDataList = useContext(RegisteredCourseContext);
+    return courseDataList;
+};
+
+export const useCurrentCourseData = (courseName: string) => {
+    const {courseDataList} = useContext(RegisteredCourseContext);
     const number = courseDataList.findIndex((data) => data.course.name === courseName);
     return courseDataList[number];
 };
