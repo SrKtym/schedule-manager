@@ -2,17 +2,37 @@
 
 import { 
     dateOptionforCalendar, 
+    dateOptionforSchedule, 
     daysOfWeek, 
     hoursOfDay, 
     timeRange 
 } from "@/constants/definitions";
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useState } from "react";
 import { SidebarContext } from "@/contexts/sidebar-context";
 import { cn } from "@heroui/react";
 import { Button } from "@heroui/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSchedule } from "@/contexts/schedule-context";
-import { useRegisteredCourseData } from "@/contexts/schedule-context";
+import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { CurrentTimeIndicator } from "./current-time-indicator";
+import { 
+    getDateFromTimeString, 
+    getWeekDates, 
+    timeSlots,  
+    calculateWidthAsPercentage, 
+    hexWithAlpha,
+    isSpanningDays,
+    calculateHeightAsPercentage
+} from "@/utils/related-to-schedule";
+import * as m from "motion/react-m";
+import { 
+    AnimatePresence, 
+    LayoutGroup, 
+    LazyMotion, 
+    domAnimation 
+} from "motion/react";
+import { SingleItemModal } from "../shared-layout-modal";
+import { fetchSchedule } from "@/utils/getter";
 
 export function BigCalendar({
     currentDate,
@@ -25,69 +45,55 @@ export function BigCalendar({
 }) {
     // コンテキストから取得
     const isCollapsed = useContext(SidebarContext);
-    const dataList = useRegisteredCourseData();
+    const {courseDataList} = useRegisteredCourseData();
     const schedule = useSchedule();
+    
+    const [selectedCourse, setSelectedCourse] = useState<{ 
+        day: string, 
+        start: Date, 
+        end: Date, 
+        name: string 
+    } | false>(false);
 
-    const getDateFromTimeString = (timeStr: string) => {
-        const [hours, minutes] =  timeStr.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date
-    }
-    
-    const getWeekDates = (date: Date) => {
-        const week = [];
-        const startOfWeek = new Date(date);
-        startOfWeek.setDate(date.getDate() - date.getDay());
-    
-        for (let i = 0; i < 7; i++) {
-            const day = new Date(startOfWeek);
-            day.setDate(startOfWeek.getDate() + i);
-            week.push(day);
-        }
-        return week;
-    };
-    
+    const [selectedSchedule, setSelectedSchedule] = useState<Awaited<ReturnType<typeof fetchSchedule>>[number] | false>(false);
+
     const changeWeek = (increment: number) => {
         setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() + (7 * increment))));
     };
-    
-    const timeSlots = (h: number) => {
-        const slot: string[] = [];
-        const date = new Date();
-        date.setSeconds(0);
-        date.setMilliseconds(0);
-        
-        for (let m = 0; m < 60; m += 60) {
-            const time = new Date(date);
-                time.setHours(h, m) ;
-                slot.push(time.toLocaleTimeString('default', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }));
-            }
-        
-        return slot;
-    };
-    
-    const registeredCourse = dataList.map((data) => {
+      
+    const registeredCourse = courseDataList.map((data) => {
         return {
             day: data.course.week[0],
             start: getDateFromTimeString(timeRange[Number(data.course.period[0]) - 1].split("-")[0]),
             end: getDateFromTimeString(timeRange[Number(data.course.period[0]) - 1].split("-")[1]),
-            title: data.course.name
+            name: data.course.name
         }
     });
 
-    const courseOfDay = (d: string) => {
-        const res = registeredCourse.filter(v => v.day === d);
-        return res;
+    // 1日の講義を取得
+    const dailyCourse = (day: string) => {
+        const dailyCourseList = registeredCourse.filter(v => v.day === day);
+        return dailyCourseList;
     }
-    const scheduleOfDay = (date: string) => {
-        const res = schedule.filter(v => 
-            v.schedule.start.toLocaleDateString('default') === date
+    // 1日のスケジュールを取得
+    const dailySchedule = (date: Date) => {
+        const newDate = new Date(date);
+        newDate.setHours(23, 59, 0, 0);
+
+        // スケジュール（終日、または日を跨ぐもの）を取得
+        const scheduleList = schedule.filter(v => 
+            v.start <= newDate && date <= v.end
         );
-        return res;
+
+        // 日曜日以外の日付なら、1日のスケジュールを返す
+        if (date.getDay() !== 0) {
+            const oneDayScheduleList = scheduleList.filter(
+                v => v.start.getDate() === date.getDate()
+            );
+            return oneDayScheduleList;
+        }
+
+        return scheduleList;
     }
 
     const weekDates = getWeekDates(currentDate);
@@ -120,8 +126,8 @@ export function BigCalendar({
                     </Button>
                 </div>
             </div>
-            <div className="grid grid-cols-8 p-4 rounded-lg shadow dark:bg-content1">
-                <div className="sticky top-29 z-10 bg-white dark:bg-content1 max-[415px]:top-35" />
+            <div className="relative grid grid-cols-8 p-4 rounded-large shadow-small dark:bg-content1">
+                <div className="sticky top-29 mb-2 z-10 bg-white dark:bg-content1 max-[415px]:top-35" />
                 {daysOfWeek.map((day, index) => (
                     <div 
                         key={day} 
@@ -131,8 +137,7 @@ export function BigCalendar({
                         )}
                     >
                         <div className={cn("flex flex-col items-center justify-center w-[48px] gap-1 rounded-full",
-                            new Date().toLocaleDateString('default', dateOptionforCalendar) === 
-                            weekDates[index].toLocaleDateString('default', dateOptionforCalendar) ? 
+                            new Date().toLocaleDateString('default') === weekDates[index].toLocaleDateString('default') ? 
                             "bg-sky-500/50" : undefined
                         )}>
                             {/* 曜日 */}
@@ -150,70 +155,120 @@ export function BigCalendar({
                         </div>
                     </div>
                 ))}
-                {hoursOfDay.map((hour) => (
-                    // <></>と同義
-                    <Fragment key={hour}>
-                        <div className="border-r border-gray-300 text-right h-12 pr-2 max-lg:text-sm">
-                            {timeSlots(hour)}
-                        </div>
-                        {daysOfWeek.map((day, index) => (
-                            <div 
-                                key={`${day}-${hour}`} 
-                                className="relative text-center border-r border-gray-300 h-12"
-                            >
-                                <div className="absolute w-full border-b border-gray-300 bottom-0"/>
-                                {/* 1日の講義 */}
-                                {courseOfDay(day).map((course) => (
-                                    <div
-                                        key={course.title}
-                                        style={{
-                                            height: course.start.getHours() === hour ?
-                                                `${(60 - course.start.getMinutes()) / 60 * 100}%` :
-                                                course.end.getHours() === hour ?
-                                                `${(course.end.getMinutes()) / 60 * 100}%` :
-                                                undefined,
-                                            top: course.start.getHours() === hour ?
-                                                `${course.start.getMinutes() / 60 * 100}%` :
-                                                undefined
-                                        }}
-                                        className={cn(course.start.getHours() <= hour && hour <= course.end.getHours() ? 
-                                            "absolute w-full h-full bg-primary backdrop-blur-lg hover:cursor-pointer z-5" : undefined,
-                                            course.start.getHours() === hour ? "z-8" : undefined
-                                        )}
-                                    >
-                                        {course.start.getHours() === hour ? course.title : null}
-                                    </div> 
-                                ))}
-                                {/* 1日の予定 */}
-                                {scheduleOfDay(weekDates[index].toLocaleDateString('default')).map(({schedule}) => (
-                                    <div
-                                        key={`${schedule.id}`}
-                                        style={{
-                                            height: schedule.start.getHours() === hour ? 
-                                                `${((60 - schedule.start.getMinutes()) / 60 ) * 100}%` :
-                                                schedule.end.getHours() === hour ?
-                                                `${(schedule.end.getMinutes()) / 60 * 100}%` : 
-                                                undefined,
-                                            top: schedule.start.getHours() === hour ? 
-                                                `${schedule.start.getMinutes() / 60 * 100}%` : 
-                                                undefined,
-                                            backgroundColor: schedule.color
-                                        }}
-                                        className={cn(schedule.start.getHours() <= hour && hour <= schedule.end.getHours() ?
-                                            "absolute w-full h-full backdrop-blur-lg z-5 overflow-visible hover:cursor-pointer" : 
-                                            undefined,
-                                            schedule.start.getHours() === hour ? 
-                                            "z-8" : 
-                                            undefined
-                                        )} 
-                                    >
-                                        {schedule.start.getHours() === hour ? schedule.title : null}
-                                    </div> 
-                                ))}
-                            </div>
-                        ))}
-                    </Fragment>
-                ))}
+                <LazyMotion features={domAnimation}>
+                    <div className="col-span-full relative -top-2">
+                        <CurrentTimeIndicator />
+                    </div>
+                    <LayoutGroup>
+                        <AnimatePresence>
+                            {hoursOfDay.map((hour) => (
+                                <Fragment key={hour}>
+                                    {/* 時刻 */}
+                                    <div className="relative border-r border-gray-300 text-right h-12 pr-2 max-lg:text-xs">
+                                        <p className="absolute -top-3 right-1 max-lg:-top-2">
+                                            {timeSlots(hour)}
+                                        </p>
+                                    </div>
+                                    {/* 表 */}
+                                    {daysOfWeek.map((day, index) => (
+                                        <div 
+                                            key={`${day}-${hour}`} 
+                                            className="relative text-center border-r border-b border-gray-300 h-12"
+                                        >
+                                            {/* 1日の講義 */}
+                                            {dailyCourse(day).map((course) => (
+                                                course.start.getHours() === hour && 
+                                                    <m.div
+                                                        key={course.name}
+                                                        layoutId={course.name}
+                                                        style={{
+                                                            height: calculateHeightAsPercentage(course.start, course.end),
+                                                            width: calculateWidthAsPercentage(course.start, course.end, weekDates[0]),
+                                                            top: `${course.start.getMinutes() / 60 * 100}%`,
+                                                        }}
+                                                        className="absolute inset-0 bg-primary/80 z-5 mx-1 rounded-medium cursor-pointer hover:z-6"
+                                                        onClick={() => setSelectedCourse(course)}
+                                                    >
+                                                        <div className="flex flex-col items-start gap-1 m-1 truncate text-sm max-lg:text-xs">
+                                                            <p>
+                                                                {course.name}
+                                                            </p>
+                                                            <p>
+                                                            {course.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} 
+                                                            - 
+                                                            {course.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}
+                                                            </p>
+                                                        </div>
+                                                    </m.div>
+                                            ))} 
+                                            {/* 1日の予定 */}
+                                            {dailySchedule(weekDates[index]).map((schedule) => (
+                                                schedule.start.getHours() === hour && 
+                                                    <m.div
+                                                        key={`${schedule.id}`}
+                                                        layoutId={`${schedule.id}`}
+                                                        style={{
+                                                            height: calculateHeightAsPercentage(schedule.start, schedule.end),
+                                                            width: calculateWidthAsPercentage(schedule.start, schedule.end, weekDates[0]),
+                                                            top: `${schedule.start.getMinutes() / 60 * 100}%`,
+                                                            backgroundColor: hexWithAlpha(schedule.color, 0.8),
+                                                        }}
+                                                        className="absolute inset-0 h-full z-5 mx-1 rounded-medium cursor-pointer hover:z-6"
+                                                        onClick={() => setSelectedSchedule(schedule)}
+                                                    >
+                                                        <div className="flex flex-col items-start gap-1 m-1 truncate text-sm max-lg:text-xs">
+                                                            <p>
+                                                                {schedule.title}
+                                                            </p>
+                                                            <p>
+                                                            {isSpanningDays(schedule.start, schedule.end) ? 
+                                                                `${schedule.start.toLocaleDateString('default', dateOptionforSchedule)} - ${schedule.end.toLocaleDateString('default', dateOptionforSchedule)}` : 
+                                                                `${schedule.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} - ${schedule.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}`}
+                                                            </p>
+                                                        </div>
+                                                    </m.div> 
+                                            ))}
+                                            {selectedCourse && (
+                                                <m.div 
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 0.6 }}
+                                                    exit={{ opacity: 0 }}
+                                                    key="overlay"
+                                                    className="absolute inset-0 bg-background opacity-20"
+                                                    onClick={() => setSelectedCourse(false)}
+                                                />
+                                            )}
+                                            {selectedSchedule && (
+                                                <m.div 
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 0.6 }}
+                                                    exit={{ opacity: 0 }}
+                                                    key="overlay"
+                                                    className="absolute inset-0 bg-background opacity-20"
+                                                    onClick={() => setSelectedSchedule(false)}
+                                                />
+                                            )}
+                                            {selectedCourse && (
+                                                <SingleItemModal 
+                                                    key="modal"
+                                                    registeredCourse={selectedCourse}
+                                                    onClick={() => setSelectedCourse(false)}
+                                                />
+                                            )}
+                                            {selectedSchedule && (
+                                                <SingleItemModal 
+                                                    key="modal"
+                                                    schedule={selectedSchedule}
+                                                    onClick={() => setSelectedSchedule(false)}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </Fragment>
+                            ))}
+                        </AnimatePresence>
+                    </LayoutGroup>
+                </LazyMotion>
             </div>
         </div>
     );
