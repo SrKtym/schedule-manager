@@ -127,7 +127,13 @@ export const dateOptionforCalendar: Intl.DateTimeFormatOptions = {
     month: '2-digit',
     day: '2-digit'
 };
-export const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+export const dateOptionforSchedule: Intl.DateTimeFormatOptions = {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+};
+export const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'] as const;
 export const hoursOfDay = Array.from({length: 24}, (_, i) => i);
 
 
