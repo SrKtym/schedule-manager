@@ -1,7 +1,7 @@
 import { Overall } from "@/components/home/course-list/course/id/overall";
 import { AssignmentStatusProvider } from "@/contexts/assignment-status-context";
 import { SubmissionProvider } from "@/contexts/submission-context";
-import { fetchAssignmentStatus, fetchSubmissionMetaData, fetchComments } from "@/utils/fetch";
+import { fetchAssignmentStatus, fetchSubmissionMetaData, fetchComments } from "@/utils/getter";
 import { CommentProvider } from "@/contexts/comment-context";
 
 export default async function AssignmentDetailPage(
@@ -13,14 +13,19 @@ export default async function AssignmentDetailPage(
 ) {
     const paramsValue = await props.params;
     const assignmentId = paramsValue.id;
-    const assignmentStatus = await fetchAssignmentStatus(assignmentId);
-    const submissionMetaData = await fetchSubmissionMetaData(assignmentId);
-    const comments = await fetchComments(assignmentId);
+    const [assignmentStatus, submissionMetaData, comments] = await Promise.allSettled([
+        fetchAssignmentStatus(assignmentId),
+        fetchSubmissionMetaData(assignmentId),
+        fetchComments(assignmentId)
+    ]);
+    const assignmentStatusValue = assignmentStatus.status === 'fulfilled' ? assignmentStatus.value : [];
+    const submissionMetaDataValue = submissionMetaData.status === 'fulfilled' ? submissionMetaData.value : null;
+    const commentsValue = comments.status === 'fulfilled' ? comments.value : [];
 
     return (
-        <AssignmentStatusProvider assignmentStatus={assignmentStatus}>
-            <SubmissionProvider submissionMetaData={submissionMetaData}>
-                <CommentProvider comment={comments}>
+        <AssignmentStatusProvider assignmentStatus={assignmentStatusValue}>
+            <SubmissionProvider submissionMetaData={submissionMetaDataValue}>
+                <CommentProvider comment={commentsValue}>
                     <Overall />
                 </CommentProvider>
             </SubmissionProvider>
