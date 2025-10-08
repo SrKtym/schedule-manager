@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Overall } from "@/components/home/schedule/overall";
-import { fetchRegisteredCourseData, fetchSchedule, getSession } from "@/utils/fetch";
+import { fetchSchedule, getSession } from "@/utils/getter";
 import { ScheduleProvider } from "@/contexts/schedule-context";
 
 
@@ -10,18 +10,10 @@ export const metadata: Metadata = {
 
 export default async function SchedulePage() {
     const session = await getSession();
-    const [registeredCourseData, schedule] = await Promise.allSettled([
-        fetchRegisteredCourseData(session),
-        fetchSchedule(session)
-    ]);
-    const registeredCourseValue = registeredCourseData.status === 'fulfilled' ? registeredCourseData.value : [];
-    const scheduleValue = schedule.status === 'fulfilled' ? schedule.value : [];
+    const schedule = await fetchSchedule(session);
 
     return (
-        <ScheduleProvider 
-            registeredCourse={registeredCourseValue}
-            schedule={scheduleValue}
-        >
+        <ScheduleProvider schedule={schedule}>
             <Overall />
         </ScheduleProvider>
     );
