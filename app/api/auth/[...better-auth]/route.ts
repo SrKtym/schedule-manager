@@ -13,7 +13,7 @@ import {
 } from "@arcjet/next";
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/utils/fetch";
+import { getSession } from "@/utils/getter";
 
 const emailOptions = {
     mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
