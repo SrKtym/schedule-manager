@@ -11,21 +11,12 @@ import * as m from 'motion/react-m';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { CourseCard } from "@/components/home/course-list/course-card";
 import Link from "next/link";
-import { fetchRegisteredCourseData } from "@/utils/fetch";
+import { useRegisteredCourseData } from "@/contexts/registered-course-context";
 import { CreateCourse } from "./create-course";
 
-export function Overall({
-    courseDataList
-}: {
-    courseDataList: Awaited<ReturnType<typeof fetchRegisteredCourseData>>
-}) {
+export function Overall() {
     const isTeacher = false;
-    const registeredCourseData = courseDataList.map((registered, index) => {
-        return {
-            ...registered,
-            coverImage: `https://img.heroui.chat/image/landscape?w=400&h=120&u=${index + 1}`
-        }
-    });
+    const { courseDataList } = useRegisteredCourseData();
 
     return (
         <div className="container mx-auto px-4 py-6 max-w-screen-xl">
@@ -33,13 +24,12 @@ export function Overall({
                 <h1 className="text-2xl font-google-sans font-medium">
                     登録済みの講義
                 </h1>
-                {isTeacher && <CreateCourse />}
-                <div className="flex items-center gap-4 sm:flex-1">
+                <div className="flex items-center gap-4">
                     <Input
-                        className="flex-1 max-w-xl sm:ml-4"
                         type="text"
                         placeholder="講義名を入力してください。"
                         variant="bordered"
+                        className="flex-1 max-w-xl sm:ml-4"
                         startContent={
                             <Search 
                                 width={18}
@@ -54,6 +44,7 @@ export function Overall({
                     >
                         フィルター
                     </Button>
+                    {isTeacher && <CreateCourse />}
                 </div>
             </div>
             {courseDataList.length > 0 && (
@@ -63,7 +54,7 @@ export function Overall({
                     </h2>
                     <LazyMotion features={domAnimation}>
                         <m.div 
-                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                             variants={{
                                 hidden: { opacity: 0 },
                                 visible: {
@@ -76,9 +67,9 @@ export function Overall({
                             initial="hidden"
                             animate="visible"
                         >
-                            {registeredCourseData.map((courseData) => (
+                            {courseDataList.map((currentCourseData) => (
                                 <m.div
-                                    key={courseData.course.name}
+                                    key={currentCourseData.course.name}
                                     variants={{
                                         hidden: { opacity: 0, y: 20 },
                                         visible: {
@@ -88,9 +79,7 @@ export function Overall({
                                         }
                                     }}
                                 >
-                                    <CourseCard 
-                                        courseData={courseData} 
-                                    />
+                                    <CourseCard courseData={currentCourseData} />
                                 </m.div>
                             ))}
                         </m.div>

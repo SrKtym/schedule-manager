@@ -45,6 +45,7 @@ export function CreateAnnouncementForm({ courseName }: { courseName: string }) {
                         {isExpanded ? (
                             <form
                                 action={formAction}
+                                className='space-y-4'
                             >
                                 <Input
                                     label="タイトル"
@@ -57,6 +58,7 @@ export function CreateAnnouncementForm({ courseName }: { courseName: string }) {
                                     placeholder="アナウンスメントを投稿"
                                     value={content}
                                     onValueChange={setContent}
+                                    variant='bordered'
                                     minRows={3}
                                     isRequired
                                 />

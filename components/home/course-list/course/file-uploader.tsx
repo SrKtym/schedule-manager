@@ -24,7 +24,7 @@ import { env } from '@/env';
 import { hc } from 'hono/client';
 import { useCurrentCourseData } from '@/contexts/registered-course-context';
 import { getFileType, getFileColor } from '@/utils/related-to-assignment';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 
 export function FileUploader({
@@ -46,9 +46,11 @@ export function FileUploader({
     const [isDragging, setIsDragging] = useState(false);
     const [reading, setReading] = useState<{[key: string]: number}>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const params = useParams<{course: string}>();
     const email = useSessionUserData().email;
     const userName = useSessionUserData().name;
-    const courseName = useCurrentCourseData().course.name;
+    const decodedCourseName = decodeURIComponent(params.course);
+    const courseName = useCurrentCourseData(decodedCourseName).course.name;
     const pathName = usePathname();
 
     const handleDragOver = (e: React.DragEvent) => {

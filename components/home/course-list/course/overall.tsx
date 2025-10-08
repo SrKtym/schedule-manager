@@ -17,13 +17,13 @@ import Image from 'next/image';
 import { useCurrentAssignmentData } from '@/contexts/assignment-data-context';
 import { useCurrentAnnouncement } from '@/contexts/announcement-context';
 
-export function Overall() {
-    const { course, coverImage } = useCurrentCourseData();
+export function Overall({ courseName }: { courseName: string }) {
+    const { course, coverImage } = useCurrentCourseData(courseName);
     const assignmentData = useCurrentAssignmentData()?.assignmentData;
     const announcements = useCurrentAnnouncement();
     const [selectedTab, setSelectedTab] = useState<HeaderTabKey>('announcement');
     const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false);
-    const isTeacher = false;
+    const isTeacher = true;
   
     return (
         <div>
@@ -35,6 +35,7 @@ export function Overall() {
                         src={coverImage}
                         alt="背景画像"
                         fill={true}
+                        priority
                     />
                 </div>
                 <div className="relative z-10 container mx-auto p-6 max-w-screen-xl">

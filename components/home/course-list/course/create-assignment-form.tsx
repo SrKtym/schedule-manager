@@ -11,7 +11,8 @@ import {
     Input, 
     Textarea, 
     Select,
-    SelectItem
+    SelectItem,
+    DatePicker
 } from '@heroui/react';
 import { useActionState, useState } from 'react';
 import { createAssignment } from '@/utils/action';
@@ -26,7 +27,6 @@ export function CreateAssignmentForm({
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [points, setPoints] = useState('100');
-    const [dueDate, setDueDate] = useState('');
     const [state, formAction, isPending] = useActionState(createAssignment, undefined)
     
 
@@ -45,10 +45,12 @@ export function CreateAssignmentForm({
                         <ModalBody>
                             <form
                                 action={formAction}
+                                className='space-y-4'
                             >
                                 <Input
                                     label="タイトル"
                                     placeholder="タイトルを入力してください。"
+                                    variant='bordered'
                                     value={title}
                                     onValueChange={setTitle}
                                     isRequired
@@ -56,6 +58,7 @@ export function CreateAssignmentForm({
                                 <Textarea
                                     label="説明文"
                                     placeholder="説明文を入力してください。"
+                                    variant='bordered'
                                     value={description}
                                     onValueChange={setDescription}
                                     minRows={3}
@@ -65,20 +68,19 @@ export function CreateAssignmentForm({
                                     type="number"
                                     label="点数"
                                     placeholder="点数を入力してください。"
+                                    variant='bordered'
                                     value={points}
                                     onValueChange={setPoints}
                                     min={0}
                                     max={100}
                                 />
-                                <Input
-                                    type="datetime-local"
+                                <DatePicker
                                     label="期限日"
-                                    placeholder="期限日を入力してください。"
-                                    value={dueDate}
-                                    onValueChange={setDueDate}
+                                    variant='bordered'
                                 />
                                 <Select
                                     label="ファイルタイプの指定"
+                                    variant='bordered'
                                 >
                                     {attachmentType.map((type) => (
                                         <SelectItem key={type}>
@@ -92,8 +94,9 @@ export function CreateAssignmentForm({
                             <Button 
                                 color="primary"  
                                 type="submit"
-                                isDisabled={!title}
+                                isDisabled={!title || !description}
                                 isLoading={isPending}
+                                
                             >
                                 作成
                             </Button>

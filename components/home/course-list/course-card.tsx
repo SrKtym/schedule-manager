@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MoreVertical, Folder } from 'lucide-react';
-import { fetchRegisteredCourseData } from '@/utils/fetch';
+import { fetchRegisteredCourseData } from '@/utils/getter';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
@@ -39,18 +39,18 @@ export function CourseCard({
                     <Image
                         src={coverImage}
                         alt={course.name}
-                        width={400}
-                        height={120}
+                        width={600}
+                        height={400}
                         priority
                     />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                            <h2 className="text-xl text-white text-shadow-xl font-medium truncate">
-                                {course.name}
-                            </h2>
-                            <p className="text-sm text-white text-shadow-xl opacity-90 truncate">
-                                教室: {course.classroom}
-                            </p>
-                        </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                        <h2 className="text-xl text-white font-medium truncate">
+                            {course.name}
+                        </h2>
+                        <p className="text-sm text-white opacity-90 truncate">
+                            教室: {course.classroom}
+                        </p>
+                    </div>
                 </div>
                 <CardBody className="p-4">
                     <div className="flex items-center">

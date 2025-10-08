@@ -3,7 +3,7 @@
 import { Avatar, Button, Card, CardBody } from '@heroui/react';
 import { Plus, MoreVertical } from 'lucide-react';
 import { useCurrentMemberList } from '@/contexts/member-context';
-import { fetchMemberList } from '@/utils/fetch';
+import { fetchMemberList } from '@/utils/getter';
 
 
 export function MemberList() {
