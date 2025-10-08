@@ -3,7 +3,8 @@ import { notoSansJP } from '@/public/fonts/fonts';
 import React from "react";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
-import { getThemeCookie } from "@/utils/fetch";
+import { getThemeCookie } from "@/utils/getter";
+import NextjsTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: {
@@ -23,10 +24,11 @@ export default async function RootLayout({
   return (
     <html lang="ja" className={`${theme}`}>
       <body className={`${notoSansJP.className} antialiased`}>
+        <NextjsTopLoader showSpinner={false} />
         <Providers>
           {children}
         </Providers>
       </body>
     </html>
-    );
+  );
 }
