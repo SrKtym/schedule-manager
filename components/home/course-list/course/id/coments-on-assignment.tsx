@@ -32,7 +32,7 @@ export function CommentsOnAssignment({id}: {id: string}) {
                         <h2 className="text-lg font-google-sans font-medium mb-4">
                             メンバーのコメント
                         </h2>
-                        <div className="flex gap-3 mb-6">
+                        <div className="flex items-center gap-3 mb-6">
                             <Avatar
                                 src={userData?.image ?? undefined}
                                 name={userData?.name}
@@ -43,28 +43,26 @@ export function CommentsOnAssignment({id}: {id: string}) {
                                     placeholder="コメントを追加"
                                     value={comment}
                                     onValueChange={setComment}
+                                    variant="bordered"
                                     minRows={1}
                                 />
-            
-                                {comment.trim() && (
-                                    <div className="flex justify-end mt-2">
-                                        <Button 
-                                            size="sm" 
-                                            color="primary"
-                                            variant="flat"
-                                        >
-                                            投稿
-                                        </Button>
-                                    </div>
-                                )}
                             </div>
                         </div>
-        
+                        {comment.trim() && (
+                            <div className="flex justify-end mt-2">
+                                <Button 
+                                    color="primary"
+                                    variant="bordered"
+                                >
+                                    投稿
+                                </Button>
+                            </div>
+                        )}
                         <div className="space-y-6">
                             {filteredComments.map((comment) => (
                                 <div 
                                     key={comment.id}
-                                    className="flex gap-3"
+                                    className="flex items-center gap-3"
                                 >
                                     <Avatar
                                         name={comment.userName}

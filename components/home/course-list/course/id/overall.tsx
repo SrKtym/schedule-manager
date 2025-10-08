@@ -13,11 +13,11 @@ export function Overall() {
     const params = useParams<{id: string}>();
 
     return (
-        <div className="bg-background min-h-screen pb-12">
+        <div className="bg-background min-h-screen pb-12 space-y-8">
             {/* ヘッダー */}
             <AssignmentHeader id={params.id}/>
             
-            <div className="container mx-auto px-4 max-w-screen-xl">
+            <div className="container m-auto px-4 max-w-screen-xl space-y-8">
 
                 {/* 課題の詳細 */}
                 <AssignmentDetail id={params.id}/>
