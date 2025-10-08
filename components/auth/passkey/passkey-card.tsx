@@ -10,11 +10,22 @@ import Link from "next/link";
 
 export function PasskeyCard() {
     return (
-        <div className="space-y-5">
+        <div className="space-y-8">
             <h1 className="text-center text-xl font-medium">
                 パスキーの登録
             </h1>
-            <div className="flex items-center justify-center space-x-5">
+            <div className="text-justify space-y-5">
+                <p>
+                    ・パスワードの代わりにパスキーを使ってログインできます。
+                </p>
+                <p>
+                    ・パスキーとは、人間の顔や指紋といった生体情報、あるいはPINコードのようなデバイスのロック解除情報を使って本人確認を行う、より安全な認証方式です。
+                </p>
+                <p>
+                    ・一度登録すれば、次回以降はパスワードを入力する必要がなく、簡単にログインできます。
+                </p>
+            </div>
+            <div className="flex items-center justify-between gap-x-5">
                 <Button 
                     className="max-w-[200px] w-full"
                     color="primary"  
@@ -34,7 +45,7 @@ export function PasskeyCard() {
                         }
                     }}
                 >
-                    登録
+                    登録する
                 </Button>
                 <Link href='/home'>
                     <Button
