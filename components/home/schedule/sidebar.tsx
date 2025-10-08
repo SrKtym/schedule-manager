@@ -139,6 +139,9 @@ export function Sidebar({
                                     <Button
                                         color="primary"
                                         type="submit"
+                                        aria-label="Save schedule"
+                                        aria-disabled={isPending}
+                                        isLoading={isPending}
                                     >
                                         {isPending ? "保存中..." : "保存"}
                                     </Button>
