@@ -1,4 +1,4 @@
-import { get2faCookie, getSession } from '@/utils/fetch';
+import { get2faCookie, getSession } from '@/utils/getter';
 import { db } from '@/lib/drizzle';
 import { TwoFactorSettings } from '@/components/auth/two-factor/two-factor-settings';
 import { redirect } from 'next/navigation';
