@@ -8,7 +8,7 @@ import { sumCredit } from "@/hooks/sum-credit";
 
 export function Timetable() {
     return (
-        <div className="overflow-auto w-full p-4 mb-5 space-y-4 bg-white rounded-lg shadow lg:sticky top-20 dark:bg-content1">
+        <div className="overflow-auto w-full p-4 mb-5 space-y-4 bg-white rounded-large shadow-small lg:sticky top-20 dark:bg-content1">
             <h2 className="text-2xl text-center mb-4">
                 時間割
             </h2>

@@ -19,7 +19,7 @@ import { hc } from "hono/client";
 import { env } from "@/env";
 import { course } from "@/lib/drizzle/schema/public";
 import { AppType } from "@/app/api/[[...route]]/route";
-import { useRegisteredCourseData } from "@/contexts/schedule-context";
+import { useRegisteredCourseData } from "@/contexts/registered-course-context";
 import { useEffect, useRef, useState } from "react";
 import { InferResponseType } from "hono/client";
 import { Edit, Plus, Trash } from "lucide-react";
@@ -48,7 +48,7 @@ export function RenderCourse({
     }, []);
 
     const dataList = useRegisteredCourseData();
-    const data = dataList.find(
+    const data = dataList.courseDataList.find(
         v => v.course.period === period && v.course.week === week
     );
     const name = data?.course.name;
