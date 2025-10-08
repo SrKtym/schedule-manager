@@ -14,7 +14,7 @@ import { auth } from '@/lib/better-auth/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
 import { cookies, headers } from 'next/headers';
-import { getSession } from './fetch';
+import { getSession } from './getter';
 import { 
     announcement, 
     assignmentData, 
