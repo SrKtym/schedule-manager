@@ -1,6 +1,6 @@
 import { Overall } from "@/components/home/course-list/course/overall";
 import { 
-    fetchAssignment, 
+    fetchAssignmentData, 
     fetchAnnouncement,
     fetchMemberList 
 } from "@/utils/getter";
@@ -17,8 +17,8 @@ export default async function CoursePage(props: {
     const courseName = paramsValue.course;
     const decodedCourseName = decodeURIComponent(courseName);
     const [assignment, announcement, memberList] = await Promise.allSettled([
-        fetchAssignment(decodedCourseName),
-        fetchAnnouncement(decodedCourseName),
+        fetchAssignmentData([decodedCourseName]),
+        fetchAnnouncement([decodedCourseName]),
         fetchMemberList(decodedCourseName)
     ]);
     const assignmentValue = assignment.status === 'fulfilled' ? assignment.value : null;
