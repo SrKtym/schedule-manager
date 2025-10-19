@@ -1,16 +1,16 @@
 'use client';
 
-import { fetchAssignment } from '@/utils/getter';
+import { fetchAssignmentData } from '@/utils/getter';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-const AssignmentDataContext = createContext<Awaited<ReturnType<typeof fetchAssignment>> | null>(null);
+const AssignmentDataContext = createContext<Awaited<ReturnType<typeof fetchAssignmentData>> | null>(null);
 
 export const AssignmentDataProvider = ({ 
     children,
     assignmentData
 }: { 
     children: ReactNode,
-    assignmentData: Awaited<ReturnType<typeof fetchAssignment>> | null
+    assignmentData: Awaited<ReturnType<typeof fetchAssignmentData>> | null
 }) => {
     const [currentAssignmentData, setCurrentAssignmentData] = useState(assignmentData);
     return (

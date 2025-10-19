@@ -39,11 +39,13 @@ export const RegisteredCourseProvider = ({
     );
 };
 
-export const useRegisteredCourseData = () => {
+// すべての登録済み講義のデータリストを取得
+export const useRegisteredCourseDataList = () => {
     const courseDataList = useContext(RegisteredCourseContext);
     return courseDataList;
 };
 
+// 特定の講義のデータを取得
 export const useCurrentCourseData = (courseName: string) => {
     const {courseDataList} = useContext(RegisteredCourseContext);
     const number = courseDataList.findIndex((data) => data.course.name === courseName);
