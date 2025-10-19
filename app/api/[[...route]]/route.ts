@@ -9,6 +9,7 @@ import {
     course, 
     messages, 
     registered, 
+    schedule, 
     settings, 
     submissionMetaData 
 } from '@/lib/drizzle/schema/public';
@@ -17,6 +18,7 @@ import {
     selectAssignmentStatusSchema, 
     selectAttachmentMetaDataSchema, 
     selectRegisteredSchema, 
+    selectScheduleSchema, 
     selectSubmissionMetaDataSchema 
 } from '@/schemas/select-schema';
 
@@ -249,6 +251,21 @@ const app = new Hono()
 
             return c.json({
                 success: 'ファイルのメタデータを保存しました。'
+            });
+        }
+    )
+
+    // スケジュールの削除
+    .delete('/schedule',
+        zValidator(
+            'json',
+            selectScheduleSchema.pick({id: true})
+        ),
+        async (c) => {
+            const {id} = c.req.valid('json');
+            await db.delete(schedule).where(eq(schedule.id, id));
+            return c.json({
+                success: 'スケジュールを削除しました。'
             });
         }
     )
