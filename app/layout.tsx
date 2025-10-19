@@ -3,7 +3,7 @@ import { notoSansJP } from '@/public/fonts/fonts';
 import React from "react";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
-import { getThemeCookie } from "@/utils/getter";
+import { fetchThemeCookie } from "@/utils/getter";
 import NextjsTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = await getThemeCookie();
+  const theme = await fetchThemeCookie();
 
   return (
     <html lang="ja" className={`${theme}`}>
