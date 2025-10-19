@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { fetchMessages, getSession } from "@/utils/getter";
+import { fetchMessages, fetchSession } from "@/utils/getter";
 import { Inbox } from "@/components/home/notification/inbox";
 import { Suspense } from "react";
 import { InboxSkelton } from "@/components/skeltons";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default async function NotificationPage() {
-    const session = await getSession()
+    const session = await fetchSession()
     const data = await fetchMessages(session);
     
     if (session) {
