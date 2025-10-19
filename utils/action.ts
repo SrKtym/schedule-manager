@@ -14,7 +14,7 @@ import { auth } from '@/lib/better-auth/auth';
 import { APIError } from 'better-auth/api';
 import { cache } from 'react';
 import { cookies, headers } from 'next/headers';
-import { getSession } from './getter';
+import { fetchSession } from './getter';
 import { 
     announcement, 
     assignmentData, 
@@ -548,8 +548,9 @@ export async function createAnnouncement(prevState: AnnouncementState | undefine
 // 課題作成
 export async function createAssignment(prevState: AssignmentState | undefined, formData: FormData) {
     const validatedFields = createAssignmentSchema.safeParse({
-        title: formData.get('title'),
+        name: formData.get('name'),
         description: formData.get('description'),
+        courseName: formData.get('courseName'),
         points: formData.get('points'),
         dueDate: formData.get('dueDate'),
         attachmentIds: formData.get('attachmentIds'),
@@ -567,14 +568,14 @@ export async function createAssignment(prevState: AssignmentState | undefined, f
             .values(validatedFields.data)
             .onConflictDoNothing();
 
-        revalidatePath(`/home/course-list/${validatedFields.data.courseName}`);
+        revalidatePath(`../${validatedFields.data.courseName}`);
     }
 }
 
 // テーマ設定
 export const setThemeCookie = cache(async () => {
     const cookieStore = await cookies();
-    const session = await getSession();
+    const session = await fetchSession();
     if (session) {
         const settings = await db.query.settings.findFirst({
             where: (settings, {eq}) => (eq(settings.email, session.user.email))

@@ -9,14 +9,14 @@ import { course, registered, schedule, users } from "../lib/drizzle/schema/publi
 import { asc, eq } from "drizzle-orm";
 
 
-export const getSession = cache(async () => {
+export const fetchSession = cache(async () => {
     const settionData = await auth.api.getSession({
         headers: await headers()
     });
     return settionData;
 });
 
-export async function get2faCookie() {
+export async function fetch2faCookie() {
     const cookieStore = await cookies();
     const cookieName = process.env.NODE_ENV === 'development' ?
         'better-auth.two_factor' : 
@@ -24,13 +24,13 @@ export async function get2faCookie() {
     return cookieStore.get(cookieName)?.value;
 }
 
-export async function getThemeCookie() {
+export async function fetchThemeCookie() {
     const cookieStore = await cookies();
     return cookieStore.get('theme')?.value || 'light';
 }
 
 // 講義一覧の取得
-export const getCourse = cache(async (
+export const fetchCourse = cache(async (
     gradeList: string[], 
     facultyList: string[],
     departmentList: string[],
@@ -70,7 +70,7 @@ export const getCourse = cache(async (
 });
 
 // 講義の総数を取得
-export const getItemsLength = cache(async (
+export const fetchItemsLength = cache(async (
     gradeList: string[], 
     facultyList: string[],
     departmentList: string[],
@@ -107,7 +107,7 @@ export const getItemsLength = cache(async (
 })
 
 // 登録済みの講義の詳細を取得
-export const fetchRegisteredCourseData = cache(async (session: Awaited<ReturnType<typeof getSession>>) => {
+export const fetchRegisteredCourseData = cache(async (session: Awaited<ReturnType<typeof fetchSession>>) => {
     const result = await db
         .select({
             course: {
@@ -129,7 +129,7 @@ export const fetchRegisteredCourseData = cache(async (session: Awaited<ReturnTyp
 });
 
 // 予定の取得
-export const fetchSchedule = cache(async (session: Awaited<ReturnType<typeof getSession>>) => {
+export const fetchSchedule = cache(async (session: Awaited<ReturnType<typeof fetchSession>>) => {
     const result = await db.query.schedule.findMany({
         where: (schedule, {eq}) => (eq(schedule.email, session?.user.email as string)),
         orderBy: (schedule, {asc}) => (asc(schedule.start))
@@ -139,7 +139,7 @@ export const fetchSchedule = cache(async (session: Awaited<ReturnType<typeof get
 });
 
 // 通知の取得
-export const fetchMessages = cache(async (session: Awaited<ReturnType<typeof getSession>>) => {
+export const fetchMessages = cache(async (session: Awaited<ReturnType<typeof fetchSession>>) => {
     const data = await db.query.messages.findMany({
         where: (messages, {eq}) => (eq(messages.receiverEmail, session?.user.email as string)),
         orderBy: (messages, {desc}) => (desc(messages.createdAt))
@@ -149,10 +149,10 @@ export const fetchMessages = cache(async (session: Awaited<ReturnType<typeof get
 });
 
 // 課題と添付ファイルメタデータの取得
-export const fetchAssignment = cache(async (courseName: string) => {
+export const fetchAssignmentData = cache(async (courseNameList: string[]) => {
     const result = await db.transaction(async (tx) => {
         const assignmentData = await tx.query.assignmentData.findMany({
-            where: (assignmentData, {eq}) => (eq(assignmentData.courseName, courseName)),
+            where: (assignmentData, {inArray}) => (inArray(assignmentData.courseName, courseNameList)),
         });
         
         const hasAttachments = assignmentData.filter(
@@ -204,9 +204,9 @@ export const fetchSubmissionMetaData = cache(async (assignmentId: string) => {
 });
 
 // アナウンスメントの取得
-export const fetchAnnouncement = cache(async (courseName: string) => {
+export const fetchAnnouncement = cache(async (courseNameList: string[]) => {
     const result = await db.query.announcement.findMany({
-        where: (announcement, {eq}) => (eq(announcement.courseName, courseName)),
+        where: (announcement, {inArray}) => (inArray(announcement.courseName, courseNameList)),
     });
     return result;
 });
