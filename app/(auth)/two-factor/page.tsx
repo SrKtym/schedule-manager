@@ -1,4 +1,4 @@
-import { get2faCookie, getSession } from '@/utils/getter';
+import { fetchSession, fetch2faCookie } from '@/utils/getters/auth';
 import { db } from '@/lib/drizzle';
 import { TwoFactorSettings } from '@/components/auth/two-factor/two-factor-settings';
 import { redirect } from 'next/navigation';
@@ -11,14 +11,13 @@ export const metadata: Metadata = {
     title: '2要素認証'
 }
 
-
 export default async function TwoFactorPage() {
-    const session = await getSession();
-    const cookie = await get2faCookie();
+    const session = await fetchSession();
+    const cookie = await fetch2faCookie();
 
     if (session) {
         const user = await db.query.users.findFirst({
-            where: (users, {eq}) => (eq(users.id, session.session.userId))
+            where: (users, {eq}) => (eq(users.id, session.user.id))
         });
 
         return (
@@ -29,7 +28,9 @@ export default async function TwoFactorPage() {
                             2要素認証の設定を行ってください。
                         </h1>
                         <div className='flex items-center justify-center space-x-3'>
-                            <p>現在のステータス: </p>
+                            <p>
+                                現在のステータス: 
+                            </p>
                             {user?.twoFactorEnabled ? 
                                 <div className='flex'>
                                     <ShieldCheck className='text-green-500'/>
@@ -52,6 +53,6 @@ export default async function TwoFactorPage() {
     } else if (cookie) {
         return <FormTabs />;
     } else {
-        redirect('/');
+        redirect("/");
     }
 }

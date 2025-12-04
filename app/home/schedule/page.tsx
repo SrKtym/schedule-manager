@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Overall } from "@/components/home/schedule/overall";
-import { fetchSchedule, fetchSession } from "@/utils/getter";
+import { fetchSession } from "@/utils/getters/auth";
+import { fetchSchedule } from "@/utils/getters/main";
 import { ScheduleProvider } from "@/contexts/schedule-context";
 
 

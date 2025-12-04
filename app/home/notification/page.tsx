@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { fetchMessages, fetchSession } from "@/utils/getter";
+import { fetchSession } from "@/utils/getters/auth";
+import { fetchMessages } from "@/utils/getters/main";
 import { Inbox } from "@/components/home/notification/inbox";
 import { Suspense } from "react";
 import { InboxSkelton } from "@/components/skeltons";

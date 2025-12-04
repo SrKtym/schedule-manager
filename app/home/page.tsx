@@ -3,7 +3,8 @@ import { NotificationsList } from "@/components/home/notifications-list";
 import { DailySchedule } from "@/components/home/daily-schedule";
 import { UpcomingAssignment } from "@/components/home/upcoming-assignment";
 import { AssignmentProgress } from "@/components/home/assignment-progress";
-import { fetchSchedule, fetchSession } from "@/utils/getter";
+import { fetchSession } from "@/utils/getters/auth";
+import { fetchSchedule } from "@/utils/getters/main";
 
 export const metadata: Metadata = {
     title: 'ホーム'
