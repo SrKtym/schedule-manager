@@ -12,13 +12,12 @@ import {
 import { CustomRadio } from './custom-radio';
 import { useState, useActionState } from 'react';
 import { TwoFactorValid } from '@/components/auth/two-factor/two-factor-valid';
-import { enableTwoFactor } from '@/utils/action';
-
+import { setTwoFactor } from '@/utils/actions/auth';
 
 export function TwoFactorSettings({twoFactorEnabled}: {twoFactorEnabled: boolean | null | undefined}) {
     const [selected, setSelected] = useState<string>();
     const [open, setOpen] = useState<boolean>(false);
-    const [state, formAction, isPending] = useActionState(enableTwoFactor, undefined);
+    const [state, formAction, isPending] = useActionState(setTwoFactor, undefined);
 
     return twoFactorEnabled ? 
         // 2要素認証が有効の場合

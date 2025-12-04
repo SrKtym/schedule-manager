@@ -1,3 +1,5 @@
+'use client';
+
 import { Radio, cn } from "@heroui/react";
 import { type ReactNode } from "react";
 

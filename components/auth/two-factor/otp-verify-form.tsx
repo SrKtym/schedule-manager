@@ -1,13 +1,9 @@
 'use client';
 
-import { 
-    addToast,
-    Button,
-    Input
-} from '@heroui/react';
+import { addToast, Button, Input } from '@heroui/react';
 import { authClient } from "@/lib/better-auth/auth-client";
 import { useTransition, useActionState } from 'react';
-import { verifyOtp } from '@/utils/action';
+import { verifyOtp } from '@/utils/actions/auth';
 
 
 export function OtpVerifyForm() {

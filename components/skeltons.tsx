@@ -1,16 +1,17 @@
 import { Card, Skeleton } from "@heroui/react";
+import { Fragment } from "react";
 
 
 function DataTableRowsSkelton() {
     return (
         <div className="flex justify-between items-center gap-2 p-3">
             <Skeleton className="w-[20px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
-            <Skeleton className="w-[100px] h-[20px] rounded-lg" />
+            {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton 
+                    key={index} 
+                    className="w-[100px] h-[20px] rounded-lg" 
+                />
+            ))}
         </div>
     );
 }
@@ -32,12 +33,12 @@ export function InboxSkelton() {
 
                 {/* サイドバー */}
                 <div className="flex flex-col items-center w-15 gap-2 p-4 border-r border-divider max-sm:hidden">
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
-                    <Skeleton className="w-[40px] h-[40px] rounded-lg" />
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <Skeleton 
+                            key={index} 
+                            className="w-[40px] h-[40px] rounded-lg" 
+                        />
+                    ))}
                 </div>
 
                 {/* メール一覧 */}
@@ -55,34 +56,22 @@ export function InboxSkelton() {
                     </div>
                     <div className="grid grid-cols-3 items-center p-4 w-full gap-2">
                         {/* テーブルヘッダー */}
-                        <Skeleton className="w-[50px] h-[20px] rounded-lg"/>
-                        <Skeleton className="w-[50px] h-[20px] rounded-lg"/>
-                        <Skeleton className="w-[50px] h-[20px] rounded-lg"/>
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <Skeleton key={index} className="w-[50px] h-[20px] rounded-lg" />
+                        ))}
                         {/* テーブルボディ */}
-                        <div className="flex items-center gap-2">
-                            <Skeleton className="w-[20px] h-[20px] rounded-lg" />
-                            <Skeleton className="w-[18px] h-[18px] rounded-lg" />
-                            <Skeleton className="w-[32px] h-[32px] rounded-full" />
-                            <Skeleton className="w-[100px] h-[20px] rounded-lg"/>
-                        </div>
-                        <Skeleton className="w-full max-w-[200px] h-[20px] rounded-lg" />
-                        <Skeleton className="w-full max-w-[131px] h-[20px] rounded-lg" />
-                        <div className="flex items-center gap-2">
-                            <Skeleton className="w-[20px] h-[20px] rounded-lg" />
-                            <Skeleton className="w-[18px] h-[18px] rounded-lg" />
-                            <Skeleton className="w-[32px] h-[32px] rounded-full" />
-                            <Skeleton className="w-[100px] h-[20px] rounded-lg"/>
-                        </div>
-                        <Skeleton className="w-full max-w-[200px] h-[20px] rounded-lg" />
-                        <Skeleton className="w-full max-w-[131px] h-[20px] rounded-lg" />
-                        <div className="flex items-center gap-2">
-                            <Skeleton className="w-[20px] h-[20px] rounded-lg" />
-                            <Skeleton className="w-[18px] h-[18px] rounded-lg" />
-                            <Skeleton className="w-[32px] h-[32px] rounded-full" />
-                            <Skeleton className="w-[100px] h-[20px] rounded-lg"/>
-                        </div>
-                        <Skeleton className="w-full max-w-[200px] h-[20px] rounded-lg" />
-                        <Skeleton className="w-full max-w-[131px] h-[20px] rounded-lg" />
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <Fragment key={index}>
+                                <div className="flex items-center gap-2">
+                                    <Skeleton className="w-[20px] h-[20px] rounded-lg" />
+                                    <Skeleton className="w-[18px] h-[18px] rounded-lg" />
+                                    <Skeleton className="w-[32px] h-[32px] rounded-full" />
+                                    <Skeleton className="w-[100px] h-[20px] rounded-lg"/>
+                                </div>
+                                <Skeleton className="w-full max-w-[200px] h-[20px] rounded-lg" />
+                                <Skeleton className="w-full max-w-[131px] h-[20px] rounded-lg" />
+                            </Fragment>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -95,12 +84,12 @@ export function FilterSkelton() {
         <>
             {/* フィルター */}
             <div className="grid grid-cols-3 gap-3">
-                <Skeleton className="w-full h-[56px] rounded-lg" />
-                <Skeleton className="w-full h-[56px] rounded-lg" />
-                <Skeleton className="w-full h-[56px] rounded-lg" />
-                <Skeleton className="w-full h-[56px] rounded-lg" />
-                <Skeleton className="w-full h-[56px] rounded-lg" />
-                <Skeleton className="w-full h-[56px] rounded-lg" />
+                {Array.from({ length: 6 }).map((_, index) => (
+                    <Skeleton 
+                        key={index} 
+                        className="w-full h-[56px] rounded-lg" 
+                    />
+                ))}
             </div>
             {/* インプット */}
             <Skeleton className="w-full h-[40px] rounded-lg" />
@@ -119,11 +108,9 @@ export function FilterSkelton() {
 export function DataTableSkelton() {
     return (
         <Card className="flex flex-col w-full h-[704px] rouded-lg">
-            <DataTableRowsSkelton />
-            <DataTableRowsSkelton />
-            <DataTableRowsSkelton />
-            <DataTableRowsSkelton />
-            <DataTableRowsSkelton />
+            {Array.from({ length: 5 }).map((_, index) => (
+                <DataTableRowsSkelton key={index} />
+            ))}
         </Card>
     );
 }

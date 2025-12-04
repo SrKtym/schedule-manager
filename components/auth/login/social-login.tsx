@@ -5,7 +5,7 @@ import { Button } from "@heroui/react";
 import { GoogleLogo } from "../../../public/logo/google-logo";
 import { GithubLogo } from "../../../public/logo/github-logo";
 import { XLogo } from "../../../public/logo/x-logo";
-import { setThemeCookie } from "@/utils/action";
+import { setThemeCookie } from "@/utils/actions/main";
 import { useTransition } from "react";
 
 

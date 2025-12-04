@@ -3,15 +3,19 @@
 import * as m from "motion/react-m";
 import { LazyMotion, domAnimation } from "motion/react";
 import { Calendar } from "lucide-react";
-import { fetchSchedule } from "@/utils/getter";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
-import { decimalHours, getDateFromTimeString, isProgressingOrUpcoming } from "@/utils/related-to-schedule";
+import { fetchSchedule } from "@/utils/getters/main";
+import { decimalHours, getDateFromTimeString, isProgressingOrUpcoming } from "@/utils/helpers/schedule";
 import { daysOfWeek, timeRange } from "@/constants/definitions";
 import { cn } from "@heroui/react";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 
 
-export function DailySchedule({todaySchedule}: {todaySchedule: Awaited<ReturnType<typeof fetchSchedule>>}) {
-    const {courseDataList} = useRegisteredCourseData();
+export function DailySchedule({
+    todaySchedule
+}: {
+    todaySchedule: Awaited<ReturnType<typeof fetchSchedule>>
+}) {
+    const {courseDataList} = useRegisteredCourseDataList();
     const registeredCourse = courseDataList.map((data) => {
         return {
             day: data.course.week[0],

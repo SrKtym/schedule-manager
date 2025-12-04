@@ -2,7 +2,7 @@
 
 import { Input, Button } from "@heroui/react";
 import { useActionState } from "react";
-import { verifyTotp } from "@/utils/action";
+import { verifyTotp } from "@/utils/actions/auth";
 
 export function TotpVerifyForm() {
     const [state, formAction, isPending] = useActionState(verifyTotp, undefined);

@@ -1,9 +1,6 @@
 'use client';
 
-import { 
-    addToast,
-    Button 
-} from "@heroui/react";
+import { addToast, Button } from "@heroui/react";
 import { authClient } from "@/lib/better-auth/auth-client";
 import Link from "next/link";
 
@@ -47,13 +44,13 @@ export function PasskeyCard() {
                 >
                     登録する
                 </Button>
-                <Link href='/home'>
-                    <Button
-                        className="max-w-[200px] w-full"
-                    >
-                        ホームページへ
-                    </Button>
-                </Link>
+                <Button
+                    as={Link}
+                    href='/home'
+                    className="max-w-[200px] w-full"
+                >
+                    ホームページへ
+                </Button>
             </div>
         </div>
     );
