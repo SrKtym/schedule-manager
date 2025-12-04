@@ -13,6 +13,7 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
+      // 未使用の変数を許可
       "@typescript-eslint/no-unused-vars": "off"
     }
   }
