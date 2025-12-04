@@ -2,7 +2,7 @@
 
 import { Card, CardBody } from "@heroui/react";
 import { features } from "@/constants/definitions";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 
 export function FeaturesSection() {
