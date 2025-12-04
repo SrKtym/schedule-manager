@@ -62,7 +62,7 @@ const app = new Hono()
 
 
 export const middleware = handle(app);
-export default createMiddleware(aj);
+// export default createMiddleware(aj);
 
 export const config = {
     matcher: [
