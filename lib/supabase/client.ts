@@ -2,12 +2,10 @@ import { createBrowserClient } from '@supabase/ssr'
 import { env } from '@/env'
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-export const supabase = createBrowserClient(supabaseUrl, supabaseKey, {
-    // global: {
-    //     headers: {
-    //         Authorization: `Bearer ${jwt}`
-    //     }
-    // }
-});
+// この接続はstored procedureの呼び出しのみに制限する
+export const supabaseAnon = createBrowserClient(
+    supabaseUrl,
+    supabaseKey
+);
