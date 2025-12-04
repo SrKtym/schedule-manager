@@ -3,8 +3,9 @@ import { notoSansJP } from '@/public/fonts/fonts';
 import React from "react";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
-import { fetchThemeCookie } from "@/utils/getter";
+import { fetchThemeCookie } from "@/utils/getters/main";
 import NextjsTopLoader from "nextjs-toploader";
+import { BackToTopButton } from "@/components/home/back-to-top-button";
 
 export const metadata: Metadata = {
   title: {
@@ -28,6 +29,12 @@ export default async function RootLayout({
         <Providers>
           {children}
         </Providers>
+        <footer className="flex flex-col items-center justify-center">
+          <BackToTopButton />
+          <p className="w-full text-center text-tiny text-white bg-gray-700 px-3 py-5">
+              Copyright &copy; 2025 Schedule Manager All rights reserved.
+          </p>
+        </footer>
       </body>
     </html>
   );
