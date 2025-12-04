@@ -35,6 +35,7 @@ export function ConfirmSignUpEmail({
                         <Text className='text-justify text-base space-y-3'>
                             <span>
                                 サインアップしました。ご自身で行った場合は以下のリンクに進み、サインインを完了してください。
+                                完了後、2要素認証の設定を行ってください。
                             </span>
                             <p className='text-primary'>
                                 {url}

@@ -6,14 +6,14 @@ import {
     SelectItem
 } from "@heroui/react";
 import { FileText, Settings } from "lucide-react";
-import { useCurrentAssignmentData } from "@/contexts/assignment-data-context";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { useAssignmentData } from "@/contexts/assignment-data-context";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 
 export function UpcomingAssignment() {
-    const registeredCourse = useRegisteredCourseData().courseDataList;
-    const {assignmentData} = useCurrentAssignmentData();
+    const {courseDataList} = useRegisteredCourseDataList();
+    const assignmentData = useAssignmentData();
     const assignments = assignmentData?.filter(
-        assignment => registeredCourse.find(
+        assignment => courseDataList.find(
             ({course}) => course.name === assignment.courseName
         ) && assignment.dueDate.getDate() - new Date().getDate() <= 7
     );
@@ -39,10 +39,10 @@ export function UpcomingAssignment() {
                     radius="lg"
                     variant="bordered"
                 >
-                    <SelectItem key="3days">
+                    <SelectItem key="3日以内">
                         3日以内
                     </SelectItem>
-                    <SelectItem key="7days">
+                    <SelectItem key="7日以内">
                         7日以内
                     </SelectItem>
                 </Select>
@@ -59,11 +59,10 @@ export function UpcomingAssignment() {
             </div>
             {assignments ? (
                 <p className="text-center p-5">
-                    {assignments.map(
-                        assignment => (
-                            <span key={assignment.id} className="block mb-2">
-                                {assignment.name}
-                            </span>
+                    {assignments.map(assignment => (
+                        <span key={assignment.id} className="block mb-2">
+                            {assignment.name}
+                        </span>
                         )
                     )}
                 </p>

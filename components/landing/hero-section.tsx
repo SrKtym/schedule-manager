@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@heroui/react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 

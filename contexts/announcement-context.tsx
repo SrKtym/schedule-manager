@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchAnnouncement } from '@/utils/getter';
+import { fetchAnnouncement } from '@/utils/getters/main';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 const AnnouncementContext = createContext<Awaited<ReturnType<typeof fetchAnnouncement>>>([]);
