@@ -9,11 +9,10 @@ import {
 } from "@/constants/definitions";
 import { Fragment, useContext, useState } from "react";
 import { SidebarContext } from "@/contexts/sidebar-context";
-import { cn } from "@heroui/react";
-import { Button } from "@heroui/react";
+import { Button, cn } from "@heroui/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSchedule } from "@/contexts/schedule-context";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 import { CurrentTimeIndicator } from "./current-time-indicator";
 import { 
     getDateFromTimeString, 
@@ -23,7 +22,7 @@ import {
     hexWithAlpha,
     isSpanningDays,
     calculateHeightAsPercentage
-} from "@/utils/related-to-schedule";
+} from "@/utils/helpers/schedule";
 import * as m from "motion/react-m";
 import { 
     AnimatePresence, 
@@ -31,8 +30,10 @@ import {
     LazyMotion, 
     domAnimation 
 } from "motion/react";
-import { SingleItemModal } from "../shared-layout-modal";
-import { fetchSchedule } from "@/utils/getter";
+import { fetchSchedule } from "@/utils/getters/main";
+import dynamic from "next/dynamic";
+
+const SingleItemModal = dynamic(() => import("../shared-layout-modal"), { ssr: false });
 
 export function BigCalendar({
     currentDate,
@@ -45,7 +46,7 @@ export function BigCalendar({
 }) {
     // コンテキストから取得
     const isCollapsed = useContext(SidebarContext);
-    const {courseDataList} = useRegisteredCourseData();
+    const {courseDataList} = useRegisteredCourseDataList();
     const schedule = useSchedule();
     
     const [selectedCourse, setSelectedCourse] = useState<{ 
@@ -57,6 +58,7 @@ export function BigCalendar({
 
     const [selectedSchedule, setSelectedSchedule] = useState<Awaited<ReturnType<typeof fetchSchedule>>[number] | false>(false);
 
+    // 週の変更
     const changeWeek = (increment: number) => {
         setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() + (7 * increment))));
     };
@@ -194,9 +196,9 @@ export function BigCalendar({
                                                                 {course.name}
                                                             </p>
                                                             <p>
-                                                            {course.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} 
-                                                            - 
-                                                            {course.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}
+                                                                {course.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} 
+                                                                - 
+                                                                {course.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}
                                                             </p>
                                                         </div>
                                                     </m.div>
@@ -221,51 +223,31 @@ export function BigCalendar({
                                                                 {schedule.title}
                                                             </p>
                                                             <p>
-                                                            {isSpanningDays(schedule.start, schedule.end) ? 
-                                                                `${schedule.start.toLocaleDateString('default', dateOptionforSchedule)} - ${schedule.end.toLocaleDateString('default', dateOptionforSchedule)}` : 
-                                                                `${schedule.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} - ${schedule.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}`}
+                                                                {isSpanningDays(schedule.start, schedule.end) ? 
+                                                                    `${schedule.start.toLocaleDateString('default', dateOptionforSchedule)} - ${schedule.end.toLocaleDateString('default', dateOptionforSchedule)}` : 
+                                                                    `${schedule.start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })} - ${schedule.end.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })}`}
                                                             </p>
                                                         </div>
                                                     </m.div> 
                                             ))}
-                                            {selectedCourse && (
-                                                <m.div 
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 0.6 }}
-                                                    exit={{ opacity: 0 }}
-                                                    key="overlay"
-                                                    className="absolute inset-0 bg-background opacity-20"
-                                                    onClick={() => setSelectedCourse(false)}
-                                                />
-                                            )}
-                                            {selectedSchedule && (
-                                                <m.div 
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 0.6 }}
-                                                    exit={{ opacity: 0 }}
-                                                    key="overlay"
-                                                    className="absolute inset-0 bg-background opacity-20"
-                                                    onClick={() => setSelectedSchedule(false)}
-                                                />
-                                            )}
-                                            {selectedCourse && (
-                                                <SingleItemModal 
-                                                    key="modal"
-                                                    registeredCourse={selectedCourse}
-                                                    onClick={() => setSelectedCourse(false)}
-                                                />
-                                            )}
-                                            {selectedSchedule && (
-                                                <SingleItemModal 
-                                                    key="modal"
-                                                    schedule={selectedSchedule}
-                                                    onClick={() => setSelectedSchedule(false)}
-                                                />
-                                            )}
                                         </div>
                                     ))}
                                 </Fragment>
                             ))}
+                            {selectedCourse && (
+                                <SingleItemModal 
+                                    key="modal"
+                                    registeredCourse={selectedCourse}
+                                    onClose={() => setSelectedCourse(false)}
+                                />
+                            )}
+                            {selectedSchedule && (
+                                <SingleItemModal 
+                                    key="modal"
+                                    schedule={selectedSchedule}
+                                    onClose={() => setSelectedSchedule(false)}
+                                />
+                            )}
                         </AnimatePresence>
                     </LayoutGroup>
                 </LazyMotion>
