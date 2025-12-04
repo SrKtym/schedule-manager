@@ -3,21 +3,22 @@ import {
     fetchAssignmentData, 
     fetchAnnouncement,
     fetchMemberList 
-} from "@/utils/getter";
+} from "@/utils/getters/main";
 import { AssignmentDataProvider } from "@/contexts/assignment-data-context";
 import { AnnouncementProvider } from "@/contexts/announcement-context";
 import { MemberProvider } from "@/contexts/member-context";
+import { fetchSession } from "@/utils/getters/auth";
 
 export default async function CoursePage(props: {
     params: Promise<{
         course: string
     }>
 }) {
-    const paramsValue = await props.params;
-    const courseName = paramsValue.course;
-    const decodedCourseName = decodeURIComponent(courseName);
+    const session = await fetchSession();
+    const {course} = await props.params;
+    const decodedCourseName = decodeURIComponent(course);
     const [assignment, announcement, memberList] = await Promise.allSettled([
-        fetchAssignmentData([decodedCourseName]),
+        fetchAssignmentData(session, [decodedCourseName]),
         fetchAnnouncement([decodedCourseName]),
         fetchMemberList(decodedCourseName)
     ]);
