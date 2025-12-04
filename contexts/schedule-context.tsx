@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchSchedule } from '@/utils/getter';
+import { fetchSchedule } from '@/utils/getters/main';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 const ScheduleContext = createContext<Awaited<ReturnType<typeof fetchSchedule>>>([]);

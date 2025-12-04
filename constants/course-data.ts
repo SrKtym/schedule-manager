@@ -1,4 +1,4 @@
-import { course } from '@/lib/drizzle/schema/public';
+import { course } from '@/lib/drizzle/schemas/main';
 
 export const courseList: typeof course.$inferInsert[] = [
     {

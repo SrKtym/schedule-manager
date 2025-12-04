@@ -1,9 +1,9 @@
 'use client'
 
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 
 export function sumCredit() {
-    const dataList = useRegisteredCourseData();
+    const dataList = useRegisteredCourseDataList();
     const creditList = dataList.courseDataList.map((data) => {
         return Number(data.course.credit)
     });
