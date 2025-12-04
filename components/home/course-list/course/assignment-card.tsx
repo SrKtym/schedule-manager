@@ -8,16 +8,12 @@ import {
 import { FileText } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { getFileColor } from '@/utils/related-to-assignment';
+import { getFileColor } from '@/utils/helpers/assignment';
 import { dateOptionforAnnouncement } from '@/constants/definitions';
-import { assignmentData } from '@/lib/drizzle/schema/public';
+import { assignmentData } from '@/lib/drizzle/schemas/main';
 
 
-export function AssignmentCard({
-    assignment
-}: {
-    assignment: typeof assignmentData.$inferSelect;
-}) {
+export function AssignmentCard({assignment}: {assignment: typeof assignmentData.$inferSelect}) {
     const pathName = usePathname();
     
     const { 

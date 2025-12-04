@@ -1,12 +1,8 @@
-import { 
-    Card, 
-    CardBody, 
-    Chip, 
-} from '@heroui/react';
+import { Card, CardBody, Chip } from '@heroui/react';
 import { dateOptionforAnnouncement } from '@/constants/definitions';
-import { announcement } from '@/lib/drizzle/schema/public';
+import { announcement } from '@/lib/drizzle/schemas/main';
 import { File, FileQuestion, Info } from 'lucide-react';
-import { getAnnouncementTypeColor } from '@/utils/related-to-announcement';
+import { getAnnouncementTypeColor } from '@/utils/helpers/announcement';
 
 
 export function AnnouncementCard({ data }: { data: typeof announcement.$inferSelect}) {

@@ -11,12 +11,12 @@ import * as m from 'motion/react-m';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { CourseCard } from "@/components/home/course-list/course-card";
 import Link from "next/link";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 import { CreateCourse } from "./create-course";
 
 export function Overall() {
     const isTeacher = false;
-    const { courseDataList } = useRegisteredCourseData();
+    const { courseDataList } = useRegisteredCourseDataList();
 
     return (
         <div className="container mx-auto px-4 py-6 max-w-screen-xl">

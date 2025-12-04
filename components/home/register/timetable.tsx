@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@heroui/react";
-import { timeRange, week } from "@/constants/definitions";
+import { period, timeRange, week } from "@/constants/definitions";
 import { RenderCourse } from "./render-course";
 import { sumCredit } from "@/hooks/sum-credit";
 
@@ -34,7 +34,7 @@ export function Timetable() {
                             <td className="border border-gray-300 p-2 text-center">
                                 <div className="flex flex-col items-center space-y-2">
                                     <span>
-                                        {`${i + 1}限目`}
+                                        {period[i]}
                                     </span>
                                     <span className="text-sm">
                                         {time}
@@ -47,7 +47,7 @@ export function Timetable() {
                                     className="border border-gray-300 p-2 text-center text-gray-700 dark:text-white"
                                 >
                                     <RenderCourse
-                                        period={`${i + 1}限目`}
+                                        period={period[i]}
                                         week={day}
                                     />
                                 </td>
@@ -58,14 +58,14 @@ export function Timetable() {
             </table>
             <div className="flex justify-between items-center gap-3">
                 <div className="flex flex-col gap-2">
-                    <p className="sm:text-xl dark:text-white">
+                    <p className="sm:text-xl text-foreground">
                         取得予定の単位数: {sumCredit()}
                     </p>
-                    <div className="flex justify-between items-center gap-2">
-                        <p className="dark:text-white">
+                    <div className="flex justify-between items-center text-foreground gap-2">
+                        <p>
                             上限: 50
                         </p>
-                        <p className="dark:text-white">
+                        <p>
                             下限: 40
                         </p>
                     </div>

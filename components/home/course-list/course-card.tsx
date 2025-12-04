@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MoreVertical, Folder } from 'lucide-react';
-import { fetchRegisteredCourseData } from '@/utils/getter';
+import { fetchRegisteredCourseData } from '@/utils/getters/main';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
