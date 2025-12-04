@@ -1,0 +1,2 @@
+ALTER TABLE "main"."attachment_metadata" ADD COLUMN "user_id" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "main"."attachment_metadata" ADD CONSTRAINT "attachment_metadata_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "better_auth"."users"("id") ON DELETE cascade ON UPDATE no action;
