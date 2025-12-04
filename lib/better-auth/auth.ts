@@ -1,11 +1,11 @@
 import { env } from '../../env';
 import { betterAuth } from 'better-auth';
-import { admin as adminPlugin, jwt, twoFactor } from 'better-auth/plugins';
+import { admin as adminPlugin, twoFactor } from 'better-auth/plugins';
 import { ac, admin, student, professor } from '@/permissions';
 import { passkey } from 'better-auth/plugins/passkey';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../drizzle';
-import * as schema from '@/lib/drizzle/schema/public';
+import * as betterAuthSchema from '@/lib/drizzle/schemas/better-auth';
 import { nextCookies } from 'better-auth/next-js';
 import { resend } from '@/lib/resend/resend';
 import { ResetPasswordEmail } from '@/components/verify-email/reset-password-email';
@@ -16,7 +16,7 @@ import { DeleteAccountEmail } from '@/components/verify-email/delete-account-ema
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: 'pg',
-        schema: schema,
+        schema: betterAuthSchema,
         usePlural: true,
     }),
 
@@ -74,6 +74,19 @@ export const auth = betterAuth({
         }
     },
 
+    // hooks: {
+    //     after: createAuthMiddleware(async (ctx) => {
+    //         const userId = ctx.context.session?.user.id;
+    //         const email = ctx.context.session?.user.email;
+            
+    //         if (!userId) return;
+
+    //         // stored procedureを呼び出す
+    //         await supabaseAnon.rpc("set_user_context", {
+    //             user_id: userId
+    //         });
+    //     })
+    // },
 
     plugins: [
         adminPlugin({
@@ -105,7 +118,6 @@ export const auth = betterAuth({
         }),
 
         passkey(),
-        jwt(),
         nextCookies()
 
     ],
