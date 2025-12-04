@@ -1,4 +1,4 @@
-import type { State } from "@/types/sign-up";
+import type { State } from "@/types/auth/sign-up";
 
 // ログインアクションのバリデーションエラー
 export type StateOmitName = {
