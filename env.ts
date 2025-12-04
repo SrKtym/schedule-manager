@@ -14,13 +14,14 @@ export const env = createEnv({
         RESEND_API_KEY: z.string(),
         ARCJET_KEY: z.string(),
         DATABASE_URL: z.url(),
+        SUPABASE_SECRET_KEY: z.string(),
         BETTER_AUTH_ADMIN_USER_ID: z.string(),
     },
 
     client: {
         NEXT_PUBLIC_APP_URL: z.url(),
         NEXT_PUBLIC_SUPABASE_URL: z.url(),
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string()
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string()
     },
 
     runtimeEnv: {
@@ -35,8 +36,9 @@ export const env = createEnv({
         RESEND_API_KEY: process.env.RESEND_API_KEY!,
         ARCJET_KEY: process.env.ARCJET_KEY!,
         DATABASE_URL: process.env.DATABASE_URL!,
+        SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY!,
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
         BETTER_AUTH_ADMIN_USER_ID: process.env.BETTER_AUTH_ADMIN_USER_ID!
     }
 });
