@@ -1,0 +1,16 @@
+services:
+  app:
+    container_name: schedule-manager
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: "bun run dev"
