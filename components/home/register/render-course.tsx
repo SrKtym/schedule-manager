@@ -1,7 +1,7 @@
 'use client';
 
 import { 
-    addToast, 
+    addToast,
     Button, 
     Listbox, 
     ListboxItem, 
@@ -15,31 +15,26 @@ import {
     PopoverTrigger, 
     Tooltip 
 } from "@heroui/react";
-import { hc } from "hono/client";
-import { env } from "@/env";
-import { course } from "@/lib/drizzle/schema/public";
-import { AppType } from "@/app/api/[[...route]]/route";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
+import { client } from "@/lib/hono/client";
+import { course } from "@/lib/drizzle/schemas/main";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 import { useEffect, useRef, useState } from "react";
 import { InferResponseType } from "hono/client";
 import { Edit, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useSessionUserData } from "@/contexts/user-data-context";
 
 
 export function RenderCourse({
     period,
     week
 }: {
-    period: string;
-    week: string;
+    period: typeof course.$inferSelect.period;
+    week: typeof course.$inferSelect.week;
 }) {
-    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
     const ref = useRef<InferResponseType<typeof client.api.course.$get>>(undefined);
     const [open, setOpen] = useState<boolean>(false);
     const [hasHover, setHasHover] = useState<boolean>(false);
     const router = useRouter();
-    const email = useSessionUserData().email;
 
     // メディアクエリで hover の可否を判定
     useEffect(() => {
@@ -47,7 +42,7 @@ export function RenderCourse({
         setHasHover(mql.matches);
     }, []);
 
-    const dataList = useRegisteredCourseData();
+    const dataList = useRegisteredCourseDataList();
     const data = dataList.courseDataList.find(
         v => v.course.period === period && v.course.week === week
     );
@@ -97,8 +92,8 @@ export function RenderCourse({
                 onPress={async () => {
                     const res = await client.api.course.$get({
                         query: {
-                            period: period as typeof course.$inferSelect.period,
-                            week: week as typeof course.$inferSelect.week
+                            period: period,
+                            week: week
                         }
                     });
                     const dataList = await res.json();
@@ -153,11 +148,10 @@ export function RenderCourse({
                                 <ListboxItem 
                                     key={item.name}
                                     textValue={item.name}
-                                    onPress={async (e) => {
+                                    onPress={async () => {
                                         const res = await client.api.course.single.$post({
                                             json: {
-                                                email: email,
-                                                name: e.target.getAttribute('data-key') as string
+                                                name: item.name
                                             }
                                         });
                                         if (res.ok) {
@@ -203,8 +197,8 @@ export function RenderCourse({
                     onPress={async () => {
                         const res = await client.api.course.$get({
                             query: {
-                                period: period as typeof course.$inferSelect.period,
-                                week: week as typeof course.$inferSelect.week
+                                period: period,
+                                week: week
                             }
                         });
                         const dataList = await res.json();

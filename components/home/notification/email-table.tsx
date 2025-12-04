@@ -29,15 +29,12 @@ import {
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { dateOptionforEmailTable } from "@/constants/definitions";
-import { hc } from "hono/client";
-import { AppType } from "@/app/api/[[...route]]/route";
-import { env } from "@/env";
+import { client } from "@/lib/hono/client";
 import { useMessages } from "@/contexts/messages-context";
-import { messages } from "@/lib/drizzle/schema/public";
+import { messages } from "@/lib/drizzle/schemas/main";
 import { CustomPagination } from "../register/pagination";
 
 export function EmailTable({isCollapsed}: {isCollapsed: boolean}) {
-    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL)
     const [open, setOpen] = useState<boolean>(false);
     const ref = useRef<typeof messages.$inferSelect | null>(null);
     const router = useRouter();
@@ -151,11 +148,11 @@ export function EmailTable({isCollapsed}: {isCollapsed: boolean}) {
                                             className={message.isRead ? "text-warning" : "text-default-400"}
                                         />
                                         <Avatar 
-                                            name={message.senderEmail} 
+                                            name={message.sender} 
                                             size="sm" 
                                         />
                                         <span>
-                                            {message.senderEmail}
+                                            {message.sender}
                                         </span>
                                     </div>
                                 </TableCell>
@@ -194,8 +191,12 @@ export function EmailTable({isCollapsed}: {isCollapsed: boolean}) {
             >
                 <ModalContent>
                     <ModalHeader className="flex flex-col space-y-2">
-                        <h1 className="text-2xl">{ref.current?.subject}</h1>
-                        <p className="text-sm">From: {ref.current?.senderEmail}</p>
+                        <h1 className="text-2xl">
+                            {ref.current?.subject}
+                        </h1>
+                        <p className="text-sm">
+                            From: {ref.current?.sender}
+                        </p>
                     </ModalHeader>
                     <ModalBody>
                         {ref.current?.body}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { fetchRegisteredCourseData } from '@/utils/getter';
+import { fetchRegisteredCourseData } from '@/utils/getters/main';
 
 const RegisteredCourseContext = createContext<{
     courseDataList: (Awaited<ReturnType<typeof fetchRegisteredCourseData>>[number] & {
@@ -31,9 +31,7 @@ export const RegisteredCourseProvider = ({
     }, [courseDataList]);
     
     return (
-        <RegisteredCourseContext value={{
-            courseDataList: currentCourseDataList
-        }}>
+        <RegisteredCourseContext value={{courseDataList: currentCourseDataList}}>
             {children}
         </RegisteredCourseContext>
     );

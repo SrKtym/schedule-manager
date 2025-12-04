@@ -2,32 +2,15 @@
 
 import { Progress } from "@heroui/react";
 import { TrendingUp } from "lucide-react";
-import { useCurrentAssignmentData } from "@/contexts/assignment-data-context";
-import { useRegisteredCourseData } from "@/contexts/registered-course-context";
-import { useCurrentAssignmentStatus } from "@/contexts/assignment-status-context";
-import { useSessionUserData } from "@/contexts/user-data-context";
+import { useAssignmentData } from "@/contexts/assignment-data-context";
 
 export function AssignmentProgress() {
-    const email = useSessionUserData().email;
-    const registeredCourse = useRegisteredCourseData().courseDataList;
-    const assignmentStatus = useCurrentAssignmentStatus();
-    const {assignmentData} = useCurrentAssignmentData();
-
     // すべての課題を取得
-    const assignments = assignmentData?.filter(
-        assignment => registeredCourse.find(
-            ({course}) => course.name === assignment.courseName
-        )
-    );
+    const assignmentData = useAssignmentData() ?? [];
 
     // 提出済みの課題を取得
-    const submittedAssignments = assignments?.filter(
-        assignment => assignmentStatus.filter(
-            assignmentStatus => 
-                assignmentStatus.assignmentId === assignment.id &&
-                assignmentStatus.status === "提出済" &&
-                assignmentStatus.email === email
-        ).length > 0
+    const submittedAssignments = assignmentData.filter(
+        ({assignmentStatus}) => {assignmentStatus?.status === "提出済"}
     );
 
     return (
@@ -44,15 +27,19 @@ export function AssignmentProgress() {
             <div className="flex items-center gap-2">
                 <Progress 
                     aria-label="assignment-progress"
-                    value={submittedAssignments?.length ?? 0 / (assignments?.length ?? 0) * 100} 
+                    value={submittedAssignments.length / assignmentData.length * 100} 
                 />
                 <p>
-                    {submittedAssignments?.length ?? 0}/{assignments?.length ?? 0}
+                    {submittedAssignments.length} / {assignmentData.length}
                 </p>
             </div>
             <div className="flex items-center justify-between gap-2">
-                <p>提出済みの課題: {submittedAssignments?.length ?? 0}</p>
-                <p>すべての課題: {assignments?.length ?? 0}</p>
+                <p>
+                    提出済みの課題: {submittedAssignments.length}
+                </p>
+                <p>
+                    すべての課題: {assignmentData.length}
+                </p>
             </div>
         </div>
     );
