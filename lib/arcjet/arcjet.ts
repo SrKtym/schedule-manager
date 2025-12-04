@@ -3,7 +3,7 @@ import { env } from "@/env";
 
 export const aj = arcjet({
     key: env.ARCJET_KEY,
-    characteristics: ["ip.src"],
+    characteristics: ["userId"],
     rules: [
         filter({
             deny: ["ip.src.vpn or ip.src.tor"],
