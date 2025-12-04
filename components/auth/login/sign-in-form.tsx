@@ -2,41 +2,36 @@
 
 import { useActionState, useTransition } from 'react';
 import { authClient } from '@/lib/better-auth/auth-client';
-import { setThemeCookie, signIn } from '@/utils/action';
-import type { StateOmitName } from '@/types/sign-in';
-import { 
-    addToast,
-    Button,
-    Input
-} from '@heroui/react';
+import { signIn } from '@/utils/actions/auth';
+import { setThemeCookie } from '@/utils/actions/main';
+import { addToast, Button, Input } from '@heroui/react';
 import { KeyRound } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SocialLogin } from './social-login';
 
-const provider = ['github', 'google', 'twitter'];
 
-export default function SignInForm() {
+export function SignInForm() {
     const router = useRouter();
-    async function action(prevState: StateOmitName | undefined, formData: FormData) {
-        const response = await signIn(formData);
-        if (response?.messages?.success) {
-            if (provider.includes(response?.messages?.success)) {
-                addToast({
-                    color: 'warning',
-                    description: `入力されたメールアドレスはすでに登録されています。前回のログイン: ${response.messages.success}`
-                });
-            } else if (response.messages.success === 'invalid') {
-                router.push('/home');
-            } else {
-                router.push('/two-factor');
-            } 
-        } else {
-            return response;
-        }
-    }
+    // async function clientAction(prevState: StateOmitName | undefined, formData: FormData) {
+    //     const response = await signIn(formData);
+    //     if (response?.messages?.success) {
+    //         if (provider.includes(response?.messages?.success)) {
+    //             addToast({
+    //                 color: 'warning',
+    //                 description: `入力されたメールアドレスはすでに登録されています。前回のログイン: ${response.messages.success}`
+    //             });
+    //         } else if (response.messages.success === 'invalid') {
+    //             router.push('/home');
+    //         } else {
+    //             router.push('/two-factor');
+    //         } 
+    //     } else {
+    //         return response;
+    //     }
+    // }
 
-    const [state, formAction, isPending] = useActionState(action, undefined);
+    const [state, formAction, isPending] = useActionState(signIn, undefined);
     const [isPendingPasskey, startTransitionPasskey] = useTransition();
 
     return (
@@ -141,7 +136,9 @@ export default function SignInForm() {
                     </Link>
                 </div>
                 <div>
-                    <p className='mb-2'>アカウントをお持ちでない方</p>
+                    <p className='mb-2'>
+                        アカウントをお持ちでない方
+                    </p>
                     <Link 
                         href='/sign-up' 
                         className='text-primary hover:underline'
