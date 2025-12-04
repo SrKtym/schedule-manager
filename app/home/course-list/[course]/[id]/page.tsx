@@ -1,34 +1,36 @@
 import { Overall } from "@/components/home/course-list/course/id/overall";
-import { AssignmentStatusProvider } from "@/contexts/assignment-status-context";
 import { SubmissionProvider } from "@/contexts/submission-context";
-import { fetchAssignmentStatus, fetchSubmissionMetaData, fetchComments } from "@/utils/getter";
+import { fetchSubmissionData, fetchComments, fetchAssignmentData } from "@/utils/getters/main";
 import { CommentProvider } from "@/contexts/comment-context";
+import { fetchSession } from "@/utils/getters/auth";
+import { AssignmentDataProvider } from "@/contexts/assignment-data-context";
 
 export default async function AssignmentDetailPage(
     props: {
         params: Promise<{
+            course: string;
             id: string
         }>
     }
 ) {
-    const paramsValue = await props.params;
-    const assignmentId = paramsValue.id;
-    const [assignmentStatus, submissionMetaData, comments] = await Promise.allSettled([
-        fetchAssignmentStatus(assignmentId),
-        fetchSubmissionMetaData(assignmentId),
-        fetchComments(assignmentId)
+    const session = await fetchSession();
+    const {course, id} = await props.params;
+    const [assignmentData, submissionData, comments] = await Promise.allSettled([
+        fetchAssignmentData(session, [course]),
+        fetchSubmissionData(session, id),
+        fetchComments(id)
     ]);
-    const assignmentStatusValue = assignmentStatus.status === 'fulfilled' ? assignmentStatus.value : [];
-    const submissionMetaDataValue = submissionMetaData.status === 'fulfilled' ? submissionMetaData.value : null;
+    const assignmentDataValue = assignmentData.status === 'fulfilled' ? assignmentData.value : null;
+    const submissionDataValue = submissionData.status === 'fulfilled' ? submissionData.value : null;
     const commentsValue = comments.status === 'fulfilled' ? comments.value : [];
 
     return (
-        <AssignmentStatusProvider assignmentStatus={assignmentStatusValue}>
-            <SubmissionProvider submissionMetaData={submissionMetaDataValue}>
+        <AssignmentDataProvider assignmentData={assignmentDataValue}>
+            <SubmissionProvider submissionMetaData={submissionDataValue}>
                 <CommentProvider comment={commentsValue}>
                     <Overall />
                 </CommentProvider>
             </SubmissionProvider>
-        </AssignmentStatusProvider>
+        </AssignmentDataProvider>
     );
 }
