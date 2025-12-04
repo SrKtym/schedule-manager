@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type UserData = {
-    email: string;
     image?: string | null;
     name: string;
     role?: string | null;
@@ -11,7 +10,6 @@ export type UserData = {
 }
 
 const UserDataContext = createContext<UserData>({
-    email: "",
     name: ""
 });
 
