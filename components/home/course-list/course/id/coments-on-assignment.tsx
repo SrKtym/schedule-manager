@@ -29,7 +29,7 @@ export function CommentsOnAssignment({id}: {id: string}) {
             >
                 <Card className="border border-divider">
                     <CardBody className="p-6">
-                        <h2 className="text-lg font-google-sans font-medium mb-4">
+                        <h2 className="text-lg font-medium mb-4">
                             メンバーのコメント
                         </h2>
                         <div className="flex items-center gap-3 mb-6">
