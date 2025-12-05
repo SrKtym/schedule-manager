@@ -19,16 +19,119 @@ import {
     assignmentData, 
     attachmentMetaData, 
     course, 
+    messages, 
+    registered, 
     schedule, 
+    settings, 
     submission, 
     submissionMetaData
 } from '../../lib/drizzle/schemas/main';
 import { revalidatePath } from 'next/cache';
 import z from 'zod/v4';
-import { AnnouncementState, AssignmentState, CourseState, SubmissionState } from '@/types/main/regisered-course';
+import { 
+    AnnouncementState, 
+    AssignmentState, 
+    CourseState, 
+    SubmissionState 
+} from '@/types/main/regisered-course';
 import { attachmentIsRelatedTo } from '@/constants/definitions';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
+
+// 単一講義の登録
+export async function registersingleCourse(courseName: string) {
+    const session = await fetchSession();
+    
+    if (!session) return;
+
+    const userId = session.user.id;
+
+    await db.transaction(async (tx) => {
+        const courseDataList = await tx
+            .select({
+                period: course.period,
+                week: course.week
+            })
+            .from(course)
+            .where(eq(course.name, courseName));
+
+        await tx
+            .insert(registered)
+            .values({
+                name: courseName,
+                period: courseDataList[0].period,
+                week: courseDataList[0].week,
+                userId: userId
+            })
+            .onConflictDoUpdate({
+                target: [registered.userId, registered.period, registered.week],
+                set: {
+                    name: courseName
+                }
+            });
+    });
+
+    revalidatePath('/home/register');
+
+    return {
+        success: true
+    }
+}
+
+// 複数講義の登録
+export async function registermultipleCourses(courseNameList: string[]) {
+    const session = await fetchSession();
+    
+    if (!session) return;
+
+    const userId = session.user.id;
+
+    await db.transaction(async (tx) => {
+        const courseDataList = await tx
+            .select({
+                name: course.name,
+                period: course.period,
+                week: course.week
+            })
+            .from(course)
+            .where(inArray(course.name, courseNameList));
+
+        const dataList = courseDataList.map((row) => {return {...row, userId: userId}});
+
+        await tx
+            .insert(registered)
+            .values(dataList)
+            .onConflictDoNothing();
+    });
+
+    revalidatePath('/home/register');
+
+    return {
+        success: true
+    }
+}
+
+// 単一講義の削除
+export async function deleteSingleCourse(courseName: string) {
+    const session = await fetchSession();
+    
+    if (!session) return;
+
+    const userId = session.user.id;
+
+    await db.delete(registered).where(
+        and(
+            eq(registered.name, courseName),
+            eq(registered.userId, userId)
+        )
+    );
+
+    revalidatePath('/home/register');
+
+    return {
+        success: true
+    }
+}
 
 // スケジュール作成
 export async function createSchedule(formData: FormData) {
@@ -73,6 +176,23 @@ export async function createSchedule(formData: FormData) {
     return {
         success: true
     };
+}
+
+// スケジュールの削除
+export async function deleteSchedule(id: string) {
+    await db.delete(schedule).where(eq(schedule.id, id));
+    revalidatePath('/home/schedule');
+    return {
+        success: true
+    };
+}
+
+// 通知を既読に変更
+export async function updateMessage(id: string) {
+    await db
+        .update(messages)
+        .set({isRead: true})
+        .where(eq(messages.id, id));
 }
 
 // 講義作成（教員用）
@@ -263,7 +383,30 @@ export async function removeFile(fileId: string, relatedTo: typeof attachmentIsR
     }
 }
 
-// テーマ設定
+// テーマの変更
+export const setTheme = cache(async (checked: boolean) => {
+    const session = await fetchSession();
+
+    if (!session) return 'light';
+
+    const theme = await db
+        .insert(settings)
+        .values({
+            userId: session.user.id,
+            theme: checked ? 'dark' : 'light' 
+        })
+        .onConflictDoUpdate({
+            target: settings.userId,
+            set: {
+                theme: checked ? 'dark' : 'light'
+            }
+        })
+        .returning({color: settings.theme});
+
+    return theme[0].color;
+});
+
+// テーマの変更をcookieに反映する
 export const setThemeCookie = cache(async () => {
     const cookieStore = await cookies();
     const session = await fetchSession();
