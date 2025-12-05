@@ -29,10 +29,10 @@ import {
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { dateOptionforEmailTable } from "@/constants/definitions";
-import { client } from "@/lib/hono/client";
 import { useMessages } from "@/contexts/messages-context";
 import { messages } from "@/lib/drizzle/schemas/main";
 import { CustomPagination } from "../register/pagination";
+import { updateMessage } from "@/utils/actions/main";
 
 export function EmailTable({isCollapsed}: {isCollapsed: boolean}) {
     const [open, setOpen] = useState<boolean>(false);
@@ -45,11 +45,8 @@ export function EmailTable({isCollapsed}: {isCollapsed: boolean}) {
         );
         if (found) {
             ref.current = found;
-            
             // 既読に変更
-            await client.api.messages.$patch({
-                json: ref.current.id
-            });
+            await updateMessage(ref.current.id);
             setOpen(true);
         }
     } 
