@@ -15,8 +15,9 @@ export default async function AssignmentDetailPage(
 ) {
     const session = await fetchSession();
     const {course, id} = await props.params;
+    const decodedCourseName = decodeURIComponent(course);
     const [assignmentData, submissionData, comments] = await Promise.allSettled([
-        fetchAssignmentData(session, [course]),
+        fetchAssignmentData(session, [decodedCourseName]),
         fetchSubmissionData(session, id),
         fetchComments(id)
     ]);
