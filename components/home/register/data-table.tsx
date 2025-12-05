@@ -1,6 +1,6 @@
 'use client';
 
-import { course } from "@/lib/drizzle/schema/public";
+import { course } from "@/lib/drizzle/schemas/main";
 import { 
     Button,
     Table,
@@ -16,11 +16,9 @@ import {
 import { dataTableColumns } from "@/constants/definitions";
 import { useState } from "react";
 import { CustomPagination } from "./pagination";
-import { hc } from "hono/client";
-import { AppType } from "@/app/api/[[...route]]/route";
-import { env } from "@/env";
+import { client } from "@/lib/hono/client";
 import { useRouter } from "next/navigation";
-import { useSessionUserData } from "@/contexts/user-data-context";
+import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
 
 
 export function DataTable({
@@ -30,10 +28,9 @@ export function DataTable({
     items: typeof course.$inferSelect[], 
     totalPages: number
 }) {
-    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
+    const {courseDataList} = useRegisteredCourseDataList();
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const router = useRouter();
-    const email = useSessionUserData().email;
     
     return (
         <>
@@ -41,14 +38,14 @@ export function DataTable({
                 aria-label="table"
                 isHeaderSticky
                 selectionMode="multiple"
+                disabledKeys={courseDataList.map(v => v.course.name)}
+                disabledBehavior="selection"
                 onSelectionChange={setSelectedKeys}
                 bottomContent={<CustomPagination totalPages={totalPages}/>}
             >
                 <TableHeader columns={dataTableColumns}>
                     {(column) => (
-                        <TableColumn 
-                            key={column.key} 
-                        >
+                        <TableColumn key={column.key}>
                             {column.name}
                         </TableColumn>
                     )}
@@ -58,9 +55,7 @@ export function DataTable({
                     items={items}                   
                 >
                     {(item) => (
-                        <TableRow 
-                            key={item.name}
-                        >
+                        <TableRow key={item.name}>
                             {(itemKey) => (
                                 <TableCell>
                                     {getKeyValue(item, itemKey)}
@@ -72,21 +67,24 @@ export function DataTable({
             {selectedKeys === 'all'
                 ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 left-0 right-0 p-3 z-10 dark:bg-gray-800 dark:text-white">
                     <div className="flex items-center justify-between w-full max-w-[800px]">
-                        <p className="flex items-center h-[40px]">すべての講義を選択中</p>
+                        <p className="flex items-center h-[40px]">
+                            すべての講義を選択中
+                        </p>
                     </div>
                   </div>
                 : selectedKeys.size !== 0
                 ? <div className="flex justify-center w-full bg-gray-100 text-lg fixed bottom-0 left-0 right-0 p-3 z-10 dark:bg-gray-800 dark:text-white">
                     <div className="flex items-center justify-between w-full max-w-[800px] gap-2">
-                        <p>{selectedKeys.size}個の講義を選択中</p>
+                        <p>
+                            {selectedKeys.size}個の講義を選択中
+                        </p>
                         <div className="flex gap-5">
                             <Button 
                                 color="primary"
                                 onPress={async () => {
                                     const res = await client.api.course.multiple.$post({
                                         json: {
-                                            email: email,
-                                            name: selectedKeys.values().toArray() as string[]
+                                            name: [...selectedKeys].map(String)
                                         }
                                     });
                                     if (res.ok) {
