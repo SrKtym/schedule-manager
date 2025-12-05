@@ -21,8 +21,7 @@ import { useRegisteredCourseDataList } from "@/contexts/registered-course-contex
 import { useEffect, useRef, useState } from "react";
 import { InferResponseType } from "hono/client";
 import { Edit, Plus, Trash } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { registersingleCourse } from "@/utils/actions/main";
+import { deleteSingleCourse, registersingleCourse } from "@/utils/actions/main";
 
 
 export function RenderCourse({
@@ -35,7 +34,6 @@ export function RenderCourse({
     const ref = useRef<InferResponseType<typeof client.api.course.$get>>(undefined);
     const [open, setOpen] = useState<boolean>(false);
     const [hasHover, setHasHover] = useState<boolean>(false);
-    const router = useRouter();
 
     // メディアクエリで hover の可否を判定
     useEffect(() => {
@@ -111,14 +109,8 @@ export function RenderCourse({
                 title="削除"
                 variant="light"
                 onPress={async () => {
-                    const res = await client.api.course.$delete({
-                        json: {
-                            name: courseName
-                        }
-                    });
-                    if (res.ok) {
-                        router.refresh();
-                    } else {
+                    const res = await deleteSingleCourse(courseName);
+                    if (!res?.success) {
                         addToast({
                             color: 'danger',
                             description: '登録解除に失敗しました。'
