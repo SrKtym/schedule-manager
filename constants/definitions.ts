@@ -11,15 +11,8 @@ import {
     Trash 
 } from "lucide-react";
 
-// 認証ページ
-export const authSteps = [
-    {title: "2要素認証の設定"}, 
-    {title: "TOTP認証の設定"}, 
-    {title: "パスキー認証の設定"}, 
-];
 
-
-// プライベートページ
+// ランディングページ関連
 export const features = [
     {
         title: "履修登録",
@@ -43,7 +36,10 @@ export const features = [
     },
 ];
 
-// ナビバー
+// 認証フォーム関連
+export const provider = ['github', 'google', 'twitter'];
+
+// ナビバーコンポーネント関連
 export const menuItems = [
     { key: "", label: "ホーム" },
     { key: "register", label: "履修登録" },
@@ -52,12 +48,17 @@ export const menuItems = [
     { key: "course-list", label: "登録済みの講義"}
 ];
 
-// データテーブル
-export const targetGrade = [
+export const theme = ['light', 'dark'] as const;
+
+// 通知コンポーネント関連
+export const notification = ['on', 'off'] as const;
+
+// データテーブルコンポーネント関連
+export const grade = [
     '1学年', '2学年', '3学年', '4学年'
 ] as const;
 
-export const targetFaculty = [
+export const faculty = [
     '文学部', 
     '経済学部', 
     '法学部', 
@@ -69,11 +70,45 @@ export const targetFaculty = [
     '医学部'
 ] as const;
 
+export const department = {
+    '文学部': ['史学科', '哲学科', '心理学科', '文学科'],
+    '経済学部': ['経済学科', '経営学科'],
+    '法学部': ['法律学科', '政治学科'],
+    '教育学部': ['教育学科'],
+    '社会学部': ['社会学科', '社会心理学科'],
+    '理学部': ['数学科', '物理学科', '化学科', '生物学科', '地学科'],
+    '工学部': ['情報工学科', '機械工学科', '電気工学科', '建築学科'],
+    '農学部': ['生物資源学科', '森林学科'],
+    '医学部': ['医学科', '看護学科', '保健学科'],
+    '全学部': [
+        ...['史学科', '哲学科', '心理学科', '文学科'],
+        ...['経済学科', '経営学科'],
+        ...['法律学科', '政治学科'],
+        ...['教育学科'],
+        ...['社会学科', '社会心理学科'],
+        ...['数学科', '物理学科', '化学科', '生物学科', '地学科'],
+        ...['情報工学科', '機械工学科', '電気工学科', '建築学科'],
+        ...['生物資源学科', '森林学科'],
+        ...['医学科', '看護学科', '保健学科']
+    ]
+} as const;
+
 export const week = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日'] as const;
 export const period = ['1限目', '2限目', '3限目', '4限目', '5限目'] as const;
 export const credit = ['1', '2', '4'] as const;
 export const required = ['必修', '選択必修', '任意'] as const;
 export const rows = [10, 20, 30];
+
+export const filteredStructure = {
+    grade,
+    faculty,
+    department: department['全学部'],
+    week,
+    period,
+    credit,
+    required
+}
+
 
 export const dataTableColumns = [
     {
@@ -118,10 +153,10 @@ export const dataTableColumns = [
     }
 ];
 
-// 時間割
-export const timeRange = ['09:00-10:30', '10:40-12:10', '13:00-14:30', '14:40-16:10', '16:20-17:50'];
+// 時間割コンポーネント関連
+export const timeRange = ['09:00-10:30', '10:40-12:10', '13:00-14:30', '14:40-16:10', '16:20-17:50'] as const;
 
-// カレンダー
+// カレンダーコンポーネント関連
 export const dateOptionforCalendar: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
@@ -137,7 +172,7 @@ export const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'] as c
 export const hoursOfDay = Array.from({length: 24}, (_, i) => i);
 
 
-// 受信箱
+// 受信箱コンポーネント関連
 export const sidebarItems = [
     { icon: Inbox, label: "受信トレイ" },
     { icon: Star, label: "スター付き" },
@@ -155,7 +190,7 @@ export const dateOptionforEmailTable: Intl.DateTimeFormatOptions = {
     minute: '2-digit'
 };
 
-// 講義の詳細
+// 講義の詳細ページ関連
 export const dateOptionforAnnouncement: Intl.DateTimeFormatOptions = {
     month: 'short',
     day: 'numeric',
@@ -173,6 +208,12 @@ export const allowedMimeTypes = [
     'application/vnd.openxmlformats-officedocument.presentationml.presentation'
 ];
 
+export const attachmentIsRelatedTo = [
+    'announcement',
+    'assignment',
+    'submission'
+] as const;
+
 export const attachmentType = [
     'PDFファイル',
     'Wordファイル',
@@ -185,6 +226,13 @@ export const announcementType = [
     'アンケート',
     'その他'
 ] as const;
+
+export const assignmentStatus = [
+    '未提出',
+    '提出済',
+    '評定済'
+] as const;
+
 
 
 
