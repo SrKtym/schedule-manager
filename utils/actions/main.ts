@@ -69,6 +69,10 @@ export async function createSchedule(formData: FormData) {
         });
 
     revalidatePath('/home/schedule');
+
+    return {
+        success: true
+    };
 }
 
 // 講義作成（教員用）
