@@ -13,7 +13,7 @@ import {
 } from "@arcjet/next";
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/utils/getter";
+import { fetchSession } from "@/utils/getters/auth";
 
 const emailOptions = {
     mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
@@ -45,7 +45,7 @@ const signupOptions = {
 
 
 async function protect(req: NextRequest): Promise<ArcjetDecision> {
-    const session = await getSession();
+    const session = await fetchSession();
     // If the user is logged in we'll use their ID as the identifier. This
     // allows limits to be applied across all devices and sessions (you could
     // also use the session ID). Otherwise, fall back to the IP address.
