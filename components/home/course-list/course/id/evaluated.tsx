@@ -10,19 +10,17 @@ import {
 } from '@heroui/react';
 import * as m from 'motion/react-m';
 import { LazyMotion, domAnimation } from 'motion/react';
-import { useCurrentAssignmentStatus } from '@/contexts/assignment-status-context';
-import { useCurrentSubmissionMetaData } from '@/contexts/submission-context';
+import { useSubmissionData } from '@/contexts/submission-context';
 import { dateOptionforAnnouncement } from '@/constants/definitions';
 
 
 export function Evaluated() {
-    const assignmentStatus = useCurrentAssignmentStatus();
-    const { submission } = useCurrentSubmissionMetaData() ?? {};
+    const submissionData = useSubmissionData();
     const isTeacher = false;
     
     return (
         // 評定
-        isTeacher && assignmentStatus && (
+        isTeacher && submissionData && (
             <LazyMotion features={domAnimation}>
                 <m.div
                     initial={{ opacity: 0, y: 10 }}
@@ -31,16 +29,15 @@ export function Evaluated() {
                 >
                     <Card className="border border-divider">
                         <CardBody className="p-6">
-                            <h2 className="text-lg font-google-sans font-medium mb-4">
+                            <h2 className="text-lg font-medium mb-4">
                                 提出状況
                             </h2>
                             <div className="space-y-4">
-                                {assignmentStatus.map((assignmentStatus, index) => (
+                                {submissionData.map((submission, index) => (
                                     <>
                                         {/* 提出済み */}
                                         {
-                                            assignmentStatus.status === '提出済' && 
-                                            submission && (
+                                            submission.assignmentStatus?.status === '提出済' && (
                                                 <div
                                                     key={index}
                                                     className="flex items-center justify-between p-3 bg-content2 rounded-medium"
@@ -49,14 +46,14 @@ export function Evaluated() {
                                                         <Avatar
                                                             src="https://img.heroui.chat/image/avatar?w=200&h=200&u=4"
                                                             name="Sarah Williams"
-                                                        size="sm"
-                                                    />
+                                                            size="sm"
+                                                        />
                                                         <div>
                                                             <p className="font-medium">
-                                                                {assignmentStatus.userName}
+                                                                {submission.assignmentStatus.userName}
                                                             </p>
                                                             <p className="text-xs text-default-500">
-                                                                提出日時: {submission?.updatedAt.toLocaleDateString("default", dateOptionforAnnouncement)}
+                                                                提出日時: {submission.updatedAt.toLocaleDateString("default", dateOptionforAnnouncement)}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -64,10 +61,10 @@ export function Evaluated() {
                                                         <Input
                                                             type="number"
                                                             aria-label="Points"
-                                                            placeholder={`/${assignmentStatus.evaluated}`}
-                                                        size="sm"
-                                                        className="w-20"
-                                                    />
+                                                            placeholder={`/${submission.assignmentStatus.evaluated}`}
+                                                            size="sm"
+                                                            className="w-20"
+                                                        />
                                                         <Button 
                                                             size="sm" 
                                                             color="primary" 
@@ -80,34 +77,35 @@ export function Evaluated() {
                                         )}
 
                                         {/* 未提出 */}
-                                        {assignmentStatus.status === '未提出' && (
-                                            <div
-                                                key={index}
-                                                className="flex items-center justify-between p-3 bg-content2 rounded-medium"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar
-                                                        src="https://img.heroui.chat/image/avatar?w=200&h=200&u=5"
-                                                        name="James Brown"
-                                                        size="sm"
-                                                    />
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {assignmentStatus.userName}
-                                                        </p>
-                                                        <p className="text-xs text-default-500">
-                                                            まだ提出していません
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <Chip 
-                                                    variant="flat" 
-                                                    color="default" 
-                                                    size="sm"
+                                        {
+                                            submission.assignmentStatus?.status === '未提出' && (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 bg-content2 rounded-medium"
                                                 >
-                                                    未提出
-                                                </Chip>
-                                            </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <Avatar
+                                                            src="https://img.heroui.chat/image/avatar?w=200&h=200&u=5"
+                                                            name="James Brown"
+                                                            size="sm"
+                                                        />
+                                                        <div>
+                                                            <p className="font-medium">
+                                                                {submission.assignmentStatus.userName}
+                                                            </p>
+                                                            <p className="text-xs text-default-500">
+                                                                まだ提出していません
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <Chip 
+                                                        variant="flat" 
+                                                        color="default" 
+                                                        size="sm"
+                                                    >
+                                                        未提出
+                                                    </Chip>
+                                                </div>
                                         )}
                                     </>
                                 ))}
