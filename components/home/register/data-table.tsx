@@ -16,9 +16,8 @@ import {
 import { dataTableColumns } from "@/constants/definitions";
 import { useState } from "react";
 import { CustomPagination } from "./pagination";
-import { client } from "@/lib/hono/client";
-import { useRouter } from "next/navigation";
 import { useRegisteredCourseDataList } from "@/contexts/registered-course-context";
+import { registermultipleCourses } from "@/utils/actions/main";
 
 
 export function DataTable({
@@ -30,7 +29,6 @@ export function DataTable({
 }) {
     const {courseDataList} = useRegisteredCourseDataList();
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
-    const router = useRouter();
     
     return (
         <>
@@ -82,14 +80,8 @@ export function DataTable({
                             <Button 
                                 color="primary"
                                 onPress={async () => {
-                                    const res = await client.api.course.multiple.$post({
-                                        json: {
-                                            name: [...selectedKeys].map(String)
-                                        }
-                                    });
-                                    if (res.ok) {
-                                        router.refresh();
-                                    } else {
+                                    const res = await registermultipleCourses([...selectedKeys].map(String));
+                                    if (!res?.success) {
                                         addToast({
                                             color: 'danger',
                                             description: "履修登録に失敗しました。"

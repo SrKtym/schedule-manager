@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { InferResponseType } from "hono/client";
 import { Edit, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { registersingleCourse } from "@/utils/actions/main";
 
 
 export function RenderCourse({
@@ -149,13 +150,8 @@ export function RenderCourse({
                                     key={item.name}
                                     textValue={item.name}
                                     onPress={async () => {
-                                        const res = await client.api.course.single.$post({
-                                            json: {
-                                                name: item.name
-                                            }
-                                        });
-                                        if (res.ok) {
-                                            router.refresh();
+                                        const res = await registersingleCourse(item.name);
+                                        if (res?.success) {
                                             setOpen(prev => !prev)
                                         } else {
                                             addToast({
