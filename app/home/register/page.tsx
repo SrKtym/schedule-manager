@@ -2,18 +2,20 @@ import { SearchField } from "@/components/home/register/search";
 import { DataTable } from "@/components/home/register/data-table";
 import { Suspense } from "react";
 import { 
-    targetGrade, 
-    targetFaculty, 
+    grade,
+    faculty,
+    department,
     week, 
     period, 
     credit, 
-    required 
+    required, 
+    filteredStructure
 } from "@/constants/definitions";
-import { targetDepartment } from "@/utils/related-to-register";
 import { 
-    getCourse, 
-    getItemsLength
-} from "@/utils/getter";
+    fetchCourse, 
+    fetchItemsLength,
+    fetchRegisteredCourseData
+} from "@/utils/getters/main";
 import { Timetable } from "@/components/home/register/timetable";
 import type { Metadata } from "next";
 import { 
@@ -21,7 +23,10 @@ import {
     FilterSkelton, 
     TimeTableSkelton 
 } from "@/components/skeltons";
-import { ScheduleProvider } from "@/contexts/schedule-context";
+import { filterByParams, objectValues } from "@/utils/helpers/register";
+import { Filter } from "@/types/main/regisered-course";
+import { fetchSession } from "@/utils/getters/auth";
+import { RegisteredCourseProvider } from "@/contexts/registered-course-context";
 
 
 export const metadata: Metadata = {
@@ -44,43 +49,60 @@ export default async function RegisterPage(
         }>
     }   
 ) {
+    const session = await fetchSession();
     const params = await props.searchParams;
-    const gradeList = params.grade?.split(',') ?? [...targetGrade];
-    const facultyList = params.faculty?.split(',') ?? [...targetFaculty];
-    const departmentList = params.department?.split(',') ?? [...targetDepartment()];
-    const weekList = params.week?.split(',') ?? [...week];
-    const periodList = params.period?.split(',') ?? [...period];
-    const creditList = params.credit?.split(',') ?? [...credit];
-    const requiredList = params.required?.split(',') ?? [...required];
     const page = Number(params.page);
     const rows = Number(params.rows);
-    const [course, itemsLength] = await Promise.allSettled([
-        getCourse(
-            gradeList, 
-            facultyList, 
-            departmentList,
-            weekList,
-            periodList,
-            creditList,
-            requiredList,
-            page, 
+
+    // ページ番号・表示件数・検索文字列以外のパラメータの値
+    const paramValues = Object.entries(params).flatMap(([key, value]) => {
+        const keys = Object.keys(filteredStructure)
+            .filter((key): key is keyof typeof filteredStructure => !!key);
+        const paramName = keys.find((name) => name === key);
+
+        if (!paramName) return [];
+
+        const paramValue = objectValues(filteredStructure, paramName);
+        const values = value
+            .split(',')
+            .filter((value): value is typeof paramValue[number] => !!value);
+        
+        return values;
+
+    });
+    const gradeList = filterByParams(paramValues, grade);
+    const facultyList = filterByParams(paramValues, faculty);
+    const departmentList = filterByParams(paramValues, department["全学部"]);
+    const weekList = filterByParams(paramValues, week);
+    const periodList = filterByParams(paramValues, period);
+    const creditList = filterByParams(paramValues, credit);
+    const requiredList = filterByParams(paramValues, required);
+    const filter: Filter = {
+        gradeList,
+        facultyList,
+        departmentList,
+        weekList,
+        periodList,
+        creditList,
+        requiredList
+    };
+    const [course, itemsLength, registeredCourse] = await Promise.allSettled([
+        fetchCourse(
+            filter,
+            page,
             rows,
             params.query
         ),
-        getItemsLength(
-            gradeList,
-            facultyList,
-            departmentList,
-            weekList,
-            periodList,
-            creditList,
-            requiredList,
+        fetchItemsLength(
+            filter,
             params.query
-        )
+        ),
+        fetchRegisteredCourseData(session)
     ]);
 
     const courseValue = course.status === 'fulfilled' ? course.value : [];
     const itemsLengthValue = itemsLength.status === 'fulfilled' ? itemsLength.value : 0;
+    const registeredCourseValue = registeredCourse.status === 'fulfilled' ? registeredCourse.value : [];
     const totalPages = Math.ceil(itemsLengthValue / (rows || 10));
 
     return (
@@ -101,9 +123,9 @@ export default async function RegisterPage(
             </div>
             <div>
                 <Suspense fallback={<TimeTableSkelton />}>
-                    <ScheduleProvider>
+                    <RegisteredCourseProvider courseDataList={registeredCourseValue}>
                         <Timetable />
-                    </ScheduleProvider>
+                    </RegisteredCourseProvider>
                 </Suspense>
             </div>
         </div>
