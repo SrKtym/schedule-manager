@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchAssignmentData } from '@/utils/getter';
+import { fetchAssignmentData } from '@/utils/getters/main';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 const AssignmentDataContext = createContext<Awaited<ReturnType<typeof fetchAssignmentData>> | null>(null);
@@ -20,18 +20,17 @@ export const AssignmentDataProvider = ({
     );
 };
 
-export const useCurrentAssignmentData = (assignmentId?: string) => {
-    const {assignmentData, attachmentMetaData} = useContext(AssignmentDataContext) ?? {};
-
-    if (!assignmentId) {
-        return {assignmentData, attachmentMetaData};
-    } else {
-        const currentAssignment = assignmentData?.find(
-            assignment => assignment.id === assignmentId
-        );
-        const currentAttachmentMetaData = attachmentMetaData?.filter(
-            metaData => currentAssignment?.attachmentsMetaDataIds?.includes(metaData.id)
-        );
-        return {currentAssignment, currentAttachmentMetaData};
-    }
+export const useAssignmentData = () => {
+    const assignmentDataList = useContext(AssignmentDataContext);
+    return assignmentDataList;
 };
+
+export const useCurrentAssignmentData = (assignmentId: string) => {
+    const assignmentDataList = useContext(AssignmentDataContext);
+    const currentAssignment = assignmentDataList?.find(
+        ({assignmentAttachmentMetaDataIds}) => assignmentAttachmentMetaDataIds.some(
+            ({assignmentId: id}) => id === assignmentId
+        )
+    );
+    return currentAssignment;
+}
