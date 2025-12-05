@@ -11,13 +11,13 @@ import {
 import QRCode from 'react-qr-code';
 import { useState, useActionState } from "react";
 import Link from 'next/link';
-import { getTotpUri, verifyTotp } from "@/utils/action";
+import { getTotpUri, verifyTotp } from "@/utils/actions/auth";
 
 
 export function TwoFactorValid() {
     const [isRequired, setIsRequired] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
-    async function action(
+    async function clientAction(
         prevState: {errors?: string[], success?: string} | undefined, 
         formData: FormData
     ) {
@@ -32,7 +32,7 @@ export function TwoFactorValid() {
         return state;
     }
     const [selected, setSelected] = useState<"totp" | "disable">();
-    const [state, formAction, isPending] = useActionState(action, undefined);
+    const [state, formAction, isPending] = useActionState(clientAction, undefined);
     const [actionState, verifyAction, isVerifying] = useActionState(verifyTotp, undefined);
 
     return (
@@ -140,6 +140,7 @@ export function TwoFactorValid() {
                                 type='password'
                                 label='パスワード'
                                 placeholder='例: 12345678'
+                                variant='bordered'
                                 minLength={8}
                                 aria-describedby='password-error'
                                 isRequired
