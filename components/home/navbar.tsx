@@ -28,15 +28,16 @@ import { menuItems } from "@/constants/definitions";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useSessionUserData } from "@/contexts/user-data-context";
 
 
 export function CustomNavbar({
     name,
-    image
+    image,
+    email
 }: {
     name: string,
-    image?: string | null
+    image?: string | null,
+    email: string
 }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [open, setOpen] = useState<boolean>(false);
@@ -44,7 +45,6 @@ export function CustomNavbar({
     const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false);
     const [isPendingLogOut, startTransitionLogOut] = useTransition();
     const [isPendingDelete, startTransitionDelete] = useTransition();
-    const email = useSessionUserData().email;
     const router = useRouter();
 
 
@@ -194,7 +194,7 @@ export function CustomNavbar({
                             <ListboxItem 
                                 key="reset-password" 
                                 description="パスワードを変更します。"
-                                href="/reset/send-email"
+                                href="/reset/request"
                             >
                                 パスワードの変更
                             </ListboxItem>
