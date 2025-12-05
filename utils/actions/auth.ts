@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation';
 import { State } from '@/types/auth/sign-up';
 import { StateOmitName } from '@/types/auth/sign-in';
 import { setThemeCookie } from './main';
+import { StatePickEmail } from '@/types/auth/request-reset-password';
 
 
 // ユーザー登録
@@ -380,10 +381,12 @@ export async function verifyOtp(
 }
 
 // パスワード再設定のリクエストメール送信
-export async function requestResetPassword(formData: FormData) {
-    const validatedField = logInSchema.omit({name: true, password: true}).safeParse({
-        email: formData.get('email'),
-    });
+export async function requestResetPassword(prevState: StatePickEmail | undefined, formData: FormData) {
+    const validatedField = logInSchema
+        .omit({name: true, password: true})
+        .safeParse({
+            email: formData.get('email'),
+        });
     
     if (validatedField.error) {
         const flattened = z.flattenError(validatedField.error);
@@ -413,7 +416,7 @@ export async function requestResetPassword(formData: FormData) {
         });
         return {
             messages: {
-                success: validatedField.data.email
+                success: "リクエストメールの送信に成功しました。入力されたメールアドレスに届いたメールを確認してください。"
             }
         }
     } catch (error) {
@@ -429,10 +432,14 @@ export async function requestResetPassword(formData: FormData) {
 }
 
 // パスワード再設定
-export async function resetPasswordAction(formData: FormData, token: string) {    
-    const validatedField = logInSchema.omit({name: true, email: true}).safeParse({
-        password: formData.get('password'),
-    });
+export async function resetPasswordAction(prevState: StateOmitName | undefined, formData: FormData) {    
+    const validatedField = logInSchema
+        .omit({name: true, email: true})
+        .extend({token: z.string()})
+        .safeParse({
+            token: formData.get('token'),
+            password: formData.get('password'),
+        });
     
     if (validatedField.error) {
         const flattened = z.flattenError(validatedField.error);
@@ -445,7 +452,7 @@ export async function resetPasswordAction(formData: FormData, token: string) {
         await auth.api.resetPassword({
             body: {
                 newPassword: validatedField.data.password,
-                token: token
+                token: validatedField.data.token
             }   
         });
         return {
