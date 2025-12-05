@@ -15,120 +15,136 @@ import {
     X, 
 } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
-import { AttachmentData } from '@/types/regisered-course';
-import { useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase/client';
-import { useSessionUserData } from '@/contexts/user-data-context';
-import { AppType } from '@/app/api/[[...route]]/route';
-import { env } from '@/env';
-import { hc } from 'hono/client';
-import { useCurrentCourseData } from '@/contexts/registered-course-context';
-import { getFileType, getFileColor } from '@/utils/related-to-assignment';
-import { useParams, usePathname } from 'next/navigation';
+import { AttachmentData } from '@/types/main/regisered-course';
+import { useState, useRef, useCallback } from 'react';
+import { getFileType, getFileColor } from '@/utils/helpers/assignment';
+import { client } from '@/lib/hono/client';  
+import { useParams } from 'next/navigation';
+import { attachmentIsRelatedTo } from '@/constants/definitions';
 
 
 export function FileUploader({
-    onFileUpload,
-    onFileRemove,
-    id,
     files,
     maxFiles,
-    allowedTypes
+    allowedTypes,
+    relatedTo,
+    onFileRemove,
 }: {
-    onFileUpload: (file: AttachmentData) => void;
-    onFileRemove: (fileId: string) => void;
-    id: string;
     files: AttachmentData[];
     maxFiles: number;
     allowedTypes: string[];
+    relatedTo: typeof attachmentIsRelatedTo[number];
+    onFileRemove: (
+        fileId: string,
+        relatedTo: typeof attachmentIsRelatedTo[number]
+    ) => void;
 }) {
-    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
+    const {course: courseName} = useParams<{course: string}>();
     const [isDragging, setIsDragging] = useState(false);
-    const [reading, setReading] = useState<{[key: string]: number}>({});
+    const [uploading, setUploading] = useState<{[key: string]: number}>({});
+    const [fileList, setFileList] = useState<AttachmentData[]>(files);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const params = useParams<{course: string}>();
-    const email = useSessionUserData().email;
-    const userName = useSessionUserData().name;
-    const decodedCourseName = decodeURIComponent(params.course);
-    const courseName = useCurrentCourseData(decodedCourseName).course.name;
-    const pathName = usePathname();
 
+    // ReadableStreamを使ったチャンクアップロード
+    const chunkedUpload = async (file: File) => {
+        const totalSize = file.size;
+        const fileName = file.name;
+
+        // ファイルのアップロード準備（進行状況を0%にする）
+        setUploading(prev => ({ ...prev, [fileName]: 0 }));
+
+        const stream = new ReadableStream({
+            start(controller) {
+                const reader = file.stream().getReader();
+                function push() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            controller.close();
+                        } else {
+                            setUploading(prev => ({ ...prev, [fileName]: Math.round((value.length / totalSize) * 100) }));
+                            controller.enqueue(value);
+                            push();
+                        }
+                    });
+                }
+                push();
+            }
+        });
+
+        const res = await client.api.upload.multipart.$post({
+            header: {
+                'content-type': file.type,
+                'x-file-name': file.name,
+                'x-course-name': courseName,
+                'x-related-to': relatedTo
+            },
+            body: stream,
+        });
+
+        const data = await res.text();
+
+        switch (data) {
+            case 'failed upload':
+                addToast({
+                    title: 'アップロード失敗',
+                    description: 'ファイルのアップロードに失敗しました。',
+                    color: 'danger',
+                });
+                break;
+            default:
+                setFileList(prev => [...prev, { 
+                    id: data,
+                    name: file.name, 
+                    relatedTo,
+                    type: getFileType(file.type), 
+                }]);
+                break;
+        }
+    }
+
+    // ドラッグオーバー時の処理
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(true);
     };
 
+    // ドラッグアウト時の処理
     const handleDragLeave = () => {
         setIsDragging(false);
     };
 
-    const handleFiles = (fileList: FileList) => {
-        if (files.length >= maxFiles) {
+    // ファイル選択時の処理
+    const handleFileUpload = async (fileList: FileList) => {
+        if (fileList.length >= maxFiles) {
             addToast({
                 color: 'warning',
                 title: 'ファイル数制限',
                 description: `アップロードできるのは最大${maxFiles}ファイルまでです。`
             });
+        } else if (fileList.length === 1) {
+
         } else {
-            Array.from(fileList).slice(0, maxFiles - files.length).forEach(async (file) => {
-                const fileId = `file-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        
-                // 選択されたファイルの読み込み準備（進行状況を0%にする）
-                setReading(prev => ({ ...prev, [fileId]: 0 }));
-
-                // FileReaderのインスタンスを生成
-                const reader = new FileReader();
-
-                // ファイルの読み込み開始
-                reader.readAsDataURL(file);
-        
-                // ファイルの読み込み状況を監視
-                reader.onprogress = (progressEvent) => {
-                    if (progressEvent.lengthComputable) {
-                        setReading(prev => ({
-                            ...prev, [fileId]: Math.round((progressEvent.loaded / progressEvent.total) * 100) 
-                        }));
-                    }
-                };
-                // ファイルの読み込み完了後の処理
-                reader.onload = () => {
-                    setTimeout(() => {
-                        const fileType = getFileType(file.type);
-
-                        const newFile: AttachmentData = {
-                            id: fileId,
-                            name: file.name,
-                            type: fileType,
-                            url: ""
-                        };
-
-                        onFileUpload(newFile);
-
-                        // 読み込み中…の状態を削除
-                        setReading(prev => {
-                            const { [fileId]: _, ...rest } = prev;
-                            return rest;
-                        });
-                    }, 500);
-                }
-            });
+            const promise = [...fileList].map(file => chunkedUpload(file));
+            // ファイルのアップロードを並列で実行
+            await Promise.all(promise);
         }
     }
 
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
+    // ドロップ時の処理(キャッシュ化)
+    const handleDrop = useCallback(
+        async (e: React.DragEvent) => {
+            e.preventDefault();
+            setIsDragging(false);
     
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            handleFiles(e.dataTransfer.files);
-        }
+            if (e.dataTransfer.files) await handleFileUpload(e.dataTransfer.files);
+        },[]
+    );
+
+    // ファイル選択時にアップロード処理をトリガー
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) handleFileUpload(e.target.files);
     };
 
-    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            handleFiles(e.target.files);
-        }
-    };
 
     return (
         <div className="flex flex-col space-y-4">
@@ -143,9 +159,7 @@ export function FileUploader({
                 <div className="flex flex-col items-center justify-center py-6">
                     <UploadCloud
                         width={40} 
-                        className={cn("mb-4", 
-                            isDragging ? 'text-primary' : 'text-default-400'
-                        )} 
+                        className={cn("mb-4", isDragging ? 'text-primary' : 'text-default-400')} 
                     />
                     <p className="text-center mb-2">
                         <span className="font-medium">
@@ -175,9 +189,9 @@ export function FileUploader({
                 </div>
             </Card>
 
-            {/* 読み込み中のファイル */}
             <AnimatePresence>
-                {Object.entries(reading).map(([fileId, progress]) => (
+                {/* アップロード中のファイル */}
+                {Object.entries(uploading).map(([fileId, progress]) => (
                     <m.div
                         key={fileId}
                         initial={{ opacity: 0, y: 10 }}
@@ -192,7 +206,7 @@ export function FileUploader({
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium truncate">
-                                    ファイルを読み込み中...
+                                    ファイルをアップロード中...
                                 </p>
                             </div>
                             <Chip 
@@ -212,11 +226,9 @@ export function FileUploader({
                         />
                     </m.div>
                 ))}
-            </AnimatePresence>
 
-            {/* アップロードしたファイル */}
-            <AnimatePresence>
-                {files.map((file) => (
+                {/* アップロードしたファイル */}
+                {fileList.map((file) => (
                     <m.div
                         key={file.id}
                         initial={{ opacity: 0, y: 10 }}
@@ -242,7 +254,7 @@ export function FileUploader({
                                 isIconOnly
                                 variant="light"
                                 size="sm"
-                                onPress={() => onFileRemove(file.id)}
+                                onPress={() => onFileRemove(file.id, file.relatedTo)}
                                 aria-label="Remove file"
                             >
                                 <X width={16} />
@@ -251,76 +263,6 @@ export function FileUploader({
                     </m.div>
                 ))}
             </AnimatePresence>
-
-            {files.length > 0 ? (
-                <Button
-                    color="primary"
-                    onPress={() => {
-                        files.forEach(async (file) => {
-                            try {
-                                if (pathName.endsWith(`/${id}`)) {
-                                    const { data } = await supabase
-                                        .storage
-                                        .from('documents')
-                                        .upload(`${courseName}/課題/${email}/${file.name}`, 
-                                            file.id, 
-                                        {
-                                            upsert: true
-                                        }
-                                    );
-                                    if (data) {
-                                        await client.api.assignment.$post({
-                                            json: {
-                                                assignment: {
-                                                    assignmentId: id,
-                                                    courseName: courseName,
-                                                    email: email,
-                                                    userName: userName,
-                                                    status: '提出済'
-                                                },
-                                                submission: {
-                                                    name: file.name,
-                                                    type: file.type,
-                                                    url: data.path
-                                                }
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    const { data } = await supabase
-                                        .storage
-                                        .from('documents')
-                                        .upload(`${courseName}/資料/${file.name}`, 
-                                            file.id, 
-                                        {
-                                            upsert: true
-                                        }
-                                    );
-                                    if (data) {
-                                        await client.api.material.$post({
-                                            json: {
-                                                name: file.name,
-                                                type: file.type,
-                                                url: data.path
-                                            }
-                                        });
-                                    }
-                                }
-                            } catch (error) {
-                                if (error instanceof Error) {
-                                    addToast({
-                                        title: "ファイルのアップロードに失敗しました。",
-                                        description: `お手数ですが再試行してください。詳細: ${error.message}`,
-                                        color: "danger"
-                                    });
-                                }
-                            }
-                        });
-                    }}
-                >
-                    提出する
-                </Button>
-            ) : null}
         </div>
     );
 }
