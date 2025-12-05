@@ -8,20 +8,6 @@ import { SocialLogin } from '@/components/auth/login/social-login';
 
 
 export function SignUpForm() {
-    // async function clientAction(prevState: State | undefined, formData: FormData) {
-    //     const response = await signUp(formData);
-    //     if (response?.messages?.success) {
-    //         addToast(
-    //             {
-    //                 title: 'サインアップに成功しました。',
-    //                 color: 'success',
-    //                 description: `${response.messages.success} にメールを送信しました。添付されたリンクに進みログインしてください。`
-    //             }
-    //         );
-    //     } else {
-    //         return response;
-    //     }
-    // }
     const [state, formAction, isPending] = useActionState(signUp, undefined);
 
     return (
