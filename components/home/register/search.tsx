@@ -15,15 +15,16 @@ import {
 import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { 
-    targetGrade, 
-    targetFaculty, 
+    grade, 
+    faculty, 
+    department,
     week, 
     period, 
     credit, 
     required, 
     rows 
 } from "@/constants/definitions";
-import { targetDepartment } from "@/utils/related-to-register";
+import { objectValues } from "@/utils/helpers/register";
 
 export function SearchField(
     {
@@ -42,7 +43,7 @@ export function SearchField(
 
     const getParam = (name: 'grade' | 'faculty' | 'department' | 'required') => {
         const values = param.get(name)?.split(",");
-        return values;
+        return values?.filter((value): value is typeof faculty[number] => !!value);
     }
 
     const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -77,7 +78,7 @@ export function SearchField(
                     variant="bordered"
                     onChange={handleFilter}
                 >
-                    {targetGrade.map((grade) => (
+                    {grade.map((grade) => (
                         <SelectItem key={grade}>
                             {grade}
                         </SelectItem>
@@ -92,7 +93,7 @@ export function SearchField(
                     variant="bordered"
                     onChange={handleFilter}
                 >
-                    {targetFaculty.map((faculity) => (
+                    {faculty.map((faculity) => (
                         <SelectItem key={faculity}>
                             {faculity}
                         </SelectItem>
@@ -106,7 +107,7 @@ export function SearchField(
                     variant="bordered"
                     errorMessage='学部が選択されていません。'
                     defaultSelectedKeys={getParam('department')}
-                    disabledKeys={(getParam('faculty')) ? undefined : targetDepartment()}
+                    disabledKeys={(getParam('faculty')) ? undefined : objectValues(department, "全学部")}
                     isInvalid={invalid}
                     onChange={handleFilter}
                     onOpenChange={() => getParam('faculty') ? setInvalid(false) : setInvalid(true)}
@@ -120,7 +121,7 @@ export function SearchField(
                                 heading: "flex w-full sticky top-1 z-20 py-1.5 px-2 bg-default-100 shadow-small rounded-small",
                             }}
                         >
-                            {targetDepartment(faculty).map((department) => (
+                            {objectValues(department, faculty).map((department) => (
                                 <SelectItem key={department}>
                                     {department}
                                 </SelectItem>
