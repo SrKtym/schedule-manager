@@ -1,6 +1,5 @@
-import 'dotenv/config';
 import { db } from "@/lib/drizzle";
-import { course } from '@/lib/drizzle/schema/public';
+import { course } from '@/lib/drizzle/schemas/main';
 import { courseList } from '@/constants/course-data';
 
 
