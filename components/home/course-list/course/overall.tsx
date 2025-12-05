@@ -4,8 +4,7 @@ import { Tabs, Tab, Button } from '@heroui/react';
 import { Settings } from 'lucide-react';
 import * as m from 'motion/react-m';
 import { LazyMotion, domAnimation } from 'motion/react';
-import { Plus } from 'lucide-react';
-import { HeaderTabKey } from '@/types/regisered-course';
+import { HeaderTabKey } from '@/types/main/regisered-course';
 import { useState } from 'react';
 import { AssignmentCard } from './assignment-card';
 import { AnnouncementCard } from './announcement-card';
@@ -14,15 +13,14 @@ import { useCurrentCourseData } from '@/contexts/registered-course-context';
 import { CreateAssignmentForm } from './create-assignment-form';
 import { CreateAnnouncementForm } from './create-announcement-form';
 import Image from 'next/image';
-import { useCurrentAssignmentData } from '@/contexts/assignment-data-context';
+import { useAssignmentData } from '@/contexts/assignment-data-context';
 import { useCurrentAnnouncement } from '@/contexts/announcement-context';
 
 export function Overall({ courseName }: { courseName: string }) {
     const { course, coverImage } = useCurrentCourseData(courseName);
-    const assignmentData = useCurrentAssignmentData()?.assignmentData;
+    const assignmentData = useAssignmentData();
     const announcements = useCurrentAnnouncement();
     const [selectedTab, setSelectedTab] = useState<HeaderTabKey>('announcement');
-    const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false);
     const isTeacher = true;
   
     return (
@@ -108,7 +106,7 @@ export function Overall({ courseName }: { courseName: string }) {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex justify-between mb-6">
                                 <h2 className="text-xl font-google-sans font-medium">
                                     アナウンスメント
                                 </h2>
@@ -147,18 +145,10 @@ export function Overall({ courseName }: { courseName: string }) {
                                     課題
                                 </h2>
                                 {/* 課題の投稿（教員用） */}
-                                {isTeacher && (
-                                    <Button 
-                                        color="primary"
-                                        startContent={<Plus width={18} />}
-                                        onPress={() => setIsCreateAssignmentOpen(true)}
-                                    >
-                                        課題作成
-                                    </Button>
-                                )}
+                                {isTeacher && <CreateAssignmentForm courseName={course.name} />}
                             </div>
                 
-                            {assignmentData.length > 0 ? (
+                            {Array.isArray(assignmentData) ? (
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     {assignmentData.map(assignment => (
                                         <AssignmentCard 
@@ -173,14 +163,6 @@ export function Overall({ courseName }: { courseName: string }) {
                                         課題はありません
                                     </p>
                                 </div>
-                            )}
-
-                            {/* 課題の投稿（教員用） */}
-                            {isTeacher && (
-                                <CreateAssignmentForm 
-                                    isOpen={isCreateAssignmentOpen} 
-                                    onClose={() => setIsCreateAssignmentOpen(false)} 
-                                />
                             )}
                         </m.div>
                     )}
