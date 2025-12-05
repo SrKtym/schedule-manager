@@ -14,20 +14,34 @@ import {
 import { useSessionUserData } from "@/contexts/user-data-context";
 import { 
     credit, 
-    targetFaculty, 
-    targetGrade, 
+    department,
+    faculty, 
+    grade, 
     week 
 } from "@/constants/definitions";
 import { useActionState, useState } from "react";
-import { targetDepartment } from "@/utils/related-to-register";
 import { Plus } from "lucide-react";
-import { createCourse } from "@/utils/action";
+import { createCourse } from "@/utils/actions/main";
+import { objectValues } from "@/utils/helpers/register";
 
 export function CreateCourse() {
     const userData = useSessionUserData();
     const [open, setOpen] = useState<boolean>(false);
-    const [currentfaculty, setCurrentFaculty] = useState<string>();
-    const [state, formAction, isPending] = useActionState(createCourse, undefined)
+    const [currentfaculty, setCurrentFaculty] = useState<typeof faculty[number]>();
+    const [state, formAction, isPending] = useActionState(createCourse, undefined);
+
+    const departmentValues = () => {
+        if (currentfaculty) {
+            const departmentValues = objectValues(department, currentfaculty);
+            return departmentValues;
+        } else {
+            return [];
+        }
+    }
+
+    const departmentList = departmentValues();
+    const disabledKeys = objectValues(department, "全学部")
+        .filter(department => !(department in departmentList));
 
     return (
         <>
@@ -53,7 +67,13 @@ export function CreateCourse() {
                                 label="講義名"
                                 type="text"
                                 isRequired
+                                aria-describedby="course-error"
                             />
+                            <div id="course-error" aria-live="polite" aria-atomic="true">
+                                {state?.errors?.name && state.errors.name.map((error: string) => (
+                                    <p className='text-base text-red-500' key={error}>{error}</p>
+                                ))}
+                            </div>
                             <Select
                                 name="grade"
                                 label='対象学年' 
@@ -61,7 +81,7 @@ export function CreateCourse() {
                                 variant="bordered"
                                 isRequired
                             >
-                            {targetGrade.map((grade) => (
+                            {grade.map((grade) => (
                                 <SelectItem key={grade}>
                                     {grade}
                                 </SelectItem>
@@ -73,11 +93,9 @@ export function CreateCourse() {
                                 placeholder="学部を選んでください"
                                 variant="bordered"
                                 isRequired
-                                onChange={(e) => {
-                                    setCurrentFaculty(e.target.value);
-                                }}
+                                onChange={e => setCurrentFaculty(e.target.value as typeof faculty[number])}
                             >
-                                {targetFaculty.map((faculty) => (
+                                {faculty.map((faculty) => (
                                     <SelectItem key={faculty}>
                                         {faculty}
                                     </SelectItem>
@@ -91,9 +109,9 @@ export function CreateCourse() {
                                 errorMessage='学部が選択されていません。'
                                 isRequired
                                 isInvalid={!currentfaculty}
-                                disabledKeys={currentfaculty ? undefined : targetDepartment()}
+                                disabledKeys={disabledKeys}
                             >
-                                {targetDepartment(currentfaculty).map((department) => (
+                                {departmentList.map((department) => (
                                     <SelectItem key={department}>
                                         {department}
                                     </SelectItem>
@@ -126,16 +144,29 @@ export function CreateCourse() {
                                 ))}
                             </Select>
                             <Input
+                                name="classroom"
                                 type="text"
                                 label="教室"
                                 placeholder="「L半角数字」の形式で入力してください（例：L101）。数字は101～999の範囲で入力してください。"
                                 isRequired
+                                aria-describedby="classroom-error"
                             />
+                            <div id="classroom-error" aria-live="polite" aria-atomic="true">
+                                {state?.errors?.classroom && state.errors.classroom.map((error: string) => (
+                                    <p className='text-base text-red-500' key={error}>{error}</p>
+                                ))}
+                            </div>
                             <input
                                 name="professor"
                                 type="hidden"
                                 value={userData?.name}
+                                aria-describedby="professor-error"
                             />
+                            <div id="professor-error" aria-live="polite" aria-atomic="true">
+                                {state?.errors?.professor && state.errors.professor.map((error: string) => (
+                                    <p className='text-base text-red-500' key={error}>{error}</p>
+                                ))}
+                            </div>
                         </form>
                     </ModalBody>
                     <ModalFooter>
