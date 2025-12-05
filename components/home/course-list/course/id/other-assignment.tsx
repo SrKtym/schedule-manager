@@ -5,13 +5,13 @@ import * as m from 'motion/react-m';
 import { Card, CardBody } from '@heroui/react';
 import { FileText } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCurrentAssignmentData } from '@/contexts/assignment-data-context';
+import { useAssignmentData } from '@/contexts/assignment-data-context';
 import { dateOptionforAnnouncement } from '@/constants/definitions';
 
 
 export function OtherAssignment({id}: {id: string}) {
-    const {assignmentData} = useCurrentAssignmentData();
-    const currentAssignment = assignmentData?.filter(
+    const assignmentData = useAssignmentData();
+    const OtherAssignmentList = assignmentData?.filter(
         assignment => assignment.id !== id
     );
     const router = useRouter();
@@ -33,7 +33,7 @@ export function OtherAssignment({id}: {id: string}) {
                     </h3>
                     
                     <div className="space-y-3">
-                        {currentAssignment?.map((assignment) => (
+                        {OtherAssignmentList?.map((assignment) => (
                             <Button
                                 key={assignment.id}
                                 variant="light"
