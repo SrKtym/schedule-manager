@@ -2,14 +2,8 @@ import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import { handle } from 'hono/vercel';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod/v4';
 import { db } from '@/lib/drizzle';
-import { 
-    attachmentMetaData, 
-    course, 
-    messages, 
-    submissionMetaData 
-} from '@/lib/drizzle/schemas/main';
+import { attachmentMetaData, course, submissionMetaData } from '@/lib/drizzle/schemas/main';
 import { and, eq } from 'drizzle-orm';
 import { selectRegisteredSchema } from '@/schemas/select-schema';
 import { fetchSession } from '@/utils/getters/auth';
