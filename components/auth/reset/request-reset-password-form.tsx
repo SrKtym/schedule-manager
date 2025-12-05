@@ -1,38 +1,18 @@
 'use client';
 
-import type { StatePickEmail } from "@/types/request-reset-password";
-import { requestResetPassword } from "@/utils/action";
+import { requestResetPassword } from "@/utils/actions/auth";
 import { useActionState } from "react";
-import { 
-    addToast,
-    Button,
-    Input
-} from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 
 
 export function RequestResetPasswordForm() {
-    async function action(prevState: StatePickEmail | undefined, formData: FormData) {
-        const response = await requestResetPassword(formData);
-            if (response?.messages?.success) {
-                addToast(
-                    {
-                        title: 'メールの送信に成功しました。',
-                        color: 'success',
-                        description: `${response.messages?.success} にメールを送信しました。添付されたリンクに進みパスワードを変更してください。`
-                    }
-                );
-            } else {
-                return response;
-            }
-    }
-    const [state, formAction, isPending] = useActionState(action, undefined);
-
+    const [state, formAction, isPending] = useActionState(requestResetPassword, undefined);
 
     return (
         <form 
             action={formAction} 
             className='space-y-8 bg-white rounded-3xl px-5 py-2.5 overflow-auto'
-            aria-describedby='form-error'
+            aria-describedby='form-messages'
         >
             <h1 className="text-xl font-medium">
                 パスワードを変更するためメールアドレスを入力してください
@@ -52,9 +32,12 @@ export function RequestResetPasswordForm() {
                     <p className='text-base text-red-500' key={error}>{error}</p>
                 ))}
             </div>
-            <div id='form-error' aria-live='polite' aria-atomic='true'>
+            <div id='form-messages' aria-live='polite' aria-atomic='true'>
                 <p className='text-base text-red-500' key={state?.messages?.errors}>
                     {state?.messages?.errors && state.messages.errors}
+                </p>
+                <p className='text-base text-green-500' key={state?.messages?.success}>
+                    {state?.messages?.success && state.messages.success}
                 </p>
             </div>
             <Button 
