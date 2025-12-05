@@ -10,19 +10,20 @@ import {
 } from "motion/react";
 import { useEffect, useState } from "react";
 import { Button } from '@heroui/react';
-import { 
-    Bell, 
-    Plus, 
-    Settings, 
-    X 
-} from 'lucide-react';
-import { SingleItemModal } from './shared-layout-modal';
+import { Bell, Settings, X } from 'lucide-react';
+import { useRegisteredCourseDataList } from '@/contexts/registered-course-context';
+import { useCurrentAnnouncement } from '@/contexts/announcement-context';
+import dynamic from 'next/dynamic';
 
+const SingleItemModal = dynamic(() => import('@/components/home/shared-layout-modal'), { ssr: false });
 
 export function NotificationsList() {
+    const {courseDataList} = useRegisteredCourseDataList();
+    const courseNameList = courseDataList.map(({course}) => course.name);
+    const announcementData = useCurrentAnnouncement();
     const [notifications, setNotifications] = useState([
         { id: 1, title: 'マクロ経済学に新しい課題が追加されました', message: 'これはテスト通知です。通知を消すには右上のXを押してください。この通知リストには、framer-motionを使用してアニメーションを適用しています。', read: false },
-        { id: 2, title: 'ミクロ経済学に新しい課題が追加されました', message: 'njkbjhbjhbjkbjkbvjhvkucgcgjugcgcmjcgfhchfchcgfcugjvcgckghchgckhcghcckhchch', read: false },
+        { id: 2, title: 'ミクロ経済学に新しい課題が追加されました', message: 'njkbjhbjhbjkbjkbvjhvkucgcgjugcgcmjcgfhchfchcgfcugjvcgckghchgckhcghcckhchch.', read: false },
         { id: 3, title: 'タイトル3', message: 'これはテスト通知です。', read: false }
     ]);
 
@@ -46,7 +47,25 @@ export function NotificationsList() {
                 duration: 0.8
             });
         }
-    }, [notifications]);
+    }, []);
+
+    useEffect(() => {
+        const connect = () => {
+            const eventSource = new EventSource('/api/sse');
+
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                setNotifications(prev => [...prev, data]);
+            };
+
+            eventSource.onerror = () => {
+                eventSource.close();
+                setTimeout(connect, 1000);
+            }
+        }
+
+        connect();
+    }, []);
 
     return (
         <div className="h-[400px] overflow-y-auto scrollbar-hidden bg-gradient-to-b from-success-50 to-success-100 shadow-small rounded-large p-2">
@@ -127,20 +146,10 @@ export function NotificationsList() {
                                 </m.li>
                             ))}
                             {index && (
-                                <m.div 
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 0.6 }}
-                                    exit={{ opacity: 0 }}
-                                    key="overlay"
-                                    className="absolute inset-0 bg-background opacity-20"
-                                    onClick={() => setIndex(false)}
-                                />
-                            )}
-                            {index && (
                                 <SingleItemModal 
                                     key="modal"
                                     notification={notifications.find(n => n.id === index)}
-                                    onClick={() => setIndex(false)}
+                                    onClose={() => setIndex(false)}
                                 />
                             )}
                         </AnimatePresence>
@@ -158,7 +167,7 @@ export function NotificationsList() {
                     height={24} 
                 />
             </Button>
-            <Button
+            {/* <Button
                 aria-label="add notification"
                 isIconOnly
                 size="lg"
@@ -177,7 +186,7 @@ export function NotificationsList() {
                     width={18} 
                     height={18} 
                 />
-            </Button>
+            </Button> */}
         </div>
     );
 }
