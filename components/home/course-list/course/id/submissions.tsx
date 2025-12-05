@@ -12,30 +12,25 @@ import {
 import * as m from 'motion/react-m';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { FileUploader } from '../file-uploader';
-import { Eye, FileText } from 'lucide-react';
-import { useState } from 'react';
-import { AssignmentTabKey, AttachmentData } from '@/types/regisered-course';
-import { allowedMimeTypes } from '@/constants/definitions';
-import { useCurrentAssignmentStatus } from '@/contexts/assignment-status-context';
-import { useSessionUserData } from '@/contexts/user-data-context';
+import { useActionState, useState } from 'react';
+import { AssignmentTabKey, AttachmentData } from '@/types/main/regisered-course';
+import { allowedMimeTypes, attachmentIsRelatedTo } from '@/constants/definitions';
 import { useCurrentAssignmentData } from '@/contexts/assignment-data-context';
+import { removeFile, submitAssignment } from '@/utils/actions/main';
 
 export function Submissions({id}: {id: string}) {
-    const {currentAssignment} = useCurrentAssignmentData(id);
-    const email = useSessionUserData().email;
-    const assignmentStatus = useCurrentAssignmentStatus().find(
-        (assignmentStatus) => assignmentStatus.email === email
-    );
+    const currentAssignment = useCurrentAssignmentData(id);
     const [attachments, setAttachments] = useState<AttachmentData[]>([]);
     const [selectedTab, setSelectedTab] = useState<AssignmentTabKey>('text');
-    const [text, setText] = useState('');
+    const [submitState, formAction, isPending] = useActionState(submitAssignment, undefined);
     const isTeacher = false;
-    const handleFileUpload = (file: AttachmentData) => {
-        setAttachments(prev => [...prev, file]);
-      };
 
-    const handleFileRemove = (fileId: string) => {
-        setAttachments(prev => prev.filter(file => file.id !== fileId));
+    const handleFileRemove = async (
+        fileId: string,
+        relatedTo: typeof attachmentIsRelatedTo[number]
+    ) => {
+        await removeFile(fileId, relatedTo);
+        setAttachments(prev => prev.filter(file => file.name !== fileId));
       };
 
     return (
@@ -48,109 +43,91 @@ export function Submissions({id}: {id: string}) {
                 >
                     <Card className="border border-divider">
                         <CardBody className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-google-sans font-medium">
-                                    提出状況
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-medium">
+                                    課題の提出
                                 </h2>
                                 <Chip 
                                     variant="flat" 
                                     color={
-                                        assignmentStatus?.status === '評定済' ? 'success' : 
-                                        assignmentStatus?.status === '提出済' ? 'primary' : 
+                                        currentAssignment.assignmentStatus?.status === '評定済' ? 'success' : 
+                                        currentAssignment.assignmentStatus?.status === '提出済' ? 'primary' : 
                                         'warning'
                                     }
                                 >
-                                    {assignmentStatus?.status}
+                                    {currentAssignment.assignmentStatus?.status}
                                 </Chip>
                             </div>
-                
-                            {assignmentStatus?.status === '未提出' ? 
-                                <div className="mt-4">
-                                    <div className="space-y-2">
-                                        <Tabs
-                                            aria-label="Assignment tabs"
-                                            selectedKey={selectedTab}
-                                            onSelectionChange={key => setSelectedTab(key as AssignmentTabKey)}
-                                            variant="underlined"
-                                            color="primary"
-                                            classNames={{
-                                                base: "overflow-x-auto",
-                                                tabList: "w-full"
-                                            }}
-                                        >
-                                            <Tab 
-                                                key="text" 
-                                                title="テキスト" 
-                                            />
-                                            <Tab 
-                                                key="attachments" 
-                                                title="添付ファイル" 
-                                            />
-                                        </Tabs>
+                 
+                            <div className="mt-4">
+                                <div className="space-y-2">
+                                    <Tabs
+                                        aria-label="Assignment tabs"
+                                        selectedKey={selectedTab}
+                                        onSelectionChange={key => setSelectedTab(key as AssignmentTabKey)}
+                                        variant="underlined"
+                                        color="primary"
+                                        classNames={{
+                                            base: "overflow-x-auto",
+                                            tabList: "w-full"
+                                        }}
+                                    >
+                                        <Tab 
+                                            key="text" 
+                                            title="テキスト" 
+                                        />
+                                        <Tab 
+                                            key="attachments" 
+                                            title="添付ファイル" 
+                                        />
+                                    </Tabs>
+                                    <form 
+                                        action={formAction}
+                                        className="space-y-4"
+                                    >
                                         {selectedTab === 'text' && (
                                             <div className="flex flex-col space-y-4">
+                                                <input 
+                                                    type="hidden" 
+                                                    name="assignmentId" 
+                                                    value={currentAssignment.id} 
+                                                />
                                                 <Textarea
+                                                    name="content"
                                                     isClearable
                                                     variant="bordered"
                                                     placeholder="テキストを入力してください。"
-                                                    onValueChange={(value) => setText(value)}
+                                                    min={1}
+                                                    max={2000}
+                                                    aria-describedby="content-error"
                                                 />
-                                                <Button
-                                                    color="primary"
-                                                    isDisabled={!text}
-                                                >
-                                                    提出する
-                                                </Button>
+                                                <div id='content-error' aria-live='polite' aria-atomic='true'>
+                                                    {submitState?.errors?.content && submitState.errors.content.map((error: string) => (
+                                                        <p className='text-base text-red-500' key={error}>{error}</p>
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                         {selectedTab === 'attachments' && (
                                             <FileUploader
-                                                onFileUpload={handleFileUpload}
-                                                onFileRemove={handleFileRemove}
                                                 files={attachments}
                                                 maxFiles={10}
                                                 allowedTypes={allowedMimeTypes}
-                                                id={currentAssignment.id}
+                                                relatedTo='submission'
+                                                onFileRemove={handleFileRemove}
                                             />
                                         )}
-                                    </div>
+                                        <Button
+                                            type="submit"
+                                            color="primary"
+                                            aria-disabled={isPending}
+                                            isLoading={isPending}
+                                        >
+                                            {currentAssignment.assignmentStatus?.status === '未提出' ? "提出する" : "編集して再提出する"}
+                                        </Button>
+                                    </form>
                                 </div>
-                                : 
-                                <div className="space-y-3 mb-6">
-                                    {attachments.map(file => (
-                                        <Card key={file.id} className="border border-divider">
-                                            <CardBody className="p-3 flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-md bg-content2 flex items-center justify-center">
-                                                    <FileText
-                                                        width={20}
-                                                        className='text-default-500'
-                                                    />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="font-medium truncate">
-                                                        {file.name}
-                                                    </p>
-                                                    <p className="text-xs text-default-500 capitalize">
-                                                        {file.type}
-                                                    </p>
-                                                </div>
-                                                <Button
-                                                    as="a"
-                                                    href={file.url as string}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    size="sm"
-                                                    variant="flat"
-                                                    color="primary"
-                                                    startContent={<Eye width={14} />}
-                                                >
-                                                    見る
-                                                </Button>
-                                            </CardBody>
-                                        </Card>
-                                    ))}
-                                </div>
-                            }
+                            </div>
                         </CardBody>
                     </Card>
                 </m.div>
