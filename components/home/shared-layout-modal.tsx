@@ -1,15 +1,13 @@
-"use clent";
+"use client";
 
-import { fetchSchedule } from "@/utils/getter";
+import { fetchSchedule } from "@/utils/getters/main";
 import * as m from "motion/react-m";
 import { X } from "lucide-react";
 import { addToast, Button } from "@heroui/react";
 import { dateOptionforSchedule } from "@/constants/definitions";
-import { isSpanningDays } from "@/utils/related-to-schedule";
-import { hc } from "hono/client";
-import { env } from "@/env";
-import { AppType } from "@/app/api/[[...route]]/route";
+import { isSpanningDays } from "@/utils/helpers/schedule";
 import { useRouter } from "next/navigation";
+import { deleteSchedule } from "@/utils/actions/main";
 
 const CloseButton = ({ onClose }: { onClose: () => void }) => {
     return (
@@ -30,7 +28,7 @@ const CloseButton = ({ onClose }: { onClose: () => void }) => {
 }
 
 // 通知、講義、スケジュールのモーダル
-export function SingleItemModal({
+export default function SingleItemModal({
     notification,
     registeredCourse,
     schedule,
@@ -41,7 +39,6 @@ export function SingleItemModal({
     schedule?: Awaited<ReturnType<typeof fetchSchedule>>[number];
     onClose: () => void;
 }) {
-    const client = hc<AppType>(env.NEXT_PUBLIC_APP_URL);
     const router = useRouter();
 
     return (
@@ -105,13 +102,8 @@ export function SingleItemModal({
                     <Button
                         color="danger"
                         onPress={async () => {
-                            const res = await client.api.schedule.$delete({
-                                json: {
-                                    id: schedule.id
-                                }
-                            });
-                            if (res.ok) {
-                                router.refresh();
+                            const res = await deleteSchedule(schedule.id);
+                            if (res.success) {
                                 onClose();
                             } else {
                                 addToast({
