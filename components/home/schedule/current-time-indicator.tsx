@@ -10,7 +10,7 @@ export function CurrentTimeIndicator() {
     useEffect(() => {
         const delay = (60 - new Date().getSeconds()) * 1000;
 
-        // 指標の位置を計算
+        // 1. 指標の位置を計算
         const calculatePosition = () => {
             const now = new Date();
             const hours = now.getHours();
@@ -21,12 +21,12 @@ export function CurrentTimeIndicator() {
             return position;
         };
 
-        // 初期位置を設定
+        // 2. 初期位置を設定
         setCurrentPosition(calculatePosition());
 
-        //分頭に合わせて表示
+        // 3. 分頭に合わせて表示
         const timeout = setTimeout(() => {
-            // 毎分位置を更新
+            // ポーリングにより每分位置を更新
             const interval = setInterval(() => {
                 setCurrentPosition(calculatePosition());
             }, 60000);
