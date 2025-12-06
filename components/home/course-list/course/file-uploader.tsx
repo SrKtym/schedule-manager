@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { AttachmentData } from '@/types/main/regisered-course';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { getFileType, getFileColor } from '@/utils/helpers/assignment';
 import { client } from '@/lib/hono/client';  
 import { useParams } from 'next/navigation';
@@ -130,15 +130,13 @@ export function FileUploader({
         }
     }
 
-    // ドロップ時の処理(キャッシュ化)
-    const handleDrop = useCallback(
-        async (e: React.DragEvent) => {
-            e.preventDefault();
-            setIsDragging(false);
+    // ドロップ時の処理
+    const handleDrop = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
     
-            if (e.dataTransfer.files) await handleFileUpload(e.dataTransfer.files);
-        },[]
-    );
+        if (e.dataTransfer.files) await handleFileUpload(e.dataTransfer.files);
+    }
 
     // ファイル選択時にアップロード処理をトリガー
     const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
