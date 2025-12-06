@@ -1,5 +1,10 @@
 import { ImageResponse } from 'next/og'
- 
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
+// edgeランタイム
+export const runtime = "edge";
+
 // 画像のメタデータ
 export const alt = 'スケジュールマネージャーアプリ'
 export const size = {
@@ -11,14 +16,14 @@ export const contentType = 'image/png'
  
 // 画像生成
 export default async function Image() {
-  const fontData = await fetch(
-    new URL("./Inter-SemiBold.ttf", import.meta.url)
-  ).then((res) => res.arrayBuffer());
- 
+  const fontData = await readFile(
+    join(process.cwd(), 'public/fonts/NotoSansJP-Regular.ttf')
+  )
   return new ImageResponse(
     (
       <div
         style={{
+          fontFamily: 'Noto Sans JP',
           fontSize: 128,
           background: 'white',
           width: '100%',
@@ -35,7 +40,7 @@ export default async function Image() {
       ...size,
       fonts: [
         {
-          name: 'Inter',
+          name: 'Noto Sans JP',
           data: fontData,
           style: 'normal',
           weight: 400,
