@@ -12,15 +12,12 @@ import { useEffect, useState } from "react";
 import { Button } from '@heroui/react';
 import { Bell, Settings, X } from 'lucide-react';
 import { useRegisteredCourseDataList } from '@/contexts/registered-course-context';
-import { useCurrentAnnouncement } from '@/contexts/announcement-context';
 import dynamic from 'next/dynamic';
 
 const SingleItemModal = dynamic(() => import('@/components/home/shared-layout-modal'), { ssr: false });
 
 export function NotificationsList() {
     const {courseDataList} = useRegisteredCourseDataList();
-    const courseNameList = courseDataList.map(({course}) => course.name);
-    const announcementData = useCurrentAnnouncement();
     const [notifications, setNotifications] = useState([
         { id: 1, title: 'マクロ経済学に新しい課題が追加されました', message: 'これはテスト通知です。通知を消すには右上のXを押してください。この通知リストには、framer-motionを使用してアニメーションを適用しています。', read: false },
         { id: 2, title: 'ミクロ経済学に新しい課題が追加されました', message: 'njkbjhbjhbjkbjkbvjhvkucgcgjugcgcmjcgfhchfchcgfcugjvcgckghchgckhcghcckhchch.', read: false },
@@ -47,7 +44,7 @@ export function NotificationsList() {
                 duration: 0.8
             });
         }
-    }, []);
+    }, [notifications]);
 
     useEffect(() => {
         const connect = () => {
