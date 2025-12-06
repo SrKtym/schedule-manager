@@ -1,4 +1,4 @@
-import { sendMessages } from "@/app/api/[[...route]]/route";
+import { sendMessages } from "@/utils/helpers/sse";
 import { supabaseAdmin } from "./server";
 
 

@@ -7,19 +7,12 @@ import { attachmentMetaData, course, submissionMetaData } from '@/lib/drizzle/sc
 import { and, eq } from 'drizzle-orm';
 import { selectRegisteredSchema } from '@/schemas/select-schema';
 import { fetchSession } from '@/utils/getters/auth';
-import { sseClients } from '@/types/main/sse-clients';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getFileType } from '@/utils/helpers/assignment';
 import { uploadFileSchema } from '@/schemas/form-schema';
+import { clientsMap } from '@/utils/helpers/sse';
 
 // nodejsランタイム
-
-const clientsMap = new Map<string, sseClients[]>();
-
-export function sendMessages(userId: string, data: unknown) {
-    const clients = clientsMap.get(userId) || [];
-    clients.forEach(client => client.send(JSON.stringify(data)));
-}
 
 const app = new Hono()
     .basePath('/api')
