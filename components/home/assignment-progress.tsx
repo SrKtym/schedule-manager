@@ -6,12 +6,15 @@ import { useAssignmentData } from "@/contexts/assignment-data-context";
 
 export function AssignmentProgress() {
     // すべての課題を取得
-    const assignmentData = useAssignmentData() ?? [];
+    const assignmentData = useAssignmentData();
 
     // 提出済みの課題を取得
-    const submittedAssignments = assignmentData.filter(
+    const submittedAssignments = assignmentData?.filter(
         ({assignmentStatus}) => {assignmentStatus?.status === "提出済"}
     );
+
+    const submittedAssignmentsCount = submittedAssignments?.length ?? 0;
+    const assignmentDataCount = assignmentData?.length ?? 0;
 
     return (
         <div className="bg-gradient-to-b from-warning-50 to-warning-100 shadow-small rounded-large p-2 space-y-2">
@@ -27,18 +30,18 @@ export function AssignmentProgress() {
             <div className="flex items-center gap-2">
                 <Progress 
                     aria-label="assignment-progress"
-                    value={submittedAssignments.length / assignmentData.length * 100} 
+                    value={submittedAssignmentsCount / assignmentDataCount * 100} 
                 />
                 <p>
-                    {submittedAssignments.length} / {assignmentData.length}
+                    {submittedAssignmentsCount} / {assignmentDataCount}
                 </p>
             </div>
             <div className="flex items-center justify-between gap-2">
                 <p>
-                    提出済みの課題: {submittedAssignments.length}
+                    提出済みの課題: {submittedAssignmentsCount}
                 </p>
                 <p>
-                    すべての課題: {assignmentData.length}
+                    すべての課題: {assignmentDataCount}
                 </p>
             </div>
         </div>
