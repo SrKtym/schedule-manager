@@ -10,7 +10,7 @@ import {
     uploadFileSchema
 } from '@/schemas/form-schema';
 import { db } from '../../lib/drizzle';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { serverClient } from '@/lib/supabase/server';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { fetchSession } from '../getters/auth';
@@ -346,6 +346,7 @@ export async function removeFile(fileId: string, relatedTo: typeof attachmentIsR
 
             if (!result) return;
 
+            const supabaseAdmin = await serverClient(); 
             const {data, error} = await supabaseAdmin
                 .storage
                 .from("documents")
@@ -369,6 +370,7 @@ export async function removeFile(fileId: string, relatedTo: typeof attachmentIsR
 
             if (!result) return;
 
+            const supabaseAdmin = await serverClient();
             const {data, error} = await supabaseAdmin
                 .storage
                 .from("documents")
