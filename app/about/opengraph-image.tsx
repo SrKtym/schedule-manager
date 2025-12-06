@@ -13,14 +13,15 @@ export const contentType = 'image/png'
  
 // 画像生成
 export default async function Image() {
-  const interSemiBold = await readFile(
-    join(process.cwd(), 'assets/Inter-SemiBold.ttf')
+  const fontData = await readFile(
+    join(process.cwd(), 'public', 'opengraph-image-bg.png')
   )
  
   return new ImageResponse(
     (
       <div
         style={{
+          fontFamily: 'Noto Sans JP',
           fontSize: 128,
           background: 'white',
           width: '100%',
@@ -37,8 +38,8 @@ export default async function Image() {
       ...size,
       fonts: [
         {
-          name: 'latin',
-          data: interSemiBold,
+          name: 'Noto Sans JP',
+          data: fontData,
           style: 'normal',
           weight: 400,
         },
