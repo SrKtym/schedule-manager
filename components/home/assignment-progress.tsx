@@ -13,9 +13,6 @@ export function AssignmentProgress() {
         ({assignmentStatus}) => {assignmentStatus?.status === "提出済"}
     );
 
-    const submittedAssignmentsCount = submittedAssignments?.length ?? 0;
-    const assignmentDataCount = assignmentData?.length ?? 0;
-
     return (
         <div className="bg-gradient-to-b from-warning-50 to-warning-100 shadow-small rounded-large p-2 space-y-2">
             <div className="flex items-center gap-2">
@@ -30,18 +27,18 @@ export function AssignmentProgress() {
             <div className="flex items-center gap-2">
                 <Progress 
                     aria-label="assignment-progress"
-                    value={submittedAssignmentsCount / assignmentDataCount * 100} 
+                    value={(submittedAssignments?.length ?? 0) / (assignmentData?.length ?? 0) * 100} 
                 />
                 <p>
-                    {submittedAssignmentsCount} / {assignmentDataCount}
+                    {submittedAssignments?.length ?? 0} / {assignmentData?.length ?? 0}
                 </p>
             </div>
             <div className="flex items-center justify-between gap-2">
                 <p>
-                    提出済みの課題: {submittedAssignmentsCount}
+                    提出済みの課題: {submittedAssignments?.length ?? 0}
                 </p>
                 <p>
-                    すべての課題: {assignmentDataCount}
+                    すべての課題: {assignmentData?.length ?? 0}
                 </p>
             </div>
         </div>
