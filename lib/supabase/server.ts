@@ -7,10 +7,12 @@ import { cookies } from "next/headers";
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = env.SUPABASE_SECRET_KEY;
 
-export const supabaseAdmin = createServerClient(
-    supabaseUrl, 
-    supabaseKey,
-    {
-        cookies: await cookies()
-    }
-);
+export async function serverClient() {
+    return createServerClient(
+        supabaseUrl, 
+        supabaseKey,
+        {
+            cookies: await cookies()
+        }
+    );
+}
