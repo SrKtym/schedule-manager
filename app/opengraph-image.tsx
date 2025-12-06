@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og'
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
  
 // 画像のメタデータ
 export const alt = 'スケジュールマネージャーアプリ'
@@ -13,15 +11,14 @@ export const contentType = 'image/png'
  
 // 画像生成
 export default async function Image() {
-  const fontData = await readFile(
-    join(process.cwd(), 'public', 'opengraph-image-bg.png')
-  )
+  const fontData = await fetch(
+    new URL("./Inter-SemiBold.ttf", import.meta.url)
+  ).then((res) => res.arrayBuffer());
  
   return new ImageResponse(
     (
       <div
         style={{
-          fontFamily: 'Noto Sans JP',
           fontSize: 128,
           background: 'white',
           width: '100%',
@@ -38,7 +35,7 @@ export default async function Image() {
       ...size,
       fonts: [
         {
-          name: 'Noto Sans JP',
+          name: 'Inter',
           data: fontData,
           style: 'normal',
           weight: 400,
