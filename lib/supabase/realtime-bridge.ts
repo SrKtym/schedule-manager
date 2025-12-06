@@ -1,8 +1,9 @@
 import { sendMessages } from "@/utils/helpers/sse";
-import { supabaseAdmin } from "./server";
+import { serverClient } from "./server";
 
 
-function realtimeBridge() {
+export async function realtimeBridge() {
+    const supabaseAdmin = await serverClient();
     const channel = supabaseAdmin.channel("messages");
     channel.on("postgres_changes", 
         { 
@@ -22,5 +23,3 @@ function realtimeBridge() {
 
     channel.subscribe();
 }
-
-realtimeBridge();

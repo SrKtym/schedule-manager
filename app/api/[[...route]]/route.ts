@@ -7,7 +7,7 @@ import { attachmentMetaData, course, submissionMetaData } from '@/lib/drizzle/sc
 import { and, eq } from 'drizzle-orm';
 import { selectRegisteredSchema } from '@/schemas/select-schema';
 import { fetchSession } from '@/utils/getters/auth';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { serverClient } from '@/lib/supabase/server';
 import { getFileType } from '@/utils/helpers/assignment';
 import { uploadFileSchema } from '@/schemas/form-schema';
 import { clientsMap } from '@/utils/helpers/sse';
@@ -316,6 +316,7 @@ const app = new Hono()
         const fileId = crypto.randomUUID();
         const type = getFileType(contentType);
         const stream = await c.req.arrayBuffer();
+        const supabaseAdmin = await serverClient();
 
         switch (relatedTo) {
             case 'submission': {
