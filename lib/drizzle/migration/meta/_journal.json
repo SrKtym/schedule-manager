@@ -36,6 +36,13 @@
       "when": 1764756290787,
       "tag": "0004_clean_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1765093221362,
+      "tag": "0005_late_killer_shrike",
+      "breakpoints": true
     }
   ]
 }

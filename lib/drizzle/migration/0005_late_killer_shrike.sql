@@ -1,0 +1,1 @@
+ALTER TABLE "main"."assignment_data" RENAME COLUMN "name" TO "title";
