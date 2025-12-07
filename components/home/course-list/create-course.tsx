@@ -63,7 +63,7 @@ export function CreateCourse() {
                     <ModalBody>
                         <form action={formAction}>
                             <Input
-                                name="course"
+                                name="courseName"
                                 label="講義名"
                                 type="text"
                                 isRequired
