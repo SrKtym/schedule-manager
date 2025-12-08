@@ -2,8 +2,6 @@ import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-// edgeランタイム
-export const runtime = "edge";
 
 // 画像のメタデータ
 export const alt = 'スケジュールマネージャーアプリ'
