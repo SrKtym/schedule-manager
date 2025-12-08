@@ -18,7 +18,7 @@ export function OtpVerifyForm() {
             <form 
                 action={formAction}
                 className='space-y-5' 
-                aria-describedby='form-error'
+                aria-describedby='form-messages'
             >
                 <Input
                     id='otp'
@@ -37,9 +37,12 @@ export function OtpVerifyForm() {
                         </p>
                     ))}
                 </div>
-                <div id='form-error' aria-live='polite' aria-atomic='true'>
+                <div id='form-messages' aria-live='polite' aria-atomic='true'>
                     <p className='text-base text-red-500' key={state?.messages?.errors}>
                         {state?.messages?.errors && state.messages.errors}
+                    </p>
+                    <p className='text-base text-green-500' key={state?.messages?.success}>
+                        {state?.messages?.success && state.messages.success}
                     </p>
                 </div>
                 <div className='flex items-center justify-between space-x-5'>

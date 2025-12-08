@@ -268,7 +268,8 @@ export async function verifyTotp(
     prevState: {
         errors?: string[],
         messages?: {
-            errors?: string
+            errors?: string,
+            success?: string
         }
     } | undefined, 
     formData: FormData
@@ -297,6 +298,11 @@ export async function verifyTotp(
         // TOTPコード検証成功
         if (totp.token) {
             token = totp.token;
+            return {
+                messages: {
+                    success: 'TOTPコードの検証に成功しました。'
+                }
+            }
         } 
         // TOTPコードが誤っている場合
         return {
@@ -327,7 +333,8 @@ export async function verifyOtp(
     prevState: {
         errors?: string[],
         messages?: {
-            errors?: string
+            errors?: string,
+            success?: string
         }
     } | undefined, 
     formData: FormData
@@ -356,6 +363,11 @@ export async function verifyOtp(
         // OTPコード検証成功
         if (otp.token) {
             token = otp.token;
+            return {
+                messages: {
+                    success: 'OTPコードの検証に成功しました。'
+                }
+            }
         } 
         // OTPコードが誤っている場合
         return {
