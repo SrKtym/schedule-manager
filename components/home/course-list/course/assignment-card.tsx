@@ -17,7 +17,7 @@ export function AssignmentCard({assignment}: {assignment: typeof assignmentData.
     const pathName = usePathname();
     
     const { 
-        name, 
+        title, 
         description, 
         dueDate, 
         points, 
@@ -44,7 +44,7 @@ export function AssignmentCard({assignment}: {assignment: typeof assignmentData.
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="font-medium">
-                                    {name}
+                                    {title}
                                 </h3>
                                 <div className="flex items-center gap-2 text-tiny text-default-500 mt-1">
                                     <span>
