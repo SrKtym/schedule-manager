@@ -107,7 +107,7 @@ export function SearchField(
                     variant="bordered"
                     errorMessage='学部が選択されていません。'
                     defaultSelectedKeys={getParam('department')}
-                    disabledKeys={(getParam('faculty')) ? undefined : objectValues(department, "全学部")}
+                    disabledKeys={(getParam('faculty')) ? undefined : department["全学部"]}
                     isInvalid={invalid}
                     onChange={handleFilter}
                     onOpenChange={() => getParam('faculty') ? setInvalid(false) : setInvalid(true)}
@@ -174,7 +174,7 @@ export function SearchField(
             </div>
             <Input
                 type="text"
-                placeholder="講義名を入力してください。"
+                placeholder="講義名、教室名、担当教員のいずれかを入力してください。"
                 variant="bordered"
                 startContent={
                     <Search 
