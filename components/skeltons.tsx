@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, Skeleton } from "@heroui/react";
 import { Fragment } from "react";
 
