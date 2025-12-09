@@ -1,4 +1,4 @@
-import { env } from '../../env';
+import { serverEnv } from '@/env/server';
 import { betterAuth } from 'better-auth';
 import { admin as adminPlugin, twoFactor } from 'better-auth/plugins';
 import { ac, admin, student, professor } from '@/permissions';
@@ -97,7 +97,7 @@ export const auth = betterAuth({
                 student: student,
             },
             defaultRole: "student",
-            adminUserIds: [env.BETTER_AUTH_ADMIN_USER_ID]
+            adminUserIds: [serverEnv.BETTER_AUTH_ADMIN_USER_ID]
         }),
 
         twoFactor({
@@ -124,18 +124,18 @@ export const auth = betterAuth({
 
     socialProviders: {
         github: {
-            clientId: env.GITHUB_CLIENT_ID,
-            clientSecret: env.GITHUB_CLIENT_SECRET
+            clientId: serverEnv.GITHUB_CLIENT_ID,
+            clientSecret: serverEnv.GITHUB_CLIENT_SECRET
         },
 
         google: {
-            clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GOOGLE_CLIENT_SECRET
+            clientId: serverEnv.GOOGLE_CLIENT_ID,
+            clientSecret: serverEnv.GOOGLE_CLIENT_SECRET
         },
         
         twitter: {
-            clientId: env.TWITTER_CLIENT_ID,
-            clientSecret: env.TWITTER_CLIENT_SECRET
+            clientId: serverEnv.TWITTER_CLIENT_ID,
+            clientSecret: serverEnv.TWITTER_CLIENT_SECRET
         }
     }
 });

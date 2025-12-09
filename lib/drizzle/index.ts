@@ -3,10 +3,10 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import * as mainSchema from '@/lib/drizzle/schemas/main';
 import * as betterAuthSchema from '@/lib/drizzle/schemas/better-auth';
 import * as mainRelation from '@/lib/drizzle/relations/main'
-import { env } from '@/env';
+import { serverEnv } from '@/env/server';
 
 // データベース（supabase）にssl接続
-const client = postgres(env.DATABASE_URL, {
+const client = postgres(serverEnv.DATABASE_URL, {
     prepare: false,
     ssl: "require"
 });

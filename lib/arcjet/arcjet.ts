@@ -1,8 +1,8 @@
 import arcjet, { filter, shield } from "@arcjet/next";
-import { env } from "@/env";
+import { serverEnv } from "@/env/server";
 
 export const aj = arcjet({
-    key: env.ARCJET_KEY,
+    key: serverEnv.ARCJET_KEY,
     characteristics: ["userId"],
     rules: [
         filter({

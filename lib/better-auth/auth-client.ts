@@ -1,4 +1,6 @@
-import { env } from '../../env';
+'use client';
+
+import { clientEnv } from '@/env/client';
 import { createAuthClient } from 'better-auth/react';
 import { 
     adminClient, 
@@ -13,7 +15,7 @@ import {
 } from '@/permissions';
 
 export const authClient = createAuthClient({
-    baseURL: env.NEXT_PUBLIC_APP_URL,
+    baseURL: clientEnv.NEXT_PUBLIC_APP_URL,
     plugins: [
         adminClient({
             ac: ac,

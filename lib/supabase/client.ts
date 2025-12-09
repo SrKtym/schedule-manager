@@ -1,8 +1,8 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { env } from '@/env'
+import { clientEnv } from '@/env/client';
 
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = clientEnv.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = clientEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 // この接続はstored procedureの呼び出しのみに制限する
 export const supabaseAnon = createBrowserClient(

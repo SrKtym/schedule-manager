@@ -1,11 +1,12 @@
 import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
-import { env } from "@/env";
+import { clientEnv } from "@/env/client";
+import { serverEnv } from "@/env/server";
 import { cookies } from "next/headers";
 
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = env.SUPABASE_SECRET_KEY;
+const supabaseUrl = clientEnv.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = serverEnv.SUPABASE_SECRET_KEY;
 
 export async function serverClient() {
     return createServerClient(
