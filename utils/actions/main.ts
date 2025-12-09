@@ -198,10 +198,10 @@ export async function updateMessage(id: string) {
 // 講義作成（教員用）
 export async function createCourse(prevState: CourseState | undefined, formData: FormData) {
     const validatedFields = createCourseSchema.safeParse({
-        name: formData.get('name'),
-        targetGrade: formData.get('targetGrade'),
-        targetFaculty: formData.get('targetFaculty'),
-        targetDepartment: formData.get('targetDepartment'),
+        name: formData.get('courseName'),
+        targetGrade: formData.get('grade'),
+        targetFaculty: formData.get('faculty'),
+        targetDepartment: formData.get('department'),
         week: formData.get('week'),
         period: formData.get('period'),
         credit: formData.get('credit'),
@@ -214,6 +214,18 @@ export async function createCourse(prevState: CourseState | undefined, formData:
         const flattened = z.flattenError(validatedFields.error);
         return {
             errors: flattened.fieldErrors
+        };
+    }
+
+    const existingCourse = await db.query.course.findFirst({
+        where: (course, {eq}) => (eq(course.name, validatedFields.data.name))
+    });
+
+    if (existingCourse) {
+        return {
+            errors: {
+                name: ['入力された講義名は既に存在します。他の講義名を入力してください。']
+            }
         };
     }
     
@@ -237,7 +249,6 @@ export async function createAnnouncement(prevState: AnnouncementState | undefine
         title: formData.get('title'),
         content: formData.get('content'),
         courseName: formData.get('courseName'),
-        attachmentIds: formData.get('attachmentIds'),
         type: formData.get('type'),
     });
 
@@ -265,7 +276,7 @@ export async function createAssignment(prevState: AssignmentState | undefined, f
     const userId = session.user.id;
 
     const validatedFields = createAssignmentSchema.safeParse({
-        name: formData.get('name'),
+        title: formData.get('name'),
         description: formData.get('description'),
         courseName: formData.get('courseName'),
         points: formData.get('points'),

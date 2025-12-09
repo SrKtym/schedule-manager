@@ -50,7 +50,7 @@ export const scheduleSchema = z.object({
 
 // 課題作成
 export const createAssignmentSchema = z.object({
-    name: z.string().min(1, {error: '課題名は必須です。'}),
+    title: z.string().min(1, {error: '課題名は必須です。'}),
     courseName: z.string(),
     description: z.string().min(1, {error: '説明文は必須です。'}),
     points: z.string({error: '点数は必須です。'}).transform((value) => parseInt(value)),
@@ -71,7 +71,6 @@ export const createAnnouncementSchema = z.object({
     title: z.string().min(1, {error: 'タイトルは必須です。'}),
     content: z.string().min(1, {error: '内容は必須です。'}),
     courseName: z.string(),
-    attachmentIds: z.array(z.string()).nullable(),
     type: z.enum(announcementType, {error: 'タイプは必須です。'}),
 });
 

@@ -189,7 +189,7 @@ export const assignmentData = main.table("assignment_data", {
     courseName: text('course_name')
         .references(() => course.name, { onDelete: 'cascade' })
         .notNull(),
-    name: text('name').notNull(),
+    title: text('title').notNull(),
     description: text('description').notNull(),
     points: integer('points').notNull(),
     dueDate: timestamp('due_date').notNull(),

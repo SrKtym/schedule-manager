@@ -56,15 +56,15 @@ export function CreateAssignmentForm({ courseName }: { courseName: string}) {
                             className='space-y-4'
                         >
                             <Input
-                                label="課題名"
-                                name="name"
+                                label="タイトル"
+                                name="title"
                                 placeholder="課題名を入力してください。"
                                 variant="bordered"
                                 aria-describedby="name-error"
                                 isRequired
                             />
                             <div id='name-error' aria-live='polite' aria-atomic='true'>
-                                {state?.errors?.name && state.errors.name.map((error: string) => (
+                                {state?.errors?.title && state.errors.title.map((error: string) => (
                                     <p className='text-base text-red-500' key={error}>{error}</p>
                                 ))}
                             </div>
