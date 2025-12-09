@@ -61,7 +61,7 @@ export function UpcomingAssignment() {
                 <p className="text-center p-5">
                     {assignments.map(assignment => (
                         <span key={assignment.id} className="block mb-2">
-                            {assignment.name}
+                            {assignment.title}
                         </span>
                         )
                     )}
