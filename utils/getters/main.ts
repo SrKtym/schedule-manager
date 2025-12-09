@@ -57,14 +57,15 @@ export const fetchCourse = cache(async (
                     inArray(course.required, filter.requiredList.length > 0 ? filter.requiredList : [...required]),
                     query ? or(
                         ilike(course.name, `%${query}%`),
-                        ilike(course.professor, `%${query}%`)
+                        ilike(course.professor, `%${query}%`),
+                        ilike(course.classroom, `${query}`)
                     ) : undefined
                 )
             ),
         limit: rows || 10,
         offset: ((page || 1) - 1) * (rows || 10)
     });
-    
+
     return result;
 });
 
@@ -92,7 +93,8 @@ export const fetchItemsLength = cache(async (
                     inArray(course.required, filter.requiredList.length > 0 ? filter.requiredList : [...required]),
                     query ? or(
                         ilike(course.name, `%${query}%`),
-                        ilike(course.professor, `%${query}%`)
+                        ilike(course.professor, `%${query}%`),
+                        ilike(course.classroom, `${query}`)
                     ) : undefined
                 )
             ),
