@@ -47,7 +47,7 @@ export function OtherAssignment({id}: {id: string}) {
                             >
                                 <div className="truncate">
                                     <p className="font-medium truncate">
-                                        {assignment.name}
+                                        {assignment.title}
                                     </p>
                                     <p className="text-xs text-default-500">
                                         {assignment.dueDate.toLocaleDateString("default", dateOptionforAnnouncement)}
