@@ -14,6 +14,15 @@ import { asc, eq } from "drizzle-orm";
 import { fetchSession } from "./auth";
 import { cookies } from "next/headers";
 import { Filter } from "@/types/main/regisered-course";
+import { 
+    credit,
+    department, 
+    faculty, 
+    grade, 
+    period, 
+    required, 
+    week
+} from "@/constants/definitions";
 
 
 // テーマの取得
@@ -33,26 +42,29 @@ export const fetchCourse = cache(async (
         where: (course, {or, and, inArray, isNull, ilike}) => 
             or(
                 and(
-                    inArray(course.targetGrade, filter.gradeList),
+                    inArray(course.targetGrade, filter.gradeList.length > 0 ? filter.gradeList : [...grade]),
                     or(
-                        inArray(course.targetFaculty, filter.facultyList),
+                        inArray(course.targetFaculty, filter.facultyList.length > 0 ? filter.facultyList : [...faculty]),
                         isNull(course.targetFaculty)
                     ),
                     or(
-                        inArray(course.targetDepartment, filter.departmentList),
+                        inArray(course.targetDepartment, filter.departmentList.length > 0 ? filter.departmentList : [...department["全学部"]]),
                         isNull(course.targetDepartment)
                     ),
-                    inArray(course.week, filter.weekList),
-                    inArray(course.period, filter.periodList),
-                    inArray(course.credit, filter.creditList),
-                    inArray(course.required, filter.requiredList),
-                ),
-                ilike(course.name, `%${query}%`),
-                ilike(course.professor, `%${query}%`)
+                    inArray(course.week, filter.weekList.length > 0 ? filter.weekList : [...week]),
+                    inArray(course.period, filter.periodList.length > 0 ? filter.periodList : [...period]),
+                    inArray(course.credit, filter.creditList.length > 0 ? filter.creditList : [...credit]),
+                    inArray(course.required, filter.requiredList.length > 0 ? filter.requiredList : [...required]),
+                    query ? or(
+                        ilike(course.name, `%${query}%`),
+                        ilike(course.professor, `%${query}%`)
+                    ) : undefined
+                )
             ),
         limit: rows || 10,
         offset: ((page || 1) - 1) * (rows || 10)
     });
+    
     return result;
 });
 
@@ -65,25 +77,27 @@ export const fetchItemsLength = cache(async (
         where: (course, {or, and, inArray, isNull, ilike}) => 
             or(
                 and(
-                    inArray(course.targetGrade, filter.gradeList),
+                    inArray(course.targetGrade, filter.gradeList.length > 0 ? filter.gradeList : [...grade]),
                     or(
-                        inArray(course.targetFaculty, filter.facultyList),
+                        inArray(course.targetFaculty, filter.facultyList.length > 0 ? filter.facultyList : [...faculty]),
                         isNull(course.targetFaculty)
                     ),
                     or(
-                        inArray(course.targetDepartment, filter.departmentList),
+                        inArray(course.targetDepartment, filter.departmentList.length > 0 ? filter.departmentList : [...department["全学部"]]),
                         isNull(course.targetDepartment)
                     ),
-                    inArray(course.week, filter.weekList),
-                    inArray(course.period, filter.periodList),
-                    inArray(course.credit, filter.creditList),
-                    inArray(course.required, filter.requiredList)
-                ),
-                ilike(course.name, `%${query}%`),
-                ilike(course.professor, `%${query}%`)
-                
+                    inArray(course.week, filter.weekList.length > 0 ? filter.weekList : [...week]),
+                    inArray(course.period, filter.periodList.length > 0 ? filter.periodList : [...period]),
+                    inArray(course.credit, filter.creditList.length > 0 ? filter.creditList : [...credit]),
+                    inArray(course.required, filter.requiredList.length > 0 ? filter.requiredList : [...required]),
+                    query ? or(
+                        ilike(course.name, `%${query}%`),
+                        ilike(course.professor, `%${query}%`)
+                    ) : undefined
+                )
             ),
-        })
+        });
+
     return result.length;
 })
 
