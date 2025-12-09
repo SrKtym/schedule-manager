@@ -50,7 +50,7 @@ export function AssignmentDetail({id}: {id: string}) {
                                         </div>
                                         <div className='space-y-2'>
                                             <h1 className="text-2xl font-medium">
-                                                {currentAssignment.name}
+                                                {currentAssignment.title}
                                             </h1>
                                             <span>
                                                 {currentAssignment.createdAt.toLocaleDateString("default", dateOptionforAnnouncement)}
